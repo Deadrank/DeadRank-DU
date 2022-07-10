@@ -1,0 +1,223 @@
+name: DeadRemote v0.1
+pvp: true
+
+slots:
+    core:
+        class: CoreUnit
+    db:
+        class: DataBank
+        select: manual
+    antigrav:
+        class: AntiGravityGeneratorUnit
+    warpdrive:
+        class: WarpDriveUnit
+    atmofueltank:
+        class: AtmoFuelContainer
+        select: all
+    spacefueltank:
+        class: SpaceFuelContainer
+        select: all
+    rocketfueltank:
+        class: RocketFuelContainer
+        select: all
+    gyro:
+        class: GyroUnit
+    radar:
+        class: RadarPVPUnit
+        select: manual
+
+handlers:
+  unit:
+    start:
+      lua: |
+{{unit.start.lua}}
+    stop:
+      lua: |
+{{unit.stop.lua}}
+  system:
+    start:
+      lua: |
+{{system.start.lua}}
+    update:
+      lua: |
+{{system.update.lua}}
+    flush:
+      lua: |
+{{system.flush.lua}}
+    inputText(text):
+      lua: |
+{{system.inputText.lua}}
+
+    actionStart:
+      args: ['antigravity']
+      lua: |
+{{system.actionStart.antigravity.lua}}
+    actionLoop:
+      args: ['speeddown']
+      lua: |
+{{system.actionLoop.speeddown.lua}}
+    actionStart:
+      args: ['speeddown']
+      lua: |
+{{system.actionStart.speeddown.lua}}
+    actionLoop:
+      args: ['speedup']
+      lua: |
+{{system.actionLoop.speedup.lua}}
+    actionStart:
+      args: ['speedup']
+      lua: |
+{{system.actionStart.speedup.lua}}
+    actionStart:
+      args: ['stopengines']
+      lua: |
+{{system.actionStart.stopengines.lua}}
+    actionStart:
+      args: ['booster']
+      lua: |
+{{system.actionStart.booster.lua}}
+    actionStart:
+      args: ['brake']
+      lua: |
+{{system.actionStart.brake.lua}}
+    actionStart:
+      args: ['yawleft']
+      lua: |
+{{system.actionStart.yawleft.lua}}
+    actionStop:
+      args: ['yawleft']
+      lua: |
+{{system.actionStop.yawleft.lua}}
+    actionStart:
+      args: ['yawright']
+      lua: |
+{{system.actionStart.yawright.lua}}
+    actionStop:
+      args: ['yawright']
+      lua: |
+{{system.actionStop.yawright.lua}}
+    actionLoop:
+      args: ['groundaltitudedown']
+      lua: |
+{{system.actionLoop.groundaltitudedown.lua}}
+    actionStart:
+      args: ['groundaltitudedown']
+      lua: |
+{{system.actionStart.groundaltitudedown.lua}}
+    actionLoop:
+      args: ['groundaltitudeup']
+      lua: |
+{{system.actionLoop.groundaltitudeup.lua}}
+    actionStart:
+      args: ['groundaltitudeup']
+      lua: |
+{{system.actionStart.groundaltitudeup.lua}}
+    actionStop:
+      args: ['down']
+      lua: |
+{{system.actionStop.down.lua}}
+    actionStart:
+      args: ['down']
+      lua: |
+{{system.actionStart.down.lua}}
+    actionStop:
+      args: ['up']
+      lua: |
+{{system.actionStop.up.lua}}
+    actionStart:
+      args: ['up']
+      lua: |
+{{system.actionStart.up.lua}}
+    actionStop:
+      args: ['strafeleft']
+      lua: |
+{{system.actionStop.strafeleft.lua}}
+    actionStart:
+      args: ['strafeleft']
+      lua: |
+{{system.actionStart.strafeleft.lua}}
+    actionStop:
+      args: ['straferight']
+      lua: |
+{{system.actionStop.straferight.lua}}
+    actionStart:
+      args: ['straferight']
+      lua: |
+{{system.actionStart.straferight.lua}}
+    actionStop:
+      args: ['right']
+      lua: |
+{{system.actionStop.right.lua}}
+    actionStart:
+      args: ['right']
+      lua: |
+{{system.actionStart.right.lua}}
+    actionStop:
+      args: ['left']
+      lua: |
+{{system.actionStop.left.lua}}
+    actionStart:
+      args: ['left']
+      lua: |
+{{system.actionStart.left.lua}}
+    actionStop:
+      args: ['backward']
+      lua: |
+{{system.actionStop.backward.lua}}
+    actionStart:
+      args: ['backward']
+      lua: |
+{{system.actionStart.backward.lua}}
+    actionStop:
+      args: ['forward']
+      lua: |
+{{system.actionStop.forward.lua}}
+    actionStart:
+      args: ['forward']
+      lua: |
+{{system.actionStart.forward.lua}}
+    actionStart:
+      args: ['light']
+      lua: |
+{{system.actionStart.light.lua}}
+    actionStart:
+      args: ['gear']
+      lua: |
+{{system.actionStart.gear.lua}}
+
+    actionStart:
+      args: ['option1']
+      lua: |
+{{system.actionStart.opt1.lua}}
+    actionStart:
+      args: ['option2']
+      lua: |
+{{system.actionStart.opt2.lua}}
+    actionStart:
+      args: ['option3']
+      lua: |
+{{system.actionStart.opt3.lua}}
+    actionStart:
+      args: ['option4']
+      lua: |
+{{system.actionStart.opt4.lua}}
+    actionStart:
+      args: ['option5']
+      lua: |
+{{system.actionStart.opt5.lua}}
+    actionStart:
+      args: ['option6']
+      lua: |
+{{system.actionStart.opt6.lua}}
+    actionStart:
+      args: ['option7']
+      lua: |
+{{system.actionStart.opt7.lua}}
+    actionStart:
+      args: ['option8']
+      lua: |
+{{system.actionStart.opt8.lua}}
+    actionStart:
+      args: ['option9']
+      lua: |
+{{system.actionStart.opt9.lua}}

@@ -1,0 +1,1 @@
+rollInput = rollInput + 1
