@@ -1,4 +1,4 @@
-name: DeadRemote v0.1
+name: DeadRemote v0.2
 pvp: true
 
 slots:
@@ -28,196 +28,196 @@ slots:
 
 handlers:
   unit:
-    start:
+    onStart:
       lua: |
-{{unit.start.lua}}
-    stop:
+{{unit.onStart.lua}}
+    onStop:
       lua: |
-{{unit.stop.lua}}
+{{unit.onStop.lua}}
   system:
-    start:
+    onStart:
       lua: |
-{{system.start.lua}}
-    update:
+{{system.onStart.lua}}
+    onUpdate:
       lua: |
-{{system.update.lua}}
-    flush:
+{{system.onUpdate.lua}}
+    onFlush:
       lua: |
-{{system.flush.lua}}
-    inputText(text):
+{{system.onFlush.lua}}
+    onInputText(text):
       lua: |
-{{system.inputText.lua}}
+{{system.onInputText.lua}}
 
-    actionStart:
+    onActionStart:
       args: ['antigravity']
       lua: |
-{{system.actionStart.antigravity.lua}}
-    actionLoop:
+{{system.onActionStart.antigravity.lua}}
+    onActionLoop:
       args: ['speeddown']
       lua: |
-{{system.actionLoop.speeddown.lua}}
-    actionStart:
+{{system.onActionLoop.speeddown.lua}}
+    onActionStart:
       args: ['speeddown']
       lua: |
-{{system.actionStart.speeddown.lua}}
-    actionLoop:
+{{system.onActionStart.speeddown.lua}}
+    onActionLoop:
       args: ['speedup']
       lua: |
-{{system.actionLoop.speedup.lua}}
-    actionStart:
+{{system.onActionLoop.speedup.lua}}
+    onActionStart:
       args: ['speedup']
       lua: |
-{{system.actionStart.speedup.lua}}
-    actionStart:
+{{system.onActionStart.speedup.lua}}
+    onActionStart:
       args: ['stopengines']
       lua: |
-{{system.actionStart.stopengines.lua}}
-    actionStart:
+{{system.onActionStart.stopengines.lua}}
+    onActionStart:
       args: ['booster']
       lua: |
-{{system.actionStart.booster.lua}}
-    actionStart:
+{{system.onActionStart.booster.lua}}
+    onActionStart:
       args: ['brake']
       lua: |
-{{system.actionStart.brake.lua}}
-    actionStart:
+{{system.onActionStart.brake.lua}}
+    onActionStart:
       args: ['yawleft']
       lua: |
-{{system.actionStart.yawleft.lua}}
-    actionStop:
+{{system.onActionStart.yawleft.lua}}
+    onActionStop:
       args: ['yawleft']
       lua: |
-{{system.actionStop.yawleft.lua}}
-    actionStart:
+{{system.onActionStop.yawleft.lua}}
+    onActionStart:
       args: ['yawright']
       lua: |
-{{system.actionStart.yawright.lua}}
-    actionStop:
+{{system.onActionStart.yawright.lua}}
+    onActionStop:
       args: ['yawright']
       lua: |
-{{system.actionStop.yawright.lua}}
-    actionLoop:
+{{system.onActionStop.yawright.lua}}
+    onActionLoop:
       args: ['groundaltitudedown']
       lua: |
-{{system.actionLoop.groundaltitudedown.lua}}
-    actionStart:
+{{system.onActionLoop.groundaltitudedown.lua}}
+    onActionStart:
       args: ['groundaltitudedown']
       lua: |
-{{system.actionStart.groundaltitudedown.lua}}
-    actionLoop:
+{{system.onActionStart.groundaltitudedown.lua}}
+    onActionLoop:
       args: ['groundaltitudeup']
       lua: |
-{{system.actionLoop.groundaltitudeup.lua}}
-    actionStart:
+{{system.onActionLoop.groundaltitudeup.lua}}
+    onActionStart:
       args: ['groundaltitudeup']
       lua: |
-{{system.actionStart.groundaltitudeup.lua}}
-    actionStop:
+{{system.onActionStart.groundaltitudeup.lua}}
+    onActionStop:
       args: ['down']
       lua: |
-{{system.actionStop.down.lua}}
-    actionStart:
+{{system.onActionStop.down.lua}}
+    onActionStart:
       args: ['down']
       lua: |
-{{system.actionStart.down.lua}}
-    actionStop:
+{{system.onActionStart.down.lua}}
+    onActionStop:
       args: ['up']
       lua: |
-{{system.actionStop.up.lua}}
-    actionStart:
+{{system.onActionStop.up.lua}}
+    onActionStart:
       args: ['up']
       lua: |
-{{system.actionStart.up.lua}}
-    actionStop:
+{{system.onActionStart.up.lua}}
+    onActionStop:
       args: ['strafeleft']
       lua: |
-{{system.actionStop.strafeleft.lua}}
-    actionStart:
+{{system.onActionStop.strafeleft.lua}}
+    onActionStart:
       args: ['strafeleft']
       lua: |
-{{system.actionStart.strafeleft.lua}}
-    actionStop:
+{{system.onActionStart.strafeleft.lua}}
+    onActionStop:
       args: ['straferight']
       lua: |
-{{system.actionStop.straferight.lua}}
-    actionStart:
+{{system.onActionStop.straferight.lua}}
+    onActionStart:
       args: ['straferight']
       lua: |
-{{system.actionStart.straferight.lua}}
-    actionStop:
+{{system.onActionStart.straferight.lua}}
+    onActionStop:
       args: ['right']
       lua: |
-{{system.actionStop.right.lua}}
-    actionStart:
+{{system.onActionStop.right.lua}}
+    onActionStart:
       args: ['right']
       lua: |
-{{system.actionStart.right.lua}}
-    actionStop:
+{{system.onActionStart.right.lua}}
+    onActionStop:
       args: ['left']
       lua: |
-{{system.actionStop.left.lua}}
-    actionStart:
+{{system.onActionStop.left.lua}}
+    onActionStart:
       args: ['left']
       lua: |
-{{system.actionStart.left.lua}}
-    actionStop:
+{{system.onActionStart.left.lua}}
+    onActionStop:
       args: ['backward']
       lua: |
-{{system.actionStop.backward.lua}}
-    actionStart:
+{{system.onActionStop.backward.lua}}
+    onActionStart:
       args: ['backward']
       lua: |
-{{system.actionStart.backward.lua}}
-    actionStop:
+{{system.onActionStart.backward.lua}}
+    onActionStop:
       args: ['forward']
       lua: |
-{{system.actionStop.forward.lua}}
-    actionStart:
+{{system.onActionStop.forward.lua}}
+    onActionStart:
       args: ['forward']
       lua: |
-{{system.actionStart.forward.lua}}
-    actionStart:
+{{system.onActionStart.forward.lua}}
+    onActionStart:
       args: ['light']
       lua: |
-{{system.actionStart.light.lua}}
-    actionStart:
+{{system.onActionStart.light.lua}}
+    onActionStart:
       args: ['gear']
       lua: |
-{{system.actionStart.gear.lua}}
+{{system.onActionStart.gear.lua}}
 
-    actionStart:
+    onActionStart:
       args: ['option1']
       lua: |
-{{system.actionStart.opt1.lua}}
-    actionStart:
+{{system.onActionStart.opt1.lua}}
+    onActionStart:
       args: ['option2']
       lua: |
-{{system.actionStart.opt2.lua}}
-    actionStart:
+{{system.onActionStart.opt2.lua}}
+    onActionStart:
       args: ['option3']
       lua: |
-{{system.actionStart.opt3.lua}}
-    actionStart:
+{{system.onActionStart.opt3.lua}}
+    onActionStart:
       args: ['option4']
       lua: |
-{{system.actionStart.opt4.lua}}
-    actionStart:
+{{system.onActionStart.opt4.lua}}
+    onActionStart:
       args: ['option5']
       lua: |
-{{system.actionStart.opt5.lua}}
-    actionStart:
+{{system.onActionStart.opt5.lua}}
+    onActionStart:
       args: ['option6']
       lua: |
-{{system.actionStart.opt6.lua}}
-    actionStart:
+{{system.onActionStart.opt6.lua}}
+    onActionStart:
       args: ['option7']
       lua: |
-{{system.actionStart.opt7.lua}}
-    actionStart:
+{{system.onActionStart.opt7.lua}}
+    onActionStart:
       args: ['option8']
       lua: |
-{{system.actionStart.opt8.lua}}
-    actionStart:
+{{system.onActionStart.opt8.lua}}
+    onActionStart:
       args: ['option9']
       lua: |
-{{system.actionStart.opt9.lua}}
+{{system.onActionStart.opt9.lua}}
