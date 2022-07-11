@@ -1,9 +1,14 @@
 
+-- Add Valid User ID --
+masterPlayerID = player.getId()
+pilotName = system.getPlayerName(masterPlayerID)
+validPilotCode = '123456' --Your player ID
+----------------------
+
 -- SETTINGS --
 useDB = true --export use connected DB for config options
-userCode = {}
-
-attackWarning = 4 --export
+printCombatLog = true --export Print weapon hits/misses to lua
+dangerWarning = 4 --export
 validatePilot = false --export
 bottomHUDLineColorSZ = 'white' --export
 bottomHUDFillColorSZ = 'rgba(29, 63, 255, 0.75)' --export
@@ -12,18 +17,27 @@ bottomHUDLineColorPVP = 'lightgrey' --export
 bottomHUDFillColorPVP = 'rgba(255, 0, 0, 0.75)' --export
 textColorPVP = 'black' --export
 neutralLineColor = 'lightgrey' --export
-neutralFontColor = 'darkgrey'
+neutralFontColor = 'darkgrey' --export
 generateAutoCode = false --export
-radarDataID = nil
+autoVent = true --export Autovent shield at 0 hp
+L_Shield_HP = 11500000 --export
+M_Shield_HP = 8625000 --export
+S_Shield_HP = 8625000 --export
+XS_Shield_HP = 500000 --export
+----------------
+
+userCode = {}
+userCode[validPilotCode] = pilotName
+if useDB then
+    globalDB('get')
+end
 
 -- Shield Initialize --
 dmgTick = 0
-autoVent = true --export Autovent shield at 0 hp
 --------
 
-codeSeed = nil
-
 --- Radar Initial Values ---
+radarDataID = nil
 radarStart = false
 filterSize = {}
 table.insert(filterSize,'L')
@@ -66,12 +80,10 @@ warpScan = {}
 unknownRadar = {}
 ------------------------------
 
-
 --- Screen Resolution ---
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 --------------------------
-
 
 if db_1 ~= nil then
     for _,key in pairs(db_1.getKeyList()) do
@@ -89,17 +101,17 @@ initialResistWait = 15 --export
 weaponDataList = {}
 WeaponWidgetCreate()
 shieldDmgTrack = {
-    ['L'] = 11500000,
-    ['M'] = 8625000,
-    ['S'] = 8625000,
-    ['XS'] = 500000
+    ['L'] = L_Shield_HP,
+    ['M'] = M_Shield_HP,
+    ['S'] = S_Shield_HP,
+    ['XS'] = XS_Shield_HP
 }
 dmgTracker = {}
 primary = nil
-printCombatLog = true --export Print weapon hits/misses to lua
 --------------
 
 -- Transponder --
+codeSeed = nil
 tags = {}
 transponderStatus = false
 tCode = nil
@@ -109,8 +121,6 @@ showCode = true
 -----------------
 
 bootTimer = 0
-masterPlayerID = player.getId()
-pilotName = system.getPlayerName(masterPlayerID)
 if validatePilot then
     local validPilot = false
     for k,v in pairs(userCode) do 
@@ -163,12 +173,6 @@ if generateAutoCode then
 else
     unit.setTimer('booting',1)
     codeSeed = 0
-end
-
-if useDB then
-    globalDB('get')
-elseif db_1 ~= nil then
-    db_1.clear()
 end
 
 html = [[<html> <body style="font-family: Calibri;">]]

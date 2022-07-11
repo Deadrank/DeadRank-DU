@@ -205,9 +205,42 @@ end
 function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
-
+            if db_1.hasKey('printCombatLog') == 1 then printCombatLog = db_1.getIntValue('printCombatLog') == 1 end
+            if db_1.hasKey('dangerWarning') == 1 then dangerWarning = db_1.getIntValue('dangerWarning') end
+            if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
+            if db_1.hasKey('bottomHUDLineColorSZ') == 1 then bottomHUDLineColorSZ = db_1.getStringValue('bottomHUDLineColorSZ') end
+            if db_1.hasKey('bottomHUDFillColorSZ') == 1 then bottomHUDFillColorSZ = db_1.getStringValue('bottomHUDFillColorSZ') end
+            if db_1.hasKey('textColorSZ') == 1 then textColorSZ = db_1.getStringValue('textColorSZ') end
+            if db_1.hasKey('bottomHUDLineColorPVP') == 1 then bottomHUDLineColorPVP = db_1.getStringValue('bottomHUDLineColorPVP') end
+            if db_1.hasKey('bottomHUDFillColorPVP') == 1 then bottomHUDFillColorPVP = db_1.getStringValue('bottomHUDFillColorPVP') end
+            if db_1.hasKey('textColorPVP') == 1 then textColorPVP = db_1.getStringValue('textColorPVP') end
+            if db_1.hasKey('neutralLineColor') == 1 then neutralLineColor = db_1.getStringValue('neutralLineColor') end
+            if db_1.hasKey('neutralFontColor') == 1 then neutralFontColor = db_1.getStringValue('neutralFontColor') end
+            if db_1.hasKey('generateAutoCode') == 1 then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
+            if db_1.hasKey('autoVent') == 1 then autoVent = db_1.getIntValue('autoVent') == 1 end
+            if db_1.hasKey('L_Shield_HP') == 1 then L_Shield_HP = db_1.getIntValue('L_Shield_HP') end
+            if db_1.hasKey('M_Shield_HP') == 1 then M_Shield_HP = db_1.getIntValue('M_Shield_HP') end
+            if db_1.hasKey('S_Shield_HP') == 1 then S_Shield_HP = db_1.getIntValue('S_Shield_HP') end
+            if db_1.hasKey('XS_Shield_HP') == 1 then XS_Shield_HP = db_1.getIntValue('XS_Shield_HP') end
         elseif action == 'save' then
-
+            db_1.setStringValue('uc-'..validPilotCode,pilotName)
+            if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
+            db_1.setIntValue('dangerWarning',dangerWarning)
+            if validatePilot then db_1.setIntValue('validatePilot',1) else db_1.setIntValue('validatePilot',0) end
+            db_1.setStringValue('bottomHUDLineColorSZ',bottomHUDLineColorSZ)
+            db_1.setStringValue('bottomHUDFillColorSZ',bottomHUDFillColorSZ)
+            db_1.setStringValue('textColorSZ',textColorSZ)
+            db_1.setStringValue('bottomHUDLineColorPVP',bottomHUDLineColorPVP)
+            db_1.setStringValue('bottomHUDFillColorPVP',bottomHUDFillColorPVP)
+            db_1.setStringValue('textColorPVP',textColorPVP)
+            db_1.setStringValue('neutralLineColor',neutralLineColor)
+            db_1.setStringValue('neutralFontColor',neutralFontColor)
+            if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
+            if autoVent then db_1.setIntValue('autoVent',1) else db_1.setIntValue('autoVent',0) end
+            db_1.setIntValue('L_Shield_HP',L_Shield_HP)
+            db_1.setIntValue('M_Shield_HP',M_Shield_HP)
+            db_1.setIntValue('S_Shield_HP',S_Shield_HP)
+            db_1.setIntValue('XS_Shield_HP',XS_Shield_HP)
         end
     end
 end
@@ -415,7 +448,7 @@ function radarWidget()
     <div style="float: left;color: rgba(0,0,0,1);">XS:&nbsp;</div><div style="float: left;color: darkred;">%s&nbsp;&nbsp;&nbsp;</div>
     </div>]],radarStats['enemy']['L'],radarStats['enemy']['M'],radarStats['enemy']['S'],radarStats['enemy']['XS'])
 
-    if attackedBy >= attackWarning then
+    if attackedBy >= dangerWarning then
         rw = rw .. [[ 
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <rect x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.35 * screenHeight) ..[[" rx="15" ry="15" width="9vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:red;stroke-width:5;opacity:0.9;" />
@@ -467,7 +500,7 @@ function identifiedWidget()
         end
         local speed = radar_1.getConstructSpeed(id) * 3.6
 
-        local speedCompare = 'Neutral'
+        local speedCompare = 'Stable'
         local speedDiff = mySpeed - speed
         if lastDistance[id] then
             if math.abs(speedDiff) > 1 then 
@@ -589,52 +622,68 @@ function identifiedWidget()
 
         if targeted then
 
+            -- Target Name
             targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.40 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
             <div style="float: left;color: white;">Target Name:&nbsp;</div>
             <div style="float: left;color: orange;">%s</div></div>]],uniqueName)
 
-            local accelString = 'None'
+            -- Target Speed
+            local targetSpeedString = '0.00 km/h -'
+            local targetSpeedColor = neutralFontColor
+            if speedDiff > 0 and math.abs(speedDiff) > 5 then targetSpeedString = string.format('%.2fkm/h &#8593;',speed) targetSpeedColor = 'green'
+            elseif speedDiff < 0 and math.abs(speedDiff) > 5 then targetSpeedString = string.format('%.2fkm/h &#8595;',speed) targetSpeedColor = 'red'
+            elseif not targetIdentified then targetSpeedString = 'Not Identified'
+            end
+            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.420 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
+            <div style="float: left;color: white;">Target Speed:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],targetSpeedColor,targetSpeedString)
+
+            -- Target Acceleration
+            local accelString = 'Stable'
             local accelColor = neutralFontColor
             if accelCompare == 'Accelerating' then accelString = 'Speeding Up &#8593;' accelColor = 'green'
             elseif accelCompare == 'Braking' then accelString = 'Slowing Down&#8595;' accelColor = 'darkred'
             elseif not targetIdentified then accelString = 'Not Identified'
             end
-            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.420 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
-            <div style="float: left;color: white;">Target Accel:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],accelColor,accelString)
-
-            local inRange = radarRange >= distance
-            local distanceColor = 'orange'
-            if inRange then distanceColor = 'green' end
             targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.440 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
-            <div style="float: left;color: white;">Target Dist:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],distanceColor,distString)
+            <div style="float: left;color: white;">Target Change:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],accelColor,accelString)
 
-            local speedColor = 'white'
-            if not targetIdentified then speedCompare = 'Speed Diff' speedDiff = 'Not Identified' end
-            if speedCompare == 'Closing' and math.abs(speedDiff) > 1 then speedColor = 'green'
-            elseif speedCompare == 'Parting' and math.abs(speedDiff) > 1 then speedColor = 'orange'
-            else speedCompare = 'Neutral'
+            -- Target Gap
+            local speedColor = neutralFontColor
+            if not targetIdentified then speedDiff = 0 end
+            if speedCompare == 'Closing' and math.abs(speedDiff) > 5 then speedColor = 'green'
+            elseif speedCompare == 'Parting' and math.abs(speedDiff) > 5 then speedColor = 'red'
             end
             local fontColor = 'white'
             if speedColor == 'white' then fontColor = neutralFontColor end
-            if speedDiff == 'Not Identified' then 
-                targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.460 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
-                <div style="float: left;color: %s;">%s:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],speedColor,speedCompare,fontColor,speedDiff)
-            else
-                targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.460 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
-                <div style="float: left;color: %s;">%s:&nbsp;</div><div style="float: left;color: %s;"> %.2fkm/h </div></div>]],speedColor,speedCompare,fontColor,speedDiff)
-            end
+            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.460 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
+            <div style="float: left;color: white;">Target Gap:&nbsp;</div><div style="float: left;color: %s;"> %s (%.2fkm/h) </div></div>]],speedColor,speedCompare,speedDiff)
 
+            -- Target Distance
+            local inRange = radarRange >= distance
+            local distanceColor = 'orange'
+            if inRange then distanceColor = 'green' end
+            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.400 * screenHeight) ..'px;left: '.. tostring(.60 * screenWidth) ..[[px;">
+            <div style="float: left;color: white;">Target Dist:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],distanceColor,distString)
+
+            -- Target Top Speed
             local outrunColor = neutralFontColor
             if not targetIdentified then outrun = 'Not identified' end
             if outrun == 'Is faster' then outrunColor = 'orange'
             elseif outrun == 'Is slower' then outrunColor = 'green'
             end
-            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.480 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
+            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.420 * screenHeight) ..'px;left: '.. tostring(.60 * screenWidth) ..[[px;">
             <div style="float: left;color: white;">Top Speed:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>]],outrunColor,outrun)
 
-            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.500 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
+            -- Target DMG
+            targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.440 * screenHeight) ..'px;left: '.. tostring(.60 * screenWidth) ..[[px;">
             <div style="float: left;color: white;">Damage:&nbsp;</div><div style="float: left;color: %s;"> %s (%.2f%%) </div></div>]],'orange',dmg,(1-dmgRatio)*100)
 
+            -- Target Data
+            if targetIdentified then
+                targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.460 * screenHeight) ..'px;left: '.. tostring(.60 * screenWidth) ..[[px;">
+                <div style="float: left;color: white;">Target Data:&nbsp;</div><div style="float: left;color: %s;"> Weapons: %s &nbsp;&nbsp; Radars: %.0f</div></div>]],neutralFontColor,weapons,info['radars'])
+            end
+            
             if abandonded then
                 targetString = targetString .. [[ 
                     <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
