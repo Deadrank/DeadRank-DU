@@ -28,7 +28,7 @@ XS_Shield_HP = 500000 --export
 
 userCode = {}
 userCode[validPilotCode] = pilotName
-if useDB then
+if useDB and db_1 ~= nil then
     globalDB('get')
 end
 

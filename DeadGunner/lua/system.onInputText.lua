@@ -1,4 +1,4 @@
-if string.starts(text,'code') then
+if string.starts(text:lower(),'code') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     table.insert(tags,matches[2])
@@ -7,15 +7,15 @@ if string.starts(text,'code') then
     tags = transponder_1.getTags()
     system.print('--Transponder Code Added--')
 end
-if string.starts(text,'hide codes') then
+if string.starts(text:lower(),'hide codes') then
     showCode = false
     system.print('--Transponder Codes hidden--')
 end
-if string.starts(text,'show codes') then
+if string.starts(text:lower(),'show codes') then
     showCode = true
     system.print('--Transponder Codes visible--')
 end
-if string.starts(text,'delcode') then
+if string.starts(text:lower(),'delcode') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     local r = nil
@@ -27,23 +27,21 @@ if string.starts(text,'delcode') then
     system.print('--Transponder Code Removed--')
 end
 
-if string.starts(text,'addShips') then
+if string.starts(text:lower(),'addships') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
-    local dbADD = false
-    if #matches == 2 and matches[2] == 'db' then dbADD = true end
     for _,ship in ipairs(erDisplay) do
         friendlySIDs[ship.id] = 'Auto Add'
-        if dbADD then db_1.setStringValue(string.format('sc-%s',ship.id),'Auto Add') end
+        db_1.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
         system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',ship.name,ship.id))
     end
     for _,ship in ipairs(frDisplay) do
         friendlySIDs[ship.id] = 'Auto Add'
-        if dbADD then db_1.setStringValue(string.format('sc-%s',ship.id),'Auto Add') end
+        db_1.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
         system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',ship.name,ship.id))
     end
 end
-if string.starts(text,'addShipID') then
+if string.starts(text:lower(),'addshipid') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     if #matches == 3 then
@@ -59,7 +57,7 @@ if string.starts(text,'addShipID') then
     end
     system.print('-- Construct ID added to Friendly list --') 
 end
-if string.starts(text,'delShipID') then
+if string.starts(text:lower(),'delshipid') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     local r = nil
@@ -71,7 +69,7 @@ if string.starts(text,'delShipID') then
     system.print('-- Construct removed from Friendly ID list --')
 end
 
-if string.starts(text,'agc') or codeSeed == nil then
+if string.starts(text:lower(),'agc') or codeSeed == nil then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     if (#matches ~= 2 or not tonumber(matches[2])) and codeSeed ~= nil then
@@ -90,7 +88,7 @@ if string.starts(text,'agc') or codeSeed == nil then
         end
     end
 end
-if string.starts(text,'show ') and not string.starts(text,'show code') then
+if string.starts(text:lower(),'show ') and not string.starts(text,'show code') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     if #matches ~= 2 then
@@ -106,7 +104,7 @@ if string.starts(text,'show ') and not string.starts(text,'show code') then
         end
     end
 end
-if string.starts(text,'hide ') and not string.starts(text,'hide code') then
+if string.starts(text:lower(),'hide ') and not string.starts(text,'hide code') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     if (#matches ~= 2 ) then
@@ -130,7 +128,7 @@ if string.starts(text,'hide ') and not string.starts(text,'hide code') then
         end
     end
 end
-if text == 'print db' then
+if text:lower() == 'print db' then
     if db_1 ~= nil then
         system.print('-- DB READOUT START --')
         for _,key in pairs(db_1.getKeyList()) do
@@ -143,7 +141,7 @@ if text == 'print db' then
         system.print('-- NO DB ATTACHED --')
     end
 end
-if text == 'clear db' then
+if text:lower() == 'clear db' then
     if db_1 ~= nil then
         db_1.clear()
         system.print('-- DB CLEARED --')
