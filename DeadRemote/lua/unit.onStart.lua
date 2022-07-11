@@ -1,4 +1,6 @@
 -----------------------------------
+hudVersion = 'v0.2.2'
+useDB = true --export
 showRemotePanel = false --export
 showDockingPanel = false --export
 showFuelPanel = false --export
@@ -23,9 +25,14 @@ AR_Range = 3 --export
 AR_Size = 15 --export
 AR_Fill = 'rgb(29, 63, 255)' --export
 AR_Outline = 'white' --export
-AR_Opacity = '0.5'
+AR_Opacity = '0.5' --export
 AR_Exclude_Moons = true --export
 ------------------------------------
+
+if db_1 ~= nil and useDB then
+    globalDB('get')
+end
+
 followID = nil
 AR_Custom_Points = {}
 AR_Custom = false

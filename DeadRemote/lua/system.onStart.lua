@@ -363,7 +363,7 @@ function positionInfoWidget()
         "
         stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[[" />
         
-        <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.01 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".6vw">Remote Version: 0.1</text>
+        <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.01 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".6vw">Remote Version: ]]..hudVersion..[[</text>
         <text x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Nearest Planet</text>
         <text x="]].. tostring(.15 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" >]]..closestPlanetStr..[[</text>
         
@@ -549,6 +549,66 @@ function generateScreen()
 
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
+end
+
+function globalDB(action)
+    if db_1 ~= nil then
+        if action == 'get' then
+            if db_1.hasKey('showRemotePanel') == 1 then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
+            if db_1.hasKey('showDockingPanel') == 1 then showDockingPanel = db_1.getIntValue('showDockingPanel') == 1 end
+            if db_1.hasKey('showFuelPanel') == 1 then showFuelPanel = db_1.getIntValue('showFuelPanel') == 1 end
+            if db_1.hasKey('showHelper') == 1 then showHelper = db_1.getIntValue('showHelper') == 1 end
+            if db_1.hasKey('defaultHoverHeight') == 1 then defaultHoverHeight = db_1.getIntValue('defaultHoverHeight') end
+            if db_1.hasKey('defautlFollowDistance') == 1 then defautlFollowDistance = db_1.getIntValue('defautlFollowDistance') end
+            if db_1.hasKey('topHUDLineColorSZ') == 1 then topHUDLineColorSZ = db_1.getStringValue('topHUDLineColorSZ') end
+            if db_1.hasKey('topHUDFillColorSZ') == 1 then topHUDFillColorSZ = db_1.getStringValue('topHUDFillColorSZ') end
+            if db_1.hasKey('textColorSZ') == 1 then textColorSZ = db_1.getStringValue('textColorSZ') end
+            if db_1.hasKey('topHUDLineColorPVP') == 1 then topHUDLineColorPVP = db_1.getStringValue('topHUDLineColorPVP') end
+            if db_1.hasKey('topHUDFillColorPVP') == 1 then topHUDFillColorPVP = db_1.getStringValue('topHUDFillColorPVP') end
+            if db_1.hasKey('textColorPVP') == 1 then textColorPVP = db_1.getStringValue('textColorPVP') end
+            if db_1.hasKey('fuelTextColor') == 1 then fuelTextColor = db_1.getStringValue('fuelTextColor') end
+            if db_1.hasKey('Direction_Indicator_Size') == 1 then Direction_Indicator_Size = db_1.getFloatValue('Direction_Indicator_Size') end
+            if db_1.hasKey('Direction_Indicator_Color') == 1 then Direction_Indicator_Color = db_1.getStringValue('Direction_Indicator_Color') end
+            if db_1.hasKey('Prograde_Indicator_Size') == 1 then Prograde_Indicator_Size = db_1.getFloatValue('Prograde_Indicator_Size') end
+            if db_1.hasKey('Prograde_Indicator_Color') == 1 then Prograde_Indicator_Color = db_1.getStringValue('Prograde_Indicator_Color') end
+            if db_1.hasKey('AP_Brake_Buffer') == 1 then AP_Brake_Buffer = db_1.getFloatValue('AP_Brake_Buffer') end
+            if db_1.hasKey('AP_Max_Rotation_Factor') == 1 then AP_Max_Rotation_Factor = db_1.getFloatValue('AP_Max_Rotation_Factor') end
+            if db_1.hasKey('AR_Mode') == 1 then AR_Mode = db_1.getStringValue('AR_Mode') end
+            if db_1.hasKey('AR_Range') == 1 then AR_Range = db_1.getFloatValue('AR_Range') end
+            if db_1.hasKey('AR_Size') == 1 then AR_Size = db_1.getFloatValue('AR_Size') end
+            if db_1.hasKey('AR_Fill') == 1 then AR_Fill = db_1.getStringValue('AR_Fill') end
+            if db_1.hasKey('AR_Outline') == 1 then AR_Outline = db_1.getStringValue('AR_Outline') end
+            if db_1.hasKey('AR_Opacity') == 1 then AR_Opacity = db_1.getStringValue('AR_Opacity') end
+            if db_1.hasKey('AR_Exclude_Moons') == 1 then AR_Exclude_Moons = db_1.getIntValue('AR_Exclude_Moons') == 1 end
+        elseif action == 'save' then
+            if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
+            if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
+            if showFuelPanel then db_1.setIntValue('showFuelPanel',1) else db_1.setIntValue('showFuelPanel',0) end
+            if showHelper then db_1.setIntValue('showHelper',1) else db_1.setIntValue('showHelper',0) end
+            db_1.setIntValue('defaultHoverHeight',defaultHoverHeight)
+            db_1.setIntValue('defautlFollowDistance',defautlFollowDistance)
+            db_1.setStringValue('topHUDLineColorSZ',topHUDLineColorSZ)
+            db_1.setStringValue('topHUDFillColorSZ',topHUDFillColorSZ)
+            db_1.setStringValue('textColorSZ',textColorSZ)
+            db_1.setStringValue('topHUDLineColorPVP',topHUDLineColorPVP)
+            db_1.setStringValue('topHUDFillColorPVP',topHUDFillColorPVP)
+            db_1.setStringValue('textColorPVP',textColorPVP)
+            db_1.setStringValue('fuelTextColor',fuelTextColor)
+            db_1.setFloatValue('Direction_Indicator_Size',Direction_Indicator_Size)
+            db_1.setStringValue('Direction_Indicator_Color',Direction_Indicator_Color)
+            db_1.setFloatValue('Prograde_Indicator_Size',Prograde_Indicator_Size) 
+            db_1.setStringValue('Prograde_Indicator_Color',Prograde_Indicator_Color) 
+            db_1.setFloatValue('AP_Brake_Buffer',AP_Brake_Buffer)
+            db_1.setFloatValue('AP_Max_Rotation_Factor',AP_Max_Rotation_Factor)
+            db_1.setStringValue('AR_Mode',AR_Mode)
+            db_1.setFloatValue('AR_Range',AR_Range)
+            db_1.setFloatValue('AR_Size',AR_Size)
+            db_1.setStringValue('AR_Fill',AR_Fill)
+            db_1.setStringValue('AR_Outline',AR_Outline)
+            db_1.setStringValue('AR_Opacity',AR_Opacity)
+            if AR_Exclude_Moons then db_1.setIntValue('AR_Exclude_Moons',1) else db_1.setIntValue('AR_Exclude_Moons',0) end
+        end
+    end
 end
 
 Kinematic = {} -- just a namespace
