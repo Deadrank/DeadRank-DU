@@ -478,9 +478,9 @@ function travelIndicatorWidget()
             translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
         end
         tiw = tiw .. [[<g transform="translate]]..translate..[[">
-                <circle cx="0" cy="0" r="]].. Velocity_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Velocity_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.5 ..[[;" />
-                <line x1="]].. Velocity_Indicator_Size*1.5 ..[[" y1="0" x2="]].. -Velocity_Indicator_Size*1.5 ..[[" y2="0" style="stroke:]]..Velocity_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
-                <line y1="]].. Velocity_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Velocity_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Velocity_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
+                <circle cx="0" cy="0" r="]].. Direction_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Direction_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.5 ..[[;" />
+                <line x1="]].. Direction_Indicator_Size*1.5 ..[[" y1="0" x2="]].. -Direction_Indicator_Size*1.5 ..[[" y2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
+                <line y1="]].. Direction_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Direction_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
                 </g>]]
     end
     if speed > 50 then
@@ -502,9 +502,9 @@ function travelIndicatorWidget()
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
             tiw = tiw .. [[<g transform="translate]]..translate..[[">
-                    <circle cx="0" cy="0" r="]].. Accel_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Accel_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.5 ..[[;" />
-                    <line x1="]].. Accel_Indicator_Size*1.3 ..[[" y1="0" x2="]].. -Accel_Indicator_Size*1.4 ..[[" y2="0" style="stroke:]]..Accel_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
-                    <line y1="]].. Accel_Indicator_Size*1.3 ..[[" x1="0" y2="]].. -Accel_Indicator_Size*1.4 ..[[" x2="0" style="stroke:]]..Accel_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
+                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:]]..Prograde_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.5 ..[[;" />
+                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
+                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
                     </g>]]
         end
         local r = constructPosition - 2/.000005 * direction
@@ -525,9 +525,9 @@ function travelIndicatorWidget()
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
             tiw = tiw .. [[<g transform="translate]]..translate..[[">
-                    <circle cx="0" cy="0" r="]].. Accel_Indicator_Size ..[[px" style="fill:none;stroke:red;stroke-width:1;opacity:]].. 0.5 ..[[;" />
-                    <line x1="]].. Accel_Indicator_Size*1.3 ..[[" y1="0" x2="]].. -Accel_Indicator_Size*1.4 ..[[" y2="0" style="stroke:red;stroke-width:1;opacity:]].. 0.85 ..[[;" />
-                    <line y1="]].. Accel_Indicator_Size*1.3 ..[[" x1="0" y2="]].. -Accel_Indicator_Size*1.4 ..[[" x2="0" style="stroke:red;stroke-width:1;opacity:]].. 0.85 ..[[;" />
+                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:red;stroke-width:1;opacity:]].. 0.5 ..[[;" />
+                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:red;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
+                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:red;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
                     </g>]]
         end
     end
