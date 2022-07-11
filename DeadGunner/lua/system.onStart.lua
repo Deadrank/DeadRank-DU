@@ -619,14 +619,20 @@ function identifiedWidget()
                 db_1.setIntValue('targetID',id)
                 db_1.setFloatValue('targetSpeed',speed)
                 db_1.setFloatValue('targetDistance',distance)
-                local weaponMin = radarRange - 10000
+                local weaponMin = 100000
+                if radarRange ~= nil then 
+                    weaponMin = radarRange - 10000
+                end
                 for _,w in pairs(weapon) do if w.getOptimalDistance() - 10000 < weaponMin then weaponMin = w.getOptimalDistance() - 10000 end end
                 db_1.setFloatValue('followDistance',weaponMin)
             elseif followingID == 0 then
                 db_1.setIntValue('targetID',id)
                 db_1.setFloatValue('targetSpeed',speed)
                 db_1.setFloatValue('targetDistance',distance)
-                local weaponMin = radarRange - 10000
+                local weaponMin = 100000
+                if radarRange ~= nil then 
+                    weaponMin = radarRange - 10000
+                end
                 for _,w in pairs(weapon) do if w.getOptimalDistance() - 10000 < weaponMin then weaponMin = w.getOptimalDistance() - 10000 end end
                 db_1.setFloatValue('followDistance',weaponMin)
             end
@@ -672,6 +678,7 @@ function identifiedWidget()
 
             -- Target Distance
             local inRange = radarRange >= distance
+            if radarRange == nil then inRange == true end
             local distanceColor = 'orange'
             if inRange then distanceColor = 'green' end
             targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.400 * screenHeight) ..'px;left: '.. tostring(.60 * screenWidth) ..[[px;">
