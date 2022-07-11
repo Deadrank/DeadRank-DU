@@ -24,7 +24,7 @@ L_Shield_HP = 11500000 --export
 M_Shield_HP = 8625000 --export
 S_Shield_HP = 8625000 --export
 XS_Shield_HP = 500000 --export
-max_radar_load = 500 --export
+max_radar_load = 200 --export
 ----------------
 
 userCode = {}

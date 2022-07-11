@@ -99,6 +99,7 @@ function updateRadar(filter)
         }
     }
     if #radarList > max_radar_load then radarOverload = true return data end
+    radarOverload = false
     for _,id in pairs(radarList) do
         local threatLevel = radar_1.getThreatRateFrom(id)
         if threatLevel == 2 then identifiedBy = identifiedBy + 1
@@ -479,7 +480,7 @@ end
 
 function identifiedWidget()
     local radarRange = radar_1.getIdentifyRanges()
-    radarRange = radarRange[4]
+    radarRange = radarRange[1]
     local identList = radar_1.getIdentifiedConstructIds()
     local targetID = radar_1.getTargetId()
     local followingIdentified = false
@@ -710,13 +711,15 @@ function identifiedWidget()
     iw = iw .. '</svg>'
     iw = iw .. targetString
 
-    local radarRangeString = ''
-    if radarRange < 1000 then radarRangeString = string.format('%.2fm',radarRange)
-    elseif radarRange < 100000 then radarRangeString = string.format('%2fkm',radarRange/1000)
-    else radarRangeString = string.format('%.2fsu',radarRange*.000005)
+    if radar_1 ~= nil then
+        local radarRangeString = ''
+        if radarRange < 1000 then radarRangeString = string.format('%.2fm',radarRange)
+        elseif radarRange < 100000 then radarRangeString = string.format('%2fkm',radarRange/1000)
+        else radarRangeString = string.format('%.2fsu',radarRange*.000005)
+        end
+        iw = iw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.185 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
+        <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Identification Range:&nbsp;</div><div style="float: left;color: ]]..neutralFontColor..[[;">%s&nbsp;</div></div>]],radarRangeString)
     end
-    iw = iw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.185 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
-    <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Identification Range:&nbsp;</div><div style="float: left;color: ]]..neutralFontColor..[[;">%s&nbsp;</div></div>]],radarRangeString)
     return iw
 end
 
