@@ -98,7 +98,7 @@ function updateRadar(filter)
             ['XS'] = 0
         }
     }
-
+    if #radarList > max_radar_load then radarOverload = true return data end
     for _,id in pairs(radarList) do
         local threatLevel = radar_1.getThreatRateFrom(id)
         if threatLevel == 2 then identifiedBy = identifiedBy + 1
@@ -222,6 +222,7 @@ function globalDB(action)
             if db_1.hasKey('M_Shield_HP') == 1 then M_Shield_HP = db_1.getIntValue('M_Shield_HP') end
             if db_1.hasKey('S_Shield_HP') == 1 then S_Shield_HP = db_1.getIntValue('S_Shield_HP') end
             if db_1.hasKey('XS_Shield_HP') == 1 then XS_Shield_HP = db_1.getIntValue('XS_Shield_HP') end
+            if db_1.hasKey('max_radar_load') == 1 then max_radar_load = db_1.getIntValue('max_radar_load') end
         elseif action == 'save' then
             db_1.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
@@ -241,6 +242,7 @@ function globalDB(action)
             db_1.setIntValue('M_Shield_HP',M_Shield_HP)
             db_1.setIntValue('S_Shield_HP',S_Shield_HP)
             db_1.setIntValue('XS_Shield_HP',XS_Shield_HP)
+            db_1.setIntValue('max_radar_load',max_radar_load)
         end
     end
 end
@@ -454,6 +456,15 @@ function radarWidget()
             <rect x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.35 * screenHeight) ..[[" rx="15" ry="15" width="9vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:red;stroke-width:5;opacity:0.9;" />
             <text x="]].. tostring(.46 * screenWidth) ..[[" y="]].. tostring(.375 * screenHeight) ..[[" style="fill: ]]..'red'..[[" font-size=".8vw" font-weight="bold">
                 ]]..string.format('%.0f Ships attacking you!',attackedBy)..[[</text>
+            </rect></svg>]]
+    end
+
+    if radarOverload then 
+        rw = rw .. [[ 
+            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+            <rect x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" rx="15" ry="15" width="9vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:red;stroke-width:5;opacity:0.9;" />
+            <text x="]].. tostring(.46 * screenWidth) ..[[" y="]].. tostring(.275 * screenHeight) ..[[" style="fill: ]]..'red'..[[" font-size=".8vw" font-weight="bold">
+                ]]..string.format('Radar Overloaded!')..[[</text>
             </rect></svg>]]
     end
 
