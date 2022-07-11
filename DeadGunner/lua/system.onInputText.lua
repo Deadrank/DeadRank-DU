@@ -155,8 +155,10 @@ if type(tonumber(text)) == 'number' and (#text == 3 or text == '0') and codeSeed
     if text == '0' then
             system.print('-- Removing primary target filter --')
             primary = nil
+            radarFilter = 'All'
     else
         system.print(string.format('-- Adding primary target filter [%s] --',text))
         primary = tostring(text)
+        radarFilter = 'primary'
     end
 end
