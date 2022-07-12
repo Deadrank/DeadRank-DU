@@ -1,5 +1,6 @@
 json = require("dkjson")
 Atlas = require('atlas')
+clamp = utils.clamp
 
 function convertWaypoint(wp)
     local clamp  = utils.clamp
