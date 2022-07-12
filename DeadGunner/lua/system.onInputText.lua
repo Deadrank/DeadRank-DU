@@ -69,6 +69,18 @@ if string.starts(text:lower(),'delshipid') then
     system.print('-- Construct removed from Friendly ID list --')
 end
 
+if type(tonumber(text)) == 'number' and (#text == 3 or text == '0') and codeSeed ~= nil then
+    if text == '0' then
+            system.print('-- Removing primary target filter --')
+            primary = nil
+            radarFilter = 'All'
+    else
+        system.print(string.format('-- Adding primary target filter [%s] --',text))
+        primary = tostring(text)
+        radarFilter = 'primary'
+    end
+end
+
 if string.starts(text:lower(),'agc') or codeSeed == nil then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
@@ -147,16 +159,5 @@ if text:lower() == 'clear db' then
         system.print('-- DB CLEARED --')
     else
         system.print('-- NO DB ATTACHED --')
-    end
-end
-if type(tonumber(text)) == 'number' and (#text == 3 or text == '0') and codeSeed ~= nil then
-    if text == '0' then
-            system.print('-- Removing primary target filter --')
-            primary = nil
-            radarFilter = 'All'
-    else
-        system.print(string.format('-- Adding primary target filter [%s] --',text))
-        primary = tostring(text)
-        radarFilter = 'primary'
     end
 end

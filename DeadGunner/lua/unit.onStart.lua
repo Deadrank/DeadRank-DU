@@ -147,6 +147,7 @@ end
 instructionHTML = ''
 if generateAutoCode then
     system.print('-- ENTER ACTIVATION CODE --')
+    local textColor = 'white'
     instructionHTML = [[
     <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <rect x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="50vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
