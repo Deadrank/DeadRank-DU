@@ -15,7 +15,7 @@ end
 speedVec = vec3(construct.getWorldVelocity())
 speed = speedVec:len() * 3.6
 direction = speedVec
-if speed < 50 then direction = vec3(construct.getWorldOrientationForward()) end
+if speed < 200 then direction = vec3(construct.getWorldOrientationForward()) end
 maxSpeed = construct.getMaxSpeed() * 3.6
 gravity = core.getGravityIntensity()
 mass = construct.getMass()
@@ -279,6 +279,7 @@ Nav:setBoosterCommand('rocket_engine')
 -- Disable Auto-Pilot when destination is reached --
 if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= brakeDist + 100 + AP_Brake_Buffer and speed < 5 then
     system.print('-- Autopilot complete --')
+    autopilot_dest_pos = nil
     autopilot = false
     brakeInput = brakeInput + 1
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)

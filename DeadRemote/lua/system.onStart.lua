@@ -155,8 +155,8 @@ function brakeWidget()
     if brakeON then
         bw = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                <rect x="44vw" y="28vh" rx="10" ry="10" width="7vw" height="3vh" style="fill:rgba(29, 63, 255, 0.5);stroke:rgba(49, 182, 60, 0.5);stroke-width:5;opacity:0.75;" />
-                <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.30 * screenHeight) ..[[" style="fill: red" font-size=".8vw" font-weight="bold">Brakes Engaged</text>
+                <rect x="46vw" y="28vh" rx="10" ry="10" width="7vw" height="3vh" style="fill:rgba(29, 63, 255, 0.5);stroke:rgba(49, 182, 60, 0.5);stroke-width:5;opacity:0.75;" />
+                <text x="]].. tostring(.47 * screenWidth) ..[[" y="]].. tostring(.30 * screenHeight) ..[[" style="fill: red" font-size=".8vw" font-weight="bold">Brakes Engaged</text>
             </svg>
         ]]
     end
@@ -300,8 +300,8 @@ function fuelWidget()
         local warningText = 'Fuel level below 20%'
         if not fuelWarning then warningText = 'Fuel tank is below 20%' end
         fw = fw .. [[
-                <rect x="40vw" y="9vh" rx="10" ry="10" width="9vw" height="2.25vh" style="fill:rgba(255, 0, 0, 0.5);stroke:rgba(255, 255, 0, 0.5);stroke-width:5;opacity:0.95;" />
-                <text x="]].. tostring(.405 * screenWidth) ..[[" y="]].. tostring(.105 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">]]..warningText..[[</text>
+                <rect x="45vw" y="9vh" rx="10" ry="10" width="9vw" height="2.25vh" style="fill:rgba(255, 0, 0, 0.5);stroke:rgba(255, 255, 0, 0.5);stroke-width:5;opacity:0.95;" />
+                <text x="]].. tostring(.455 * screenWidth) ..[[" y="]].. tostring(.105 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">]]..warningText..[[</text>
         ]]
     end
 
