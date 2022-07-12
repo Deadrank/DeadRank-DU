@@ -281,17 +281,19 @@ end
 
 function transponderWidget()
     local tw = ''
-    local transponderColor = 'darkred'
-    local transponderStatus = 'offline'
-    if transponder_1.isActive() == 1 then transponderColor = 'darkblue' transponderStatus = 'Active' end
-    tw = tw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.932 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Transponder Status:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>',transponderColor,transponderStatus)
-    
-    local tags = transponder_1.getTags()
-    tw = tw .. '<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.98 * screenHeight) ..'px;left: '.. tostring(.35 * screenWidth) ..'px;"><div style="float: left;color: rgba(255,255,255,1);">Transponder Tags: '
-    for i,tag in pairs(tags) do 
-        tw = tw .. tag .. ' '
+    if transponder_1 ~= nil then
+        local transponderColor = 'darkred'
+        local transponderStatus = 'offline'
+        if transponder_1.isActive() == 1 then transponderColor = 'darkblue' transponderStatus = 'Active' end
+        tw = tw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.932 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Transponder Status:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>',transponderColor,transponderStatus)
+        
+        local tags = transponder_1.getTags()
+        tw = tw .. '<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.98 * screenHeight) ..'px;left: '.. tostring(.35 * screenWidth) ..'px;"><div style="float: left;color: rgba(255,255,255,1);">Transponder Tags: '
+        for i,tag in pairs(tags) do 
+            tw = tw .. tag .. ' '
+        end
+        tw = tw .. '</div></div>'
     end
-    tw = tw .. '</div></div>'
 
     return tw
 end
