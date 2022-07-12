@@ -379,7 +379,7 @@ end
 function engineWidget()
     local ew = [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.89 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Controlling Engine tags</text>
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.045 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Controlling Engine tags</text>
             ]]..enabledEngineTagsStr..[[
         </svg>
     ]]

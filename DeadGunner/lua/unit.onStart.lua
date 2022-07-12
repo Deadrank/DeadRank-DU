@@ -75,6 +75,9 @@ radarStats = {
     }
 }
 lastDistance = {}
+lastDistanceTime = 0
+speedCompare = 'Stable'
+accelCompare = 'No Accel'
 lastSpeed = {}
 identifiedBy = 0
 attackedBy = 0

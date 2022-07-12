@@ -482,12 +482,19 @@ function radarWidget()
 end
 
 function identifiedWidget()
+    local updateTimer = false
+    if math.abs(lastDistanceTime - system.getArkTime()) > .5 then 
+        lastDistanceTime = system.getArkTime()
+        updateTimer = true
+    end
     local identList = radar_1.getIdentifiedConstructIds()
     local targetID = radar_1.getTargetId()
     local followingIdentified = false
     local followingID = 0
     if db_1 ~= nil then 
-        followingID = db_1.getIntValue('followingID')
+        if db_1.hasKey('followingID') then
+            followingID = db_1.getIntValue('followingID')
+        end
         if not contains(identList,followingID) then
             db_1.setIntValue('targetID',0) 
         else
@@ -512,25 +519,30 @@ function identifiedWidget()
         else distString = string.format('%.2fsu',distance*.000005)
         end
         local speed = radar_1.getConstructSpeed(id) * 3.6
-
-        local speedCompare = 'Stable'
         local speedDiff = mySpeed - speed
-        if lastDistance[id] then
-            if math.abs(speedDiff) > 1 then 
-                if lastDistance[id] > distance then speedCompare = 'Closing'
-                elseif lastDistance[id] < distance then speedCompare = 'Parting'
+
+        if updateTimer then
+            speedCompare = 'Stable'
+            if lastDistance[id] then
+                if (math.abs(speedDiff) > 1 or speed == 0) and updateTimer then 
+                    if lastDistance[id] > distance then speedCompare = 'Closing'
+                    elseif lastDistance[id] < distance then speedCompare = 'Parting'
+                    end
+                    if not targetIdentified then speed = myspeed - (distance - lastDistance[id])/.5*3.6 end
                 end
             end
+            lastDistance[id] = distance
         end
-        lastDistance[id] = distance
 
-        local accelCompare = 'No Accel'
-        if lastSpeed[id] and radar_1.isConstructIdentified(id) == 1 then
-            if lastSpeed[id] > speed then accelCompare = 'Accelerating'
-            elseif lastSpeed[id] < speed then accelCompare = 'Braking'
+        if updateTimer then
+            accelCompare = 'No Accel'
+            if lastSpeed[id] and radar_1.isConstructIdentified(id) == 1 then
+                if lastSpeed[id] > speed then accelCompare = 'Accelerating'
+                elseif lastSpeed[id] < speed then accelCompare = 'Braking'
+                end
             end
+            if radar_1.isConstructIdentified(id) == 1 then lastSpeed[id] = speed end
         end
-        if radar_1.isConstructIdentified(id) == 1 then lastSpeed[id] = speed end
 
         local tMatch = radar_1.hasMatchingTransponder(id) == 1
         local mass = radar_1.getConstructMass(id)
@@ -700,9 +712,17 @@ function identifiedWidget()
             if abandonded then
                 targetString = targetString .. [[ 
                     <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                    <rect x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.35 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:red;stroke-width:5;opacity:0.9;" />
-                    <text x="]].. tostring(.46 * screenWidth) ..[[" y="]].. tostring(.375 * screenHeight) ..[[" style="fill: ]]..'red'..[[" font-size=".8vw" font-weight="bold">
+                    <rect x="]].. tostring(.455 * screenWidth) ..[[" y="]].. tostring(.35 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:red;stroke-width:5;opacity:0.9;" />
+                    <text x="]].. tostring(.465 * screenWidth) ..[[" y="]].. tostring(.375 * screenHeight) ..[[" style="fill: ]]..'red'..[[" font-size=".8vw" font-weight="bold">
                         Target is Destroyed</text>
+                    </rect></svg>]]
+            end
+            if friendly then
+                targetString = targetString .. [[ 
+                    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+                    <rect x="]].. tostring(.455 * screenWidth) ..[[" y="]].. tostring(.40 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:green;stroke-width:5;opacity:0.9;" />
+                    <text x="]].. tostring(.465 * screenWidth) ..[[" y="]].. tostring(.425 * screenHeight) ..[[" style="fill: ]]..'green'..[[" font-size=".8vw" font-weight="bold">
+                        Target is Friendly</text>
                     </rect></svg>]]
             end
         end
@@ -714,7 +734,7 @@ function identifiedWidget()
 
     local radarRangeString = ''
     if radarRange < 1000 then radarRangeString = string.format('%.2fm',radarRange)
-    elseif radarRange < 100000 then radarRangeString = string.format('%2fkm',radarRange/1000)
+    elseif radarRange < 100000 then radarRangeString = string.format('%.2fkm',radarRange/1000)
     else radarRangeString = string.format('%.2fsu',radarRange*.000005)
     end
     iw = iw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.185 * screenHeight) ..'px;left: '.. tostring(.875 * screenWidth) ..[[px;">
