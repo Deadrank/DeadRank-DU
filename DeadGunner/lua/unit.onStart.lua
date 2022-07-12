@@ -182,4 +182,18 @@ html = html .. instructionHTML .. warningHTML .. [[</body></html>]]
 system.setScreen(html)
 system.showScreen(1)
 
-
+radarRange = 0
+if radar_1 ~= nil then
+    radarRange = radar_1.getIdentifyRanges()
+    if #radarRange > 0 then
+        radarRange = radarRange[1]
+    else
+        local radar_name = radar_1.getName()
+        local radar_size = radar_name:match('Space Radar (%w)')
+        local ranges = {}
+        ranges['s'] = 90750*1.5
+        ranges['m'] = 181500*1.5
+        ranges['l'] = 400000
+        radarRange = ranges[radar_size]
+    end
+end
