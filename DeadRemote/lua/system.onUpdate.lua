@@ -57,7 +57,7 @@ local offset = 0
 for i,tag in pairs(enabledEngineTags) do
     if i % 2 == 0 then 
         enabledEngineTagsStr = enabledEngineTagsStr .. [[
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.60 + (i-2)*.008) * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw">]]..tag.. ',' ..tempTag..[[</text>    
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: ]]..EngineTagColor..[[;" font-weight="bold" font-size=".8vw">]]..tag.. ',' ..tempTag..[[</text>    
         ]]
         tempTag = nil
         offset = offset + 1
@@ -66,7 +66,7 @@ for i,tag in pairs(enabledEngineTags) do
     end
 end
 if tempTag ~= nil then 
-    enabledEngineTagsStr = enabledEngineTagsStr .. [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.60 + (offset)*.016) * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw">]]..tempTag..[[</text>]]
+    enabledEngineTagsStr = enabledEngineTagsStr .. [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: ]]..EngineTagColor..[[;" font-weight="bold" font-size=".8vw">]]..tempTag..[[</text>]]
 end
 if enabledEngineTagsStr == '' then
     enabledEngineTagsStr = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw">ALL</text>]]

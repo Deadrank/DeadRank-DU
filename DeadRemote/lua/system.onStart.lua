@@ -155,8 +155,8 @@ function brakeWidget()
     if brakeON then
         bw = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                <rect x="46vw" y="28vh" rx="10" ry="10" width="7vw" height="3vh" style="fill:rgba(29, 63, 255, 0.5);stroke:rgba(49, 182, 60, 0.5);stroke-width:5;opacity:0.75;" />
-                <text x="]].. tostring(.47 * screenWidth) ..[[" y="]].. tostring(.30 * screenHeight) ..[[" style="fill: red" font-size=".8vw" font-weight="bold">Brakes Engaged</text>
+                <rect x="46vw" y="28vh" rx="10" ry="10" width="7vw" height="3vh" style="fill:rgba(29, 63, 255, 0.9);stroke:rgba(255, 60, 60, 0.9);stroke-width:5;" />
+                <text x="]].. tostring(.47 * screenWidth) ..[[" y="]].. tostring(.30 * screenHeight) ..[[" style="fill: rgb(255, 60, 60)" font-size=".8vw" font-weight="bold">Brakes Engaged</text>
             </svg>
         ]]
     end
@@ -300,8 +300,8 @@ function fuelWidget()
         local warningText = 'Fuel level below 20%'
         if not fuelWarning then warningText = 'Fuel tank is below 20%' end
         fw = fw .. [[
-                <rect x="45vw" y="9vh" rx="10" ry="10" width="9vw" height="2.25vh" style="fill:rgba(255, 0, 0, 0.5);stroke:rgba(255, 255, 0, 0.5);stroke-width:5;opacity:0.95;" />
-                <text x="]].. tostring(.455 * screenWidth) ..[[" y="]].. tostring(.105 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">]]..warningText..[[</text>
+                <rect x="45vw" y="9vh" rx="10" ry="10" width="9vw" height="2.25vh" style="fill:rgba(50, 50, 50, 0.5);stroke:rgba(255, 60, 60, 0.9);stroke-width:5;opacity:0.95;" />
+                <text x="]].. tostring(.455 * screenWidth) ..[[" y="]].. tostring(.105 * screenHeight) ..[[" style="fill: rgb(255, 60, 60);" font-size=".8vw" font-weight="bold">]]..warningText..[[</text>
         ]]
     end
 
@@ -478,9 +478,9 @@ function travelIndicatorWidget()
             translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
         end
         tiw = tiw .. [[<g transform="translate]]..translate..[[">
-                <circle cx="0" cy="0" r="]].. Direction_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Direction_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.5 ..[[;" />
-                <line x1="]].. Direction_Indicator_Size*1.5 ..[[" y1="0" x2="]].. -Direction_Indicator_Size*1.5 ..[[" y2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
-                <line y1="]].. Direction_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Direction_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.85 ..[[;" />
+                <circle cx="0" cy="0" r="]].. Direction_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
+                <line x1="]].. Direction_Indicator_Size*1.5 ..[[" y1="0" x2="]].. -Direction_Indicator_Size*1.5 ..[[" y2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
+                <line y1="]].. Direction_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Direction_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                 </g>]]
     end
     if speed > 50 then
@@ -502,9 +502,9 @@ function travelIndicatorWidget()
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
             tiw = tiw .. [[<g transform="translate]]..translate..[[">
-                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:]]..Prograde_Indicator_Color..[[;stroke-width:1;opacity:]].. 0.5 ..[[;" />
-                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
-                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
+                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
+                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
+                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                     </g>]]
         end
         local r = constructPosition - 2/.000005 * direction
@@ -525,15 +525,17 @@ function travelIndicatorWidget()
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
             tiw = tiw .. [[<g transform="translate]]..translate..[[">
-                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:red;stroke-width:1;opacity:]].. 0.5 ..[[;" />
-                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:red;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
-                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:red;stroke-width:.5;opacity:]].. 0.85 ..[[;" />
+                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
+                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
+                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                     </g>]]
         end
     end
     tiw = tiw .. '</svg>'
     return tiw
 end
+
+
 
 function generateScreen()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
@@ -580,6 +582,8 @@ function globalDB(action)
             if db_1.hasKey('AR_Outline') == 1 then AR_Outline = db_1.getStringValue('AR_Outline') end
             if db_1.hasKey('AR_Opacity') == 1 then AR_Opacity = db_1.getStringValue('AR_Opacity') end
             if db_1.hasKey('AR_Exclude_Moons') == 1 then AR_Exclude_Moons = db_1.getIntValue('AR_Exclude_Moons') == 1 end
+            if db_1.hasKey('EngineTagColor') == 1 then EngineTagColor = db_1.getStringValue('EngineTagColor') end
+            if db_1.hasKey('Indicator_Width') == 1 then Indicator_Width = db_1.getFloatValue('Indicator_Width') end
         elseif action == 'save' then
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
@@ -606,6 +610,8 @@ function globalDB(action)
             db_1.setStringValue('AR_Fill',AR_Fill)
             db_1.setStringValue('AR_Outline',AR_Outline)
             db_1.setStringValue('AR_Opacity',AR_Opacity)
+            db_1.setStringValue('EngineTagColor',EngineTagColor)
+            db_1.setFloatValue('Indicator_Width',Indicator_Width)
             if AR_Exclude_Moons then db_1.setIntValue('AR_Exclude_Moons',1) else db_1.setIntValue('AR_Exclude_Moons',0) end
         end
     end

@@ -14,10 +14,11 @@ topHUDLineColorPVP = 'lightgrey' --export
 topHUDFillColorPVP = 'rgba(255, 0, 0, 0.75)' --export
 textColorPVP = 'black' --export
 fuelTextColor = 'white' --export
+Indicator_Width = 1.5
 Direction_Indicator_Size = 5 --export
 Direction_Indicator_Color = 'white' --export
 Prograde_Indicator_Size = 7.5 --export
-Prograde_Indicator_Color = 'gold' --export
+Prograde_Indicator_Color = 'rgb(60, 255, 60)' --export
 AP_Brake_Buffer = 5000 --export
 AP_Max_Rotation_Factor = 8 --export
 AR_Mode = 'NONE' --export
@@ -27,6 +28,8 @@ AR_Fill = 'rgb(29, 63, 255)' --export
 AR_Outline = 'white' --export
 AR_Opacity = '0.5' --export
 AR_Exclude_Moons = true --export
+EngineTagColor = 'rgb(60, 255, 60)' --export
+
 ------------------------------------
 
 if db_1 ~= nil and useDB then

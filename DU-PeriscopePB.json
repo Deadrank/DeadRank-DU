@@ -1,0 +1,161 @@
+{
+    "slots": {
+        "0": {
+            "name": "slot2",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "1": {
+            "name": "slot2",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "2": {
+            "name": "slot3",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "3": {
+            "name": "slot4",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "4": {
+            "name": "slot5",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "5": {
+            "name": "slot6",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "6": {
+            "name": "slot7",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "7": {
+            "name": "slot8",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "8": {
+            "name": "slot9",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "9": {
+            "name": "slot10",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-1": {
+            "name": "unit",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-3": {
+            "name": "player",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-2": {
+            "name": "construct",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-4": {
+            "name": "system",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-5": {
+            "name": "library",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        }
+    },
+    "handlers": [
+        {
+            "code": "unit.hide() system.print('-- Peri board shown --')\nshowPeri = true\nlocal periscope = [[\n<style>\nimg {\nposition: fixed;\nwidth: 10vw; \nmax-height: 100%; \nbox-sizing: border-box;\nbottom: 48vh;\nleft: 17vw;\nborder-radius: 8px;\nborder: 2px solid white;\nanimation:blinking 0.5s 1;\n}\n\n                    @keyframes blinking{\n                    0%{   width: 0vw;  }\n                    100%{  width: 10vw;   }\n                    }\n\n</style>\n<img src=\"gunner_target.liveview\">]]\n\nsystem.setScreen(periscope)\nsystem.showScreen(1)",
+            "filter": {
+                "args": [],
+                "signature": "onStart()",
+                "slotKey": "-1"
+            },
+            "key": "0"
+        },
+        {
+            "code": "if showPeri then\n    local periscope = [[\n    <style>\n    img {\n    position: fixed;\n    width: 30vw; \n    max-height: 100%; \n    box-sizing: border-box;\n    bottom: 48vh;\n    left: 17vw;\n    border-radius: 8px;\n    border: 2px solid white;\n    border-radius: 8px;\n    animation:blinking 0.5s 1;\n    }\n\n                        @keyframes blinking{\n                        0%{   width: 10vw;  }\n                        100%{  width: 30vw;   }\n                        }\n\n    </style>\n    <img src=\"gunner_target.liveview\">]]\n\n    system.setScreen(periscope)\nend",
+            "filter": {
+                "args": [
+                    {
+                        "value": "lalt"
+                    }
+                ],
+                "signature": "onActionStart(action)",
+                "slotKey": "-4"
+            },
+            "key": "1"
+        },
+        {
+            "code": "if showPeri then\n    local periscope = [[\n    <style>\n    img {\n    position: fixed;\n    width: 10vw; \n    max-height: 100%; \n    box-sizing: border-box;\n    bottom: 48vh;\n    left: 17vw;\n    border-radius: 8px;\n    border: 2px solid white;\n    border-radius: 8px;\n    animation:blinking 0.5s 1;\n    }\n\n                        @keyframes blinking{\n                        0%{   width: 30vw;  }\n                        100%{  width: 10vw;   }\n                        }\n\n    </style>\n    <img src=\"gunner_target.liveview\">]]\n\n    system.setScreen(periscope)\nend",
+            "filter": {
+                "args": [
+                    {
+                        "value": "lalt"
+                    }
+                ],
+                "signature": "onActionStop(action)",
+                "slotKey": "-4"
+            },
+            "key": "2"
+        },
+        {
+            "code": "if text == 'scope' then\n    if showPeri then\n        showPeri = false\n        system.setScreen('')\n    else\n        showPeri = true\n        local periscope = [[\n        <style>\n        img {\n        position: fixed;\n        width: 10vw; \n        max-height: 100%; \n        box-sizing: border-box;\n        bottom: 48vh;\n        left: 17vw;\n        border-radius: 8px;\n        border: 2px solid white;\n        border-radius: 8px;\n        animation:blinking 0.5s 1;\n        }\n\n                            @keyframes blinking{\n                            0%{   width: 0vw;  }\n                            100%{  width: 10vw;   }\n                            }\n\n        </style>\n        <img src=\"gunner_target.liveview\">]]\n\n        system.setScreen(periscope)\n    end\nend",
+            "filter": {
+                "args": [
+                    {
+                        "variable": "*"
+                    }
+                ],
+                "signature": "onInputText(text)",
+                "slotKey": "-4"
+            },
+            "key": "3"
+        }
+    ],
+    "methods": [],
+    "events": []
+}
