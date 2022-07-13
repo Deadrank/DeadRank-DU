@@ -1,4 +1,9 @@
------------------------------------
+------- Predifined Engine Tags -------
+predefinedTags = {}
+table.insert(predefinedTags,'military')
+table.insert(predefinedTags,'maneuver')
+table.insert(predefinedTags,'freight')
+---------------------------------------
 hudVersion = 'v0.2.2'
 useDB = true --export
 showRemotePanel = false --export
@@ -29,7 +34,6 @@ AR_Outline = 'white' --export
 AR_Opacity = '0.5' --export
 AR_Exclude_Moons = true --export
 EngineTagColor = 'rgb(60, 255, 60)' --export
-
 ------------------------------------
 
 if db_1 ~= nil and useDB then
@@ -146,5 +150,7 @@ end
 if vec3(construct.getWorldVelocity()):len() * 3.6 < 500 then
     brakeInput = brakeInput + 1
 end
+
+lShift = false
 
 system.showScreen(1)

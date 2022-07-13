@@ -1,4 +1,4 @@
-name: DeadRemote v0.2.5
+name: DeadRemote v0.2.6
 
 slots:
     core:
@@ -71,6 +71,14 @@ handlers:
       args: ['stopengines']
       lua: |
 {{system.onActionStart.stopengines.lua}}
+    onActionStart:
+      args: ['lshift']
+      lua: |
+{{system.onActionStart.lShift.lua}}
+    onActionStop:
+      args: ['lshift']
+      lua: |
+{{system.onActionStop.lShift.lua}}
     onActionStart:
       args: ['booster']
       lua: |

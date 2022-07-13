@@ -85,7 +85,7 @@ warpScan = {}
 unknownRadar = {}
 ------------------------------
 
---- Screen Resolution ---
+--- Screen Resolution/keys ---
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 --------------------------

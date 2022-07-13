@@ -410,7 +410,7 @@ function helpWidget()
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
                 Alt+2: Toggle Augmented reality view mode (NONE, ALL, PLANETS, CUSTOM) HUD Loads custom waypoints for AR from "autoconf/custom/AR_Waypoints.lua"</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
-                Alt+3: Clear all engine tag filters (i.e. all engines controlled by throttle)</text>
+                Alt+3: Clear all engine tag filters (i.e. all engines controlled by throttle) (Alt+shift+3 toggles through predefined tags)</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
                 Alt+4: Engage AutoPilot to current AP destination (shown in VR)</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
