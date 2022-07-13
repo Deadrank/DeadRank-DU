@@ -10,6 +10,7 @@ showRemotePanel = false --export
 showDockingPanel = false --export
 showFuelPanel = false --export
 showHelper = false --export
+showShieldWidget = false --export
 defaultHoverHeight = 42 --export
 defautlFollowDistance = 40 --export
 topHUDLineColorSZ = 'white' --export
@@ -128,7 +129,7 @@ end
 if antigrav ~= nil then antigrav.show() end
 if warpdrive ~= nil then warpdrive.show() end
 if gyro ~= nil then gyro.show() end
-if shield ~= nil then shield_1.show() end
+if shield_1 ~= nil and showShieldWidget then shield_1.show() end
 
 -- freeze the player in he is remote controlling the construct
 seated = player.isSeated()
