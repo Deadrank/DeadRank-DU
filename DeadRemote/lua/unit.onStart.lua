@@ -34,6 +34,8 @@ AR_Outline = 'white' --export
 AR_Opacity = '0.5' --export
 AR_Exclude_Moons = true --export
 EngineTagColor = 'rgb(60, 255, 60)' --export
+initialResistWait = 15
+autoVent = true
 ------------------------------------
 
 if db_1 ~= nil and useDB then
@@ -126,7 +128,7 @@ end
 if antigrav ~= nil then antigrav.show() end
 if warpdrive ~= nil then warpdrive.show() end
 if gyro ~= nil then gyro.show() end
-if shield ~= nil then shield.show() end
+if shield ~= nil then shield_1.show() end
 
 -- freeze the player in he is remote controlling the construct
 seated = player.isSeated()

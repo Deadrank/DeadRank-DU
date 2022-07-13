@@ -1,4 +1,4 @@
-name: DeadRemote v0.2.7
+name: DeadRemote v0.2.9
 
 slots:
     core:
@@ -23,6 +23,9 @@ slots:
         class: GyroUnit
     radar:
         class: RadarPVPUnit
+        select: manual
+    shield:
+        class: ShieldGeneratorUnit
         select: manual
 
 handlers:

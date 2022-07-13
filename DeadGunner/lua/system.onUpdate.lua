@@ -32,7 +32,7 @@ if shield_1.getStressRatioRaw()[1] == 0 and shield_1.getStressRatioRaw()[2] == 0
     else
         shield_1.setResistances(srp,srp,srp,srp)
     end
-elseif math.abs(dmgTick - arkTime) >= initialResistWait then
+elseif math.abs(arkTime - dmgTick) >= initialResistWait then
     local srr = shield_1.getStressRatioRaw()
     if (csr[1] == (srp*srr[1]) and csr[2] == (srp*srr[2]) and csr[3] == (srp*srr[3]) and csr[4] == (srp*srr[4])) or rcd ~= 0 then -- If ratio hasn't change, or timer is not up, don't waste the resistance change timer.
         --No change
@@ -46,7 +46,7 @@ end
 local hp = shield_1.getShieldHitpoints()
 if shield_1.isVenting() == 0 and hp == 0 and autoVent then
     shield_1.startVenting()
-elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 and not rD then 
+elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 then 
     shield_1.activate()
 end
 

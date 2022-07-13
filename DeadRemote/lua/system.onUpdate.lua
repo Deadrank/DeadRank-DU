@@ -212,6 +212,39 @@ end
 planetAR = planetAR .. '</svg>'
 -----------------------------------------------------------
 
+-- Shield widget if one is linked --
+if shield_1 ~= nil then
+    local hp = shield_1.getShieldHitpoints()
+    if shield_1.isVenting() == 0 and hp == 0 and autoVent then
+        shield_1.startVenting()
+    elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 then 
+        shield_1.activate()
+    end
+    
+    local arkTime = system.getArkTime()
+    -- Shield Updates --
+    local srp = shield_1.getResistancesPool()
+    local csr = shield_1.getResistances()
+    local rcd = shield_1.getResistancesCooldown()
+    if shield_1.getStressRatioRaw()[1] == 0 and shield_1.getStressRatioRaw()[2] == 0 and shield_1.getStressRatioRaw()[3] == 0 and shield_1.getStressRatioRaw()[4] == 0 then
+        dmgTick = 0
+        srp = srp / 4
+        if (csr[1] == srp and csr[2] == srp and csr[3] == srp and csr[4] == srp) or rcd ~= 0 then
+            --No change
+        else
+            shield_1.setResistances(srp,srp,srp,srp)
+        end
+    elseif math.abs(arkTime - dmgTick) >= initialResistWait then
+        local srr = shield_1.getStressRatioRaw()
+        if (csr[1] == (srp*srr[1]) and csr[2] == (srp*srr[2]) and csr[3] == (srp*srr[3]) and csr[4] == (srp*srr[4])) or rcd ~= 0 then -- If ratio hasn't change, or timer is not up, don't waste the resistance change timer.
+            --No change
+        else
+            shield_1.setResistances(srp*srr[1],srp*srr[2],srp*srr[3],srp*srr[4])
+        end
+    elseif dmgTick == 0 then
+        dmgTick = arkTime
+    end
+end
 
 -- Choose background color scheme based on PVP --
 bgColor = ''
