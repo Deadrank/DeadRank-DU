@@ -483,8 +483,8 @@ function travelIndicatorWidget()
                 <line y1="]].. Direction_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Direction_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                 </g>]]
     end
-    if speed > 50 then
-        local a = constructPosition + 2/.000005 * direction
+    if speed > 20 then
+        local a = constructPosition + 2/.000005 * vec3(construct.getWorldVelocity())
         local aInfo = library.getPointOnScreen({a['x'],a['y'],a['z']})
         if aInfo[3] ~= 0 then
             if aInfo[1] < .01 then aInfo[1] = .01 end
@@ -507,7 +507,7 @@ function travelIndicatorWidget()
                     <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                     </g>]]
         end
-        local r = constructPosition - 2/.000005 * direction
+        local r = constructPosition - 2/.000005 * vec3(construct.getWorldVelocity())
         local aInfo = library.getPointOnScreen({r['x'],r['y'],r['z']})
         if aInfo[3] ~= 0 then
             if aInfo[1] < .01 then aInfo[1] = .01 end
