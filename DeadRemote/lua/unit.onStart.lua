@@ -5,7 +5,7 @@ table.insert(predefinedTags,'maneuver')
 table.insert(predefinedTags,'freight')
 ---------------------------------------
 hudVersion = 'v0.2.2'
-useDB = true --export
+useDB = false --export
 showRemotePanel = false --export
 showDockingPanel = false --export
 showFuelPanel = false --export
@@ -26,7 +26,7 @@ Direction_Indicator_Color = 'white' --export
 Prograde_Indicator_Size = 7.5 --export
 Prograde_Indicator_Color = 'rgb(60, 255, 60)' --export
 AP_Brake_Buffer = 5000 --export
-AP_Max_Rotation_Factor = 8 --export
+AP_Max_Rotation_Factor = 20 --export
 AR_Mode = 'NONE' --export
 AR_Range = 3 --export
 AR_Size = 15 --export

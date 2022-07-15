@@ -15,7 +15,7 @@ end
 speedVec = vec3(construct.getWorldVelocity())
 speed = speedVec:len() * 3.6
 direction = speedVec
-if speed < 200 then direction = vec3(construct.getWorldOrientationForward()) end
+if speed < 50 then direction = vec3(construct.getWorldOrientationForward()) end
 maxSpeed = construct.getMaxSpeed() * 3.6
 gravity = core.getGravityIntensity()
 mass = construct.getMass()
@@ -30,7 +30,14 @@ if #enabledEngineTags > 0 then
 end
 maxThrust = construct.getMaxThrustAlongAxis(maxThrustTags,construct.getOrientationForward())
 maxSpaceThrust = math.abs(maxThrust[3])
-brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speed/3.6,0,mass,0,0,maxBrake)
+local dockedMass = 0
+for _,id in pairs(construct.getDockedConstructs()) do 
+    dockedMass = dockedMass + construct.getDockedConstructMass(id)
+end
+for _,id in pairs(construct.getPlayersOnBoard()) do 
+    dockedMass = dockedMass + construct.getBoardedPlayerMass(id)
+end
+brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speed/3.6,0,mass + dockedMass,0,0,maxBrake)
 accelVec = vec3(construct.getWorldAcceleration())
 accel = accelVec:len()
 
@@ -97,21 +104,37 @@ local currentRollDegSign = utils.sign(currentRollDeg)
 local constructAngularVelocity = vec3(construct.getWorldAngularVelocity())
 -- SETUP AUTOPILOT ROTATIONS --
 local targetAngularVelocity = vec3()
-if autopilot and autopilot_dest ~= nil and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
-    local destVec = vec3(autopilot_dest - constructPosition)
-    local currentYaw = -math.deg(signedRotationAngle(constructUp, constructVelocity, constructForward))
-    local currentPitch = math.deg(signedRotationAngle(constructRight, constructVelocity, constructForward))
 
-    local targetYaw = -math.deg(signedRotationAngle(constructUp, destVec, constructForward))
+local destVec = vec3()
+local currentYaw = 0
+local currentPitch = 0
+local targetYaw = 0
+local targetPitch = 0
+local yawChange = 0
+local pitchChange = 0
+local totalAngularChange = nil
+if autopilot_dest then
+    destVec = vec3(autopilot_dest - constructPosition)
+    currentYaw = -math.deg(signedRotationAngle(constructUp, constructVelocity, constructForward))
+    currentPitch = math.deg(signedRotationAngle(constructRight, constructVelocity, constructForward))
+
+    targetYaw = -math.deg(signedRotationAngle(constructUp, destVec, constructForward))
     local targetPitch = math.deg(signedRotationAngle(constructRight, destVec, constructForward))
 
-    yawPID:inject(targetYaw-currentYaw)
+    yawChange = targetYaw-currentYaw
+    pitchChange = targetPitch-currentPitch
+    totalAngularChange = math.abs(yawChange) + math.abs(pitchChange)
+    --system.print(string.format('%.2f | %.2f',pitchChange,yawChange))
+end
+
+if autopilot and autopilot_dest ~= nil and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
+    yawPID:inject(yawChange)
     local apYawInput = yawPID:get()
     if apYawInput > AP_Max_Rotation_Factor then apYawInput = AP_Max_Rotation_Factor
     elseif apYawInput < -AP_Max_Rotation_Factor then apYawInput = -AP_Max_Rotation_Factor
     end
 
-    pitchPID:inject(targetPitch-currentPitch)
+    pitchPID:inject(pitchChange)
     local apPitchInput = -pitchPID:get()
     if apPitchInput > AP_Max_Rotation_Factor then apPitchInput = AP_Max_Rotation_Factor
     elseif apPitchInput < -AP_Max_Rotation_Factor then apPitchInput = -AP_Max_Rotation_Factor
@@ -121,8 +144,6 @@ if autopilot and autopilot_dest ~= nil and Nav.axisCommandManager:getThrottleCom
                             + finalPitchInput * pitchSpeedFactor * constructRight
                             + finalRollInput * rollSpeedFactor * constructForward
                             + finalYawInput * yawSpeedFactor * constructUp
-
-
 else
     targetAngularVelocity = finalPitchInput * pitchSpeedFactor * constructRight
         + finalRollInput * rollSpeedFactor * constructForward

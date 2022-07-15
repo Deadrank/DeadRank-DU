@@ -289,9 +289,9 @@ function fuelWidget()
     stroke="black" stroke-width="1.5" fill="none" />
 
     <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
-    <text x="]].. tostring(.445 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">25%</text>
+    <!--text x="]].. tostring(.445 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">25%</text>
     <text x="]].. tostring(.5 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">50%</text>
-    <text x="]].. tostring(.555 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">75%</text>
+    <text x="]].. tostring(.555 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">75%</text-->
 
 
     ]]

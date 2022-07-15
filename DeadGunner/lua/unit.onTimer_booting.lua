@@ -1,8 +1,8 @@
 if bootTimer == 2 then
-    radarData = RadarWidgetCreate()
+    if radar_1 then radarData = RadarWidgetCreate() end
     if transponder_1 ~= nil then unit.setTimer('code',.25) end
     radarStart = true
-    unit.setTimer('radar',.75)
+    if radar_1 then unit.setTimer('radar',.75) end
     unit.stopTimer('booting')
 else
     system.print('System booting: '..tostring(bootTimer))

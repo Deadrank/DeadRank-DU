@@ -312,27 +312,29 @@ function hpWidget()
             stroke="]]..lineColor..[[" stroke-width="2" fill="]]..bgColor..[[" />]]
 
     --Center Bottom Shield
-    local shieldPercent = shield_1.getShieldHitpoints()/shield_1.getMaxShieldHitpoints()*100
-    hw = hw .. string.format([[<linearGradient id="shield" x1="100%%" y1="0%%" x2="0%%" y2="0%%">
-    <stop offset="%.1f%%" style="stop-color:rgb(25, 247, 255);stop-opacity:1" />
-    <stop offset="%.1f%%" style="stop-color:rgba(255, 60, 60, 1);stop-opacity:1" />
-    </linearGradient>]],shieldPercent,shieldPercent)
-    hw = hw ..[[
-            <path d="
-            M ]] .. tostring(.3195*screenWidth) .. ' ' .. tostring(.9755*screenHeight) ..[[ 
-            L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [[
-            L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-            L ]] .. tostring(.33*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-            L ]] .. tostring(.3195*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
-            stroke="]]..bottomHUDLineColorPVP..[[" stroke-width="1" fill="url(#shield)" />]]
-    if shield_1.isVenting() == 0 then
-        hw = hw .. [[
-            <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">Shield: ]] .. string.format('%.2f%%',shieldPercent) .. [[</text>
-        ]]
-    else 
-        hw = hw .. [[
-            <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">Shield: VENTING</text>
-        ]]
+    if shield_1 then 
+        local shieldPercent = shield_1.getShieldHitpoints()/shield_1.getMaxShieldHitpoints()*100
+        hw = hw .. string.format([[<linearGradient id="shield" x1="100%%" y1="0%%" x2="0%%" y2="0%%">
+        <stop offset="%.1f%%" style="stop-color:rgb(25, 247, 255);stop-opacity:1" />
+        <stop offset="%.1f%%" style="stop-color:rgba(255, 60, 60, 1);stop-opacity:1" />
+        </linearGradient>]],shieldPercent,shieldPercent)
+        hw = hw ..[[
+                <path d="
+                M ]] .. tostring(.3195*screenWidth) .. ' ' .. tostring(.9755*screenHeight) ..[[ 
+                L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [[
+                L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
+                L ]] .. tostring(.33*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
+                L ]] .. tostring(.3195*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
+                stroke="]]..bottomHUDLineColorPVP..[[" stroke-width="1" fill="url(#shield)" />]]
+        if shield_1.isVenting() == 0 then
+            hw = hw .. [[
+                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">Shield: ]] .. string.format('%.2f%%',shieldPercent) .. [[</text>
+            ]]
+        else 
+            hw = hw .. [[
+                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">Shield: VENTING</text>
+            ]]
+        end
     end
 
     --Center Bottom CCS
@@ -437,7 +439,6 @@ function resistWidget()
     local resistTimerColor = 'rgb(25, 247, 255)'
     if resistTimer > 0 then resistTimerColor = 'rgb(255, 60, 60)' end 
     rw = rw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.87 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Resist Timer:&nbsp;</div><div style="float: left;color: %s;"> %.2fs </div></div>',resistTimerColor,resistTimer)
-
     return rw
 end
 
@@ -743,15 +744,14 @@ function identifiedWidget()
     return iw
 end
 
-
 function generateHTML()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
     html = html .. hpWidget()
-    html = html .. resistWidget()
-    html = html .. weaponsWidget()
-    html = html .. transponderWidget()
-    html = html .. radarWidget()
-    html = html .. identifiedWidget()
+    if shield_1 then html = html .. resistWidget() end
+    if weapon_1 then html = html .. weaponsWidget() end
+    if transponder_1 then html = html .. transponderWidget() end
+    if radar_1 then html = html .. radarWidget() end
+    if radar_1 then html = html .. identifiedWidget() end
     
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
