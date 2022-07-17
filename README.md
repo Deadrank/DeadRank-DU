@@ -1,5 +1,4 @@
-# DeadRank-DU
-DeadRanks PvP Scripts
+# Dead's PvP Script Suite
 
 ## Installation
 1) Download the .conf file(s) you would like to use
