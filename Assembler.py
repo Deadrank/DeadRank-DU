@@ -13,9 +13,7 @@ parser.add_argument('source',type=str,nargs=1,choices=[
     ],
     help='Source Folder to pull LUA files from (i.e. DeadGunner, DeadRemote)')
 parser.add_argument('--copy',action='store_true', 
-    help='Create an additional copy of the .conf file somewhere locally on the machine (like the DU custom config folder')
-
-args = parser.parse_args()
+    help='Create an additional copy of the .conf file somewhere locally on the machine (like the DU custom config folder)')
 
 # Parse arguments provided
 args = parser.parse_args()
