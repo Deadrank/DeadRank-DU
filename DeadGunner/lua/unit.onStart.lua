@@ -25,6 +25,8 @@ M_Shield_HP = 8625000 --export
 S_Shield_HP = 8625000 --export
 XS_Shield_HP = 500000 --export
 max_radar_load = 250 --export
+maxWeaponsPerWidget = 3 --export How many weapons in each default weapon widget
+radarBuffer = 0.00001
 ----------------
 
 userCode = {}
@@ -104,7 +106,6 @@ SZD = construct.getDistanceToSafeZone()
 --- Weapons --
 initialResistWait = 15 --export
 weaponDataList = {}
-WeaponWidgetCreate()
 shieldDmgTrack = {
     ['L'] = L_Shield_HP,
     ['M'] = M_Shield_HP,

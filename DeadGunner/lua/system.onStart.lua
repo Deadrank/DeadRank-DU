@@ -73,6 +73,7 @@ function WeaponWidgetCreate()
             local widgetType = weapon[i].getWidgetType()
             local _widget = system.createWidget(_panel, "weapon")
             system.addDataToWidget(weaponDataID,system.createWidget(_panel, widgetType))
+            if i % maxWeaponsPerWidget == 0 and i < #weapon then _panel = system.createWidgetPanel("Weapons") end
         end
     end
 end
