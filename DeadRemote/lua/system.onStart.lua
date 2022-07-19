@@ -397,6 +397,17 @@ function planetARWidget()
     return arw
 end
 
+function shipNameWidget()
+    local snw = ''
+    snw = snw .. [[
+        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
+        </svg>
+    ]]
+
+    return snw
+end
+
 function helpWidget()
     local hw = ''
     if showHelp then
@@ -548,6 +559,7 @@ function generateScreen()
     html = html .. planetARWidget()
     html = html .. helpWidget()
     html = html .. travelIndicatorWidget()
+    html = html .. shipNameWidget()
 
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
