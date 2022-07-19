@@ -1,5 +1,10 @@
 # Dead's PvP Script Suite
 
+## Downloads
+Simply right-click on the links below and select "save as" to download the configuration files:
+ - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
+ - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote.conf)
+
 ## Installation
 1) Download the .conf file(s) you would like to use
 2) Place them in your `custom` folder in the DU game path (defaults to here on installation: `C:\ProgramData\Dual Universe\Game\data\lua\autoconf\custom`
