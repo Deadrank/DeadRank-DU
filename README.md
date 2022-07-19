@@ -12,7 +12,7 @@ The gunner seat will control and/or read data from:
  - Radar (manual link
  - Transponder (auto link if present)
  - Databank (manually linked, optional)
- - Shield (auto link if present)
+ - Shield (manually linked, optional)
 
 Any items listed above as manual link, must be linked *before* running  the autoconfiguration
 
