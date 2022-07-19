@@ -161,22 +161,22 @@ Further, the HUD provides the ability to enter manual codes if needed without ac
 
 ### Features
 #### Travel Indicators
-The remote HUD includes several travel indicators to help you pilot the ship. These include a forward direction indicator (light grey), a prograde indicator (direction of travel green) and a retrograde indicator (opposite of travel direction red). See below for examples:
+The remote HUD includes several travel indicators to help you pilot the ship. These include a forward direction indicator (light grey), a prograde indicator (direction of travel green) and a retrograde indicator (opposite of travel direction red). See below for examples:<br>
 ![Travel Indicators](https://user-images.githubusercontent.com/17240745/179416679-dd1ad825-5851-49a5-a82a-bf90dfce824a.png)
 
 #### Augmented Reality
-The HUD allows you to view positions in space even when they are not rendered into the game. The further the position tag is from your current location, the smaller the indicator. The AR modes only display locations within 500 SU of your current location.
+The HUD allows you to view positions in space even when they are not rendered into the game. The further the position tag is from your current location, the smaller the indicator. The AR modes only display locations within 500 SU of your current location.<br>
 ![AR Example](https://user-images.githubusercontent.com/17240745/179419499-5da15447-409a-4325-a92b-f11224a8d10e.png)
 
 By default the HUD includes all planets as AR reference points, but addtional ones may be added through lua commands or added to a lua file in the custom folder (see additional files section for details)
 
-Your current AR mode can be seen in the upper left of the HUD:
+Your current AR mode can be seen in the upper left of the HUD:<br>
 ![image](https://user-images.githubusercontent.com/17240745/179419569-2f1f74a9-9b70-42e7-af2e-6b8032fb77a4.png)
 
 #### Engine Control
 The remote HUD allows you to control only specific engines with your throttle. By default when the remote is started, you control all engines pointed along the forward axis. When controlling specific engine tags, the current state of non-controlled engines is saved. Example:
 If there are 2 engines on the construct with the tag of "freight" and 2 with the tag of "military". Setting the throttle to 100% while controlling "ALL" engines will initially set all the engines to 100% throttle. If you then add the "military" tag to the engine control (either through lua commands or hotkeys) and then set the throttle to 0%, your engines with the "military" tag will turn off, while the "freight" tagged engines will continue at 100% throttle.
-Engine tags must be set on each engine individually. Engines without custom tags will always be ignored whenever an engine tag is enabled. Your current engine tag filtereing can be seen in the upper left of the HUD. Any combination of engine tags may be used at a time:
+Engine tags must be set on each engine individually. Engines without custom tags will always be ignored whenever an engine tag is enabled. Your current engine tag filtereing can be seen in the upper left of the HUD. Any combination of engine tags may be used at a time:<br>
 ![image](https://user-images.githubusercontent.com/17240745/179419804-30083b43-96b2-4a8b-a3ef-9aebd62200e2.png)
 
 #### Other features
