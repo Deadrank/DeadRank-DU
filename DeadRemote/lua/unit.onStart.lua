@@ -126,10 +126,10 @@ if placeRadar then -- We either have only rockets or no fuel tanks at all, uncom
     _autoconf.displayCategoryPanel(radar, radar_size, "Radar", "radar")
     placeRadar = false
 end
-if antigrav ~= nil then antigrav.show() end
-if warpdrive ~= nil then warpdrive.show() end
-if gyro ~= nil then gyro.show() end
-if shield_1 ~= nil and showShieldWidget then shield_1.show() end
+if antigrav ~= nil then antigrav.showWidget() end
+if warpdrive ~= nil then warpdrive.showWidget() end
+if gyro ~= nil then gyro.showWidget() end
+if shield_1 ~= nil and showShieldWidget then shield_1.showWidget() end
 
 -- freeze the player in he is remote controlling the construct
 seated = player.isSeated()

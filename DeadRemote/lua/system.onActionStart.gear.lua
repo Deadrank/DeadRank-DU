@@ -2,10 +2,10 @@ gearExtended = not gearExtended
 if gearExtended then
     Nav.control.deployLandingGears()
     Nav.axisCommandManager:setTargetGroundAltitude(0)
-    system.freeze(0)
+    player.freeze(false)
 else
     Nav.control.retractLandingGears()
     Nav.axisCommandManager:setTargetGroundAltitude(defaultHoverHeight)
-    system.freeze(1)
+    player.freeze(true)
 end
 
