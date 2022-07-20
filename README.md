@@ -1,5 +1,10 @@
 # Dead's PvP Script Suite
 
+## Downloads
+Simply right-click on the links below and select "Save Link As..." to download the configuration files:
+ - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
+ - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote.conf)
+
 ## Installation
 1) Download the .conf file(s) you would like to use
 2) Place them in your `custom` folder in the DU game path (defaults to here on installation: `C:\ProgramData\Dual Universe\Game\data\lua\autoconf\custom`
@@ -12,7 +17,7 @@ The gunner seat will control and/or read data from:
  - Radar (manual link
  - Transponder (auto link if present)
  - Databank (manually linked, optional)
- - Shield (auto link if present)
+ - Shield (manually linked, optional)
 
 Any items listed above as manual link, must be linked *before* running  the autoconfiguration
 
