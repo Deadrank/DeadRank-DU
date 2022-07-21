@@ -3,6 +3,10 @@ predefinedTags = {}
 table.insert(predefinedTags,'military')
 table.insert(predefinedTags,'maneuver')
 table.insert(predefinedTags,'freight')
+--------------------------------------
+
+showAlerts = false
+
 ---------------------------------------
 hudVersion = 'v0.2.2'
 useDB = false --export

@@ -5,6 +5,8 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
+showAlerts = false
+
 -- SETTINGS --
 useDB = true --export use connected DB for config options
 printCombatLog = true --export Print weapon hits/misses to lua
