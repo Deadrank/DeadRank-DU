@@ -8,7 +8,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v0.2.2'
+hudVersion = 'v0.2.17'
 useDB = false --export
 showRemotePanel = false --export
 showDockingPanel = false --export
@@ -41,6 +41,7 @@ AR_Exclude_Moons = true --export
 EngineTagColor = 'rgb(60, 255, 60)' --export
 initialResistWait = 15
 autoVent = true
+warning_size = 0.75 --export How large the warning indicators should be
 ------------------------------------
 
 if db_1 ~= nil and useDB then

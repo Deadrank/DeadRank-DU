@@ -29,6 +29,7 @@ XS_Shield_HP = 500000 --export
 max_radar_load = 250 --export
 maxWeaponsPerWidget = 3 --export How many weapons in each default weapon widget
 radarBuffer = 0.00001
+warning_size = 0.75 --export How large the warning indicators should be
 ----------------
 
 userCode = {}

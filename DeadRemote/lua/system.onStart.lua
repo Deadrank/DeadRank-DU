@@ -155,8 +155,8 @@ function brakeWidget()
     if brakeON then
         bw = [[ 
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.610 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(60, 60, 255, 0.9);stroke:rgb(255, 60, 60);stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.622 * screenWidth) ..[[" y="]].. tostring(.275 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size=".8vw" font-weight="bold">
+            <rect x="]].. tostring(0.610 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.25 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(60, 60, 255, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
+            <text x="]].. tostring(0.622 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.275 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 1.42)..[[vh" font-weight="bold">
             Brakes Engaged</text>
             </rect></svg>
             ]]
@@ -208,21 +208,21 @@ function flightWidget()
                 L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
                 stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
 
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Speed: ]] .. speedStr .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Current Accel: ]] .. accelStr .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Brake Dist: ]] .. brakeDistStr .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. speedStr .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Current Accel: ]] .. accelStr .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Brake Dist: ]] .. brakeDistStr .. [[</text>
                 
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Max Speed: ]] .. maxSpeedStr .. [[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Max Accel: ]] .. maxThrustStr ..[[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Max Brake: ]] .. maxBrakeStr .. [[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Speed: ]] .. maxSpeedStr .. [[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Accel: ]] .. maxThrustStr ..[[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Brake: ]] .. maxBrakeStr .. [[</text>
 
-                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Mass </text>
-                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">]]..massStr..[[</text>
+                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Mass </text>
+                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]]..massStr..[[</text>
 
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Gravity </text>
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">]].. gravityStr ..[[</text>
+                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Gravity </text>
+                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]].. gravityStr ..[[</text>
 
-                <text x="]].. tostring(.684 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold" transform="rotate(-10,]].. tostring(.684 * screenWidth) ..",".. tostring(.028 * screenHeight) ..[[)">]].. mode ..[[</text>
+                <text x="]].. tostring(.684 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(-10,]].. tostring(.684 * screenWidth) ..",".. tostring(.028 * screenHeight) ..[[)">]].. mode ..[[</text>
 
                 
 
@@ -290,10 +290,10 @@ function fuelWidget()
         L ]] .. tostring(.445*screenWidth) .. ' ' .. tostring(.070*screenHeight) .. [["
     stroke="black" stroke-width="1.5" fill="none" />
 
-    <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
-    <!--text x="]].. tostring(.445 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">25%</text>
-    <text x="]].. tostring(.5 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">50%</text>
-    <text x="]].. tostring(.555 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">75%</text-->
+    <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
+    <!--text x="]].. tostring(.445 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">25%</text>
+    <text x="]].. tostring(.5 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">50%</text>
+    <text x="]].. tostring(.555 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">75%</text-->
 
 
     ]]
@@ -303,8 +303,8 @@ function fuelWidget()
         if not fuelWarning then warningText = 'A Fuel tank &lt; 20%' end
         fw = fw .. [[ 
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.610 * screenWidth) ..[[" y="]].. tostring(.10 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.620 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size=".8vw" font-weight="bold">
+            <rect x="]].. tostring(0.610 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.10 * screenHeight) ..[[" rx="]]..tostring(warning_size * 15)..[[" ry="]]..tostring(warning_size * 15)..[[" width="]]..tostring(warning_size * 8)..[[vw" height="]]..tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]]..tostring(warning_size * 5)..[[;opacity:0.9;" />
+            <text x="]].. tostring(0.620 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.125 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]]..tostring(warning_size * 1.42)..[[vh" font-weight="bold">
                 ]]..string.format('%s',warningText)..[[</text>
             </rect></svg>]]
         
@@ -333,7 +333,7 @@ function apStatusWidget()
         L ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [["
         stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bg..[[" />
         
-        <text x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.012 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold" transform="rotate(10,]].. tostring(.25 * screenWidth) ..",".. tostring(.012 * screenHeight) ..[[)">AutoPilot: ]]..apStatus..[[</text>
+        <text x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.012 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(10,]].. tostring(.25 * screenWidth) ..",".. tostring(.012 * screenHeight) ..[[)">AutoPilot: ]]..apStatus..[[</text>
     ]]
 
     if autopilot_dest and speed > 1000 then
@@ -344,7 +344,7 @@ function apStatusWidget()
         balance = balance // 60
         local hours = balance % 60
         apw = apw .. [[
-            <text x="]].. tostring(.280 * screenWidth) ..[[" y="]].. tostring(.055 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">ETA: ]]..string.format('%.0f:%.0f.%.0f',hours,minutes,seconds)..[[</text>
+            <text x="]].. tostring(.280 * screenWidth) ..[[" y="]].. tostring(.055 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">ETA: ]]..string.format('%.0f:%.0f.%.0f',hours,minutes,seconds)..[[</text>
         ]]
     end
 
@@ -381,10 +381,10 @@ function positionInfoWidget()
         stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[[" />
         
         <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.01 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".6vw">Remote Version: ]]..hudVersion..[[</text>
-        <text x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Nearest Planet</text>
+        <text x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Nearest Planet</text>
         <text x="]].. tostring(.15 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" >]]..closestPlanetStr..[[</text>
         
-        <text x="]].. tostring(.82 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw" font-weight="bold">Nearest Pipe</text>
+        <text x="]].. tostring(.82 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Nearest Pipe</text>
         <text x="]].. tostring(.78 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" >]]..closestPipeStr..[[</text>
 
         <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" font-weight="bold">Safe Zone Distance: ]]..SZDStr..[[</text>
@@ -396,7 +396,7 @@ end
 function engineWidget()
     local ew = [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.045 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Controlling Engine tags</text>
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.045 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Controlling Engine tags</text>
             ]]..enabledEngineTagsStr..[[
         </svg>
     ]]
@@ -407,7 +407,7 @@ function planetARWidget()
     local arw = planetAR
     arw = arw .. [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
         </svg>
     ]]
 
@@ -418,7 +418,7 @@ function shipNameWidget()
     local snw = ''
     snw = snw .. [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
+            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
         </svg>
     ]]
 
@@ -431,48 +431,48 @@ function helpWidget()
         hw = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <rect x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="60vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size="1.42vh" font-weight="bold">
                 OPTION KEY BINDINGS</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+1: Toggle help screen</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+2: Toggle Augmented reality view mode (NONE, ALL, PLANETS, CUSTOM) HUD Loads custom waypoints for AR from "autoconf/custom/AR_Waypoints.lua"</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+3: Clear all engine tag filters (i.e. all engines controlled by throttle) (Alt+shift+3 toggles through predefined tags)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+4: Engage AutoPilot to current AP destination (shown in VR)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+5: Engage Follow Mode. Ship will attempt to mirror the speed of the target construct (or close the gap if to far away). REQUIRES an identified and targeted construct in radar</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+6: Set AutoPilot destination to the nearest safe zone</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+7: Toggles radar widget filtering mode (Show all, Show Enemy, Show Identified, Show Friendly)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+8: Toggle Shield vent. Start venting if available. Stop venting if currently venting</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+9: Toggle between Cruise and Throttle control modes</text>
             </rect>
             
             <rect x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.365 * screenHeight) ..[[" rx="15" ry="15" width="60vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.39 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.39 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size="1.42vh" font-weight="bold">
                 Lua Commands</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.41 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.41 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 disable &lt;tag&gt;: Disables control of engines tagged with the <tag> parameter</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.43 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.43 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 enable &lt;tag&gt;: Enables control of engines tagged with <tag></text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.45 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.45 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 warpFrom &lt;start position&gt; &lt;destination position&gt;: Calculates best warp bath from the <start position> (positions are in ::pos{} format)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.47 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.47 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 warp &lt;destination position&gt;: Calculates best warp path from current postion to destination (position is in ::pos{} format)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.49 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.49 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 addWaypoint &lt;waypoint1&gt; &lt;Name&gt;: Adds temporary AR points when enabled. Requires a position tag. Optionally, you can also optionally add a custom name as well</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 delWaypoint &lt;name&gt;: Removes the specified temporary AR point</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 addShips db: Adds all ships currently on radar to the friendly construct list</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.55 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.55 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 code &lt;transponder code&gt;: Adds the transponder tag to the transponder. "delcode &lt;code&gt;" removes the tag</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.57 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw" font-weight="bold">
+            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.57 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 &lt;Primary Target ID&gt;: Filters radar widget to only show the construct with the specified ID</text>
             </rect>
 
@@ -563,8 +563,6 @@ function travelIndicatorWidget()
     return tiw
 end
 
-
-
 function generateScreen()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
     html = html .. brakeWidget()
@@ -613,6 +611,7 @@ function globalDB(action)
             if db_1.hasKey('AR_Exclude_Moons') == 1 then AR_Exclude_Moons = db_1.getIntValue('AR_Exclude_Moons') == 1 end
             if db_1.hasKey('EngineTagColor') == 1 then EngineTagColor = db_1.getStringValue('EngineTagColor') end
             if db_1.hasKey('Indicator_Width') == 1 then Indicator_Width = db_1.getFloatValue('Indicator_Width') end
+            if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
         elseif action == 'save' then
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
@@ -641,6 +640,7 @@ function globalDB(action)
             db_1.setStringValue('AR_Opacity',AR_Opacity)
             db_1.setStringValue('EngineTagColor',EngineTagColor)
             db_1.setFloatValue('Indicator_Width',Indicator_Width)
+            db_1.setFloatValue('warning_size',warning_size)
             if AR_Exclude_Moons then db_1.setIntValue('AR_Exclude_Moons',1) else db_1.setIntValue('AR_Exclude_Moons',0) end
         end
     end

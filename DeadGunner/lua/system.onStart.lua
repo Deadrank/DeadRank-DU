@@ -258,6 +258,7 @@ function globalDB(action)
             if db_1.hasKey('S_Shield_HP') == 1 then S_Shield_HP = db_1.getIntValue('S_Shield_HP') end
             if db_1.hasKey('XS_Shield_HP') == 1 then XS_Shield_HP = db_1.getIntValue('XS_Shield_HP') end
             if db_1.hasKey('max_radar_load') == 1 then max_radar_load = db_1.getIntValue('max_radar_load') end
+            if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
         elseif action == 'save' then
             db_1.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
@@ -278,6 +279,7 @@ function globalDB(action)
             db_1.setIntValue('S_Shield_HP',S_Shield_HP)
             db_1.setIntValue('XS_Shield_HP',XS_Shield_HP)
             db_1.setIntValue('max_radar_load',max_radar_load)
+            db_1.setFloatValue('warning_size',warning_size)
         end
     end
 end
@@ -491,8 +493,8 @@ function radarWidget()
     if attackedBy >= dangerWarning or showAlerts then
         rw = rw .. [[ 
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(.10 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size=".8vw" font-weight="bold">
+            <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.10 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
+            <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.125 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
                 ]]..string.format('%.0f Ships attacking',attackedBy)..[[</text>
             </rect></svg>]]
     end
@@ -500,8 +502,8 @@ function radarWidget()
     if radarOverload or showAlerts then 
         rw = rw .. [[ 
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(.175 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size=".8vw" font-weight="bold">
+            <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.15 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
+            <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.175 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
                 ]]..string.format('Radar Overloaded')..[[</text>
             </rect></svg>]]
     end
@@ -750,16 +752,16 @@ function identifiedWidget()
             if abandonded or showAlerts then
                 targetString = targetString .. [[ 
                     <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                    <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(.20 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:5;opacity:0.9;" />
-                    <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(.225 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size=".8vw" font-weight="bold">
+                    <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.20 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
+                    <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.225 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
                         Target is Destroyed</text>
                     </rect></svg>]]
             end
             if friendly or showAlerts then
                 targetString = targetString .. [[ 
                     <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                    <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" rx="15" ry="15" width="8vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(60, 255, 60);stroke-width:5;opacity:0.9;" />
-                    <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(.275 * screenHeight) ..[[" style="fill: ]]..'rgb(60, 255, 60);'..[[" font-size=".8vw" font-weight="bold">
+                    <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.25 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(60, 255, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
+                    <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.275 * screenHeight) ..[[" style="fill: ]]..'rgb(60, 255, 60);'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
                         Target is Friendly</text>
                     </rect></svg>]]
             end

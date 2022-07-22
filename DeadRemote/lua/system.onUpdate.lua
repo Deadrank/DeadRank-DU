@@ -254,6 +254,14 @@ else bgColor=topHUDFillColorPVP lineColor=topHUDLineColorPVP textColor=textColor
 end
 --------------------------------------------------
 
+------- Warp Drive Brake activation ------
+if construct.isWarping() == 1 then
+    brakeInput = 1
+    brakesOn = true
+end
+-----------------------------------------
+
+
 -- Generate Screen overlay --
 if maxBrakeStr ~= nil then generateScreen() end
 -----------------------------
