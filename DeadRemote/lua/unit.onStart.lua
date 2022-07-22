@@ -1,3 +1,9 @@
+-- Add Valid User ID --
+masterPlayerID = player.getId()
+pilotName = system.getPlayerName(masterPlayerID)
+validPilotCode = '123456' --Your player ID
+----------------------
+
 ------- Predifined Engine Tags -------
 predefinedTags = {}
 table.insert(predefinedTags,'military')
@@ -8,7 +14,8 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v0.2.17'
+hudVersion = 'v1.0.1'
+validatePilot = false --export
 useDB = false --export
 showRemotePanel = false --export
 showDockingPanel = false --export
@@ -17,6 +24,7 @@ showHelper = false --export
 showShieldWidget = false --export
 defaultHoverHeight = 42 --export
 defautlFollowDistance = 40 --export
+followMaxSpeedGain = 4000 --export
 topHUDLineColorSZ = 'white' --export
 topHUDFillColorSZ = 'rgba(29, 63, 255, 0.75)' --export
 textColorSZ = 'white' --export
@@ -44,6 +52,8 @@ autoVent = true
 warning_size = 0.75 --export How large the warning indicators should be
 ------------------------------------
 
+userCode = {}
+userCode[validPilotCode] = pilotName
 if db_1 ~= nil and useDB then
     globalDB('get')
 end
@@ -160,5 +170,18 @@ if vec3(construct.getWorldVelocity()):len() * 3.6 < 500 then
 end
 
 lShift = false
+
+-- Validate pilot mode --
+if validatePilot then
+    local validPilot = false
+    for k,v in pairs(userCode) do 
+        if k == tostring(player.getId()) then validPilot = true system.print(string.format('-- Welcome %s --',pilotName)) break end
+    end
+    if not validPilot then
+        system.print(player.getId())
+        unit.exit()
+    end
+end
+----------------------------
 
 system.showScreen(1)

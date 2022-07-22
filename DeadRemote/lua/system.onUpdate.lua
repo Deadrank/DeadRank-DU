@@ -101,10 +101,10 @@ if auto_follow then
             elseif followDistance < targetDist then
                 -- Full throttle
                 brakeInput = 0
-                if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byThrottle) then
+                if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byTargetSpeed) then
                     Nav.control.cancelCurrentControlMasterMode()
                 end
-                Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,1)
+                Nav.axisCommandManager:setTargetSpeedCommand(axisCommandId.longitudinal,targetSpeed + followMaxSpeedGain)
             elseif followDistance - followDistance*.1 > targetDist then
                 -- Full brake
                 brakeInput = 1
