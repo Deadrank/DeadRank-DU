@@ -363,11 +363,11 @@ function hpWidget()
                 stroke="]]..bottomHUDLineColorPVP..[[" stroke-width="1" fill="url(#shield)" />]]
         if shield_1.isVenting() == 0 then
             hw = hw .. [[
-                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">Shield: ]] .. string.format('%.2f%%',shieldPercent) .. [[</text>
+                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">Shield: ]] .. string.format('%.2f%%',shieldPercent) .. [[</text>
             ]]
         else 
             hw = hw .. [[
-                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">Shield: VENTING</text>
+                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">Shield: VENTING</text>
             ]]
         end
     end
@@ -387,7 +387,7 @@ function hpWidget()
             L ]] .. tostring(.6805*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
             stroke="]]..bottomHUDLineColorPVP..[[" stroke-width="1" fill="url(#CCS)" />]]
     hw = hw .. [[
-        <text x="]].. tostring(.55 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size=".8vw" font-weight="bold">CCS: ]] .. string.format('%.2f%%',CCSPercent) .. [[</text>
+        <text x="]].. tostring(.55 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">CCS: ]] .. string.format('%.2f%%',CCSPercent) .. [[</text>
     ]]
 
     hw = hw .. '</svg>'
@@ -649,18 +649,18 @@ function identifiedWidget()
 
                 <line x1="]].. 0.02*screenWidth ..[[" y1="]].. 0.545*screenHeight ..[[" x2="]].. (0.17-0.15*(1-dmgRatio))*screenWidth ..[[" y2="]].. 0.545*screenHeight ..[[" style="stroke:rgb(255, 60, 60);stroke-width:1.5;opacity:]].. 1 ..[[;" />
 
-                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.495 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. tostring(uniqueName) .. [[</text>
-                <text x="]].. tostring(.100 * screenWidth) ..[[" y="]].. tostring(.495 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">Ship Size: ]] .. tostring(size) .. [[</text>
+                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.495 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. tostring(uniqueName) .. [[</text>
+                <text x="]].. tostring(.100 * screenWidth) ..[[" y="]].. tostring(.495 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">Ship Size: ]] .. tostring(size) .. [[</text>
                 
-                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.510 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. string.format('Speed: %s',speedString) .. [[</text>
-                <text x="]].. tostring(.100 * screenWidth) ..[[" y="]].. tostring(.510 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. string.format('%s: %.0fkm/h',speedCompare,speedDiff) .. [[</text>
+                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.510 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. string.format('Speed: %s',speedString) .. [[</text>
+                <text x="]].. tostring(.100 * screenWidth) ..[[" y="]].. tostring(.510 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. string.format('%s: %.0fkm/h',speedCompare,speedDiff) .. [[</text>
                 
-                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.525 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. string.format('Mass: %s',massStr) .. [[</text>
-                <text x="]].. tostring(.090 * screenWidth) ..[[" y="]].. tostring(.525 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. 'Top Speed: '.. topSpeedStr .. [[</text>
+                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.525 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. string.format('Mass: %s',massStr) .. [[</text>
+                <text x="]].. tostring(.090 * screenWidth) ..[[" y="]].. tostring(.525 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. 'Top Speed: '.. topSpeedStr .. [[</text>
                 
-                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.540 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. string.format('%s',distString) .. [[</text>
-                <text x="]].. tostring(.066 * screenWidth) ..[[" y="]].. tostring(.540 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. string.format('Radars: %.0f',info['radars']) .. [[</text>
-                <text x="]].. tostring(.103 * screenWidth) ..[[" y="]].. tostring(.540 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size=".8vw" font-weight="bold">]] .. string.format('Weapons: %s',weapons) .. [[</text>
+                <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.540 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. string.format('%s',distString) .. [[</text>
+                <text x="]].. tostring(.066 * screenWidth) ..[[" y="]].. tostring(.540 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. string.format('Radars: %.0f',info['radars']) .. [[</text>
+                <text x="]].. tostring(.103 * screenWidth) ..[[" y="]].. tostring(.540 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. string.format('Weapons: %s',weapons) .. [[</text>
                 </g>
             ]]
             count = count + 1
