@@ -67,6 +67,7 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `textColorPVP`: HUD Color customizations (Default = 'black')
  - `neutralLineColor`: HUD Color customizations (Default = 'lightgrey')
  - `neutralFontColor`: HUD Color customizations (Default = 'darkgrey')
+ - `warning_size`: Size of warning indicators in the upper right
 
 ### Weapons
 Weapons are controllable from 3rd persion view using the weapon widgets. With the widget, you can start firing, stop firing and reload the weapons. I the lower left of the screen the HUD displays the hit chance of each weapon linked.
@@ -132,6 +133,7 @@ Further, the HUD provides the ability to enter manual codes if needed without ac
  - `<::pos{auto-pilot destination}>`: Enter a position tag by itself to set the auto-pilot destination. The auto-pilot destination also adds a permenant AR point that is shown on the screen.
 
 ### Lua Parameters
+ - `validatePilot`: If enabled, will ensure that the player using the seat matches the ID entered into the lua code. To enable this, first ensure that you know your playerID, then edit the lua inside of "unit start" and replace the following with your player ID (Default = disabled):<br>
  - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters (Default = enabled)
  - `showRemotePanel`: Show default remote controller widget (Default = disabled)
  - `showDockingPanel`: Show default docking widget (Default = disabled)
