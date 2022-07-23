@@ -221,3 +221,6 @@ Any number of beacons can be added to this list. Ensure that each entry (except 
 
 ## DU-PeriscopePB.json (Periscope script for board)
 This script is simply copied an pasted to the desired programming board. No linking necessary.
+
+### Audio Files for Radar contact are put at the location below (contact.mp3, targetleft.mp3):
+..\Documents\NQ\DualUniverse\audio
