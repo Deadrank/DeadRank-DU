@@ -14,7 +14,7 @@ Simply right-click on the links below and select "Save Link As..." to download t
 ## DeadGunner.conf (Gunner Seat Script)
 The gunner seat will control and/or read data from:
  - Weapons (manual link)
- - Radar (manual link
+ - Radar (manual link)
  - Transponder (auto link if present)
  - Databank (manually linked, optional)
  - Shield (manually linked, optional)
