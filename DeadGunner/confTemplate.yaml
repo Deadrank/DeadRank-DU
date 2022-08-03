@@ -1,4 +1,4 @@
-name: DeadGunner v2.1.15
+name: DeadGunner v2.2.0
 pvp: true
 
 slots:
@@ -71,6 +71,14 @@ handlers:
       args: ['option8']
       lua: |
 {{system.onActionStart.opt8.lua}}
+    onActionStart:
+      args: ['lshift']
+      lua: |
+{{system.onActionStart.lshift.lua}}
+    onActionStop:
+      args: ['lshift']
+      lua: |
+{{system.onActionStop.lshift.lua}}
   weapon_1:
     onHit(targetId,damage):
       lua: |

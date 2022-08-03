@@ -565,16 +565,18 @@ end
 
 function generateScreen()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
-    html = html .. brakeWidget()
-    html = html .. flightWidget()
-    html = html .. fuelWidget()
-    html = html .. apStatusWidget()
-    html = html .. positionInfoWidget()
-    html = html .. engineWidget()
-    html = html .. planetARWidget()
-    html = html .. helpWidget()
-    html = html .. travelIndicatorWidget()
-    html = html .. shipNameWidget()
+    if showScreen then 
+        html = html .. brakeWidget()
+        html = html .. flightWidget()
+        html = html .. fuelWidget()
+        html = html .. apStatusWidget()
+        html = html .. positionInfoWidget()
+        html = html .. engineWidget()
+        html = html .. planetARWidget()
+        html = html .. helpWidget()
+        html = html .. travelIndicatorWidget()
+        html = html .. shipNameWidget()
+    end
 
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)

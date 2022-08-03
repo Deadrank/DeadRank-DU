@@ -1,2 +1,1 @@
-lShift = false
 showScreen = true

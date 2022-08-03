@@ -184,4 +184,6 @@ if validatePilot then
 end
 ----------------------------
 
+showScreen = true
+
 system.showScreen(1)

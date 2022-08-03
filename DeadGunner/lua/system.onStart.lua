@@ -785,11 +785,13 @@ end
 
 function generateHTML()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
+    if showScreen then
     html = html .. hpWidget()
-    if shield_1 then html = html .. resistWidget() end
-    if weapon_1 then html = html .. weaponsWidget() end
-    if transponder_1 then html = html .. transponderWidget() end
-    if radar_1 then html = html .. radarWidget() end
+        if shield_1 then html = html .. resistWidget() end
+        if weapon_1 then html = html .. weaponsWidget() end
+        if transponder_1 then html = html .. transponderWidget() end
+        if radar_1 then html = html .. radarWidget() end
+    end
     if radar_1 then html = html .. identifiedWidget() end
     
     html = html .. [[ </body> </html> ]]

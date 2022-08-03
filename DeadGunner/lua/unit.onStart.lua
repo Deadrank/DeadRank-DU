@@ -190,6 +190,8 @@ html = html .. instructionHTML .. warningHTML .. [[</body></html>]]
 system.setScreen(html)
 system.showScreen(1)
 
+showScreen = true
+
 radarRange = 0
 if radar_1 ~= nil then
     radarRange = radar_1.getIdentifyRanges()
