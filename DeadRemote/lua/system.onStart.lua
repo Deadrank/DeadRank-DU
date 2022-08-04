@@ -572,11 +572,11 @@ function generateScreen()
         html = html .. apStatusWidget()
         html = html .. positionInfoWidget()
         html = html .. engineWidget()
-        html = html .. planetARWidget()
-        html = html .. helpWidget()
-        html = html .. travelIndicatorWidget()
         html = html .. shipNameWidget()
     end
+    html = html .. planetARWidget()
+    html = html .. helpWidget()
+    html = html .. travelIndicatorWidget()
 
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)

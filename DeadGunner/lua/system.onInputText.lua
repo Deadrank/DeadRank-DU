@@ -161,3 +161,6 @@ if text:lower() == 'clear db' then
         system.print('-- NO DB ATTACHED --')
     end
 end
+if text:lower() == 'coreid' then
+    system.print(string.format('-- %.0f --',construct.getId()))
+end
