@@ -621,7 +621,7 @@ function generateScreen()
         html = html .. engineWidget()
         html = html .. shipNameWidget()
         if useLogo then
-            html = html .. [[<svg width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logo .. [[
+            html = html .. [[<svg width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
                 </svg>]]
         end
     end
@@ -669,6 +669,7 @@ function globalDB(action)
             if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
             if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
             if db_1.hasKey('useLogo') == 1 then useLogo = db_1.getIntValue('useLogo') == 1 end
+            if db_1.hasKey('logoSVG') == 1 then logoSVG = db_1.getStringValue('logoSVG') end
         elseif action == 'save' then
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
@@ -702,6 +703,7 @@ function globalDB(action)
             db_1.setStringValue('warning_outline_color',warning_outline_color)
             db_1.setStringValue('warning_fill_color',warning_fill_color)
             if useLogo then db_1.setIntValue('useLogo',1) else db_1.setIntValue('useLogo',0) end
+            db_1.setStringValue('logoSVG',logoSVG)
         end
     end
 end
