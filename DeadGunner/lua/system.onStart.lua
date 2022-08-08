@@ -259,6 +259,8 @@ function globalDB(action)
             if db_1.hasKey('XS_Shield_HP') == 1 then XS_Shield_HP = db_1.getIntValue('XS_Shield_HP') end
             if db_1.hasKey('max_radar_load') == 1 then max_radar_load = db_1.getIntValue('max_radar_load') end
             if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
+            if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
+            if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
         elseif action == 'save' then
             db_1.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
@@ -280,6 +282,8 @@ function globalDB(action)
             db_1.setIntValue('XS_Shield_HP',XS_Shield_HP)
             db_1.setIntValue('max_radar_load',max_radar_load)
             db_1.setFloatValue('warning_size',warning_size)
+            db_1.setStringValue('warning_outline_color',warning_outline_color)
+            db_1.setStringValue('warning_fill_color',warning_fill_color)
         end
     end
 end
@@ -296,8 +300,8 @@ function weaponsWidget()
         for i,w in pairs(weapon) do
             local textColor = neutralFontColor
             local ammoColor = 'rgb(60, 255, 60)'
-            local probColor = 'rgb(255, 60, 60)'
-            if w.isOutOfAmmo() == 1 then ammoColor = 'rgb(255, 60, 60)' end
+            local probColor = warning_outline_color
+            if w.isOutOfAmmo() == 1 then ammoColor = warning_outline_color end
 
             local probs = w.getHitProbability()
             if probs > .7 then probColor = 'rgb(60, 255, 60);' elseif probs > .5 then probColor = 'yellow' end
@@ -318,13 +322,13 @@ end
 function transponderWidget()
     local tw = ''
     if transponder_1 ~= nil then
-        local transponderColor = 'rgb(255, 60, 60)'
+        local transponderColor = warning_outline_color
         local transponderStatus = 'offline'
         if transponder_1.isActive() == 1 then transponderColor = 'rgb(25, 247, 255)' transponderStatus = 'Active' end
         tw = tw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.932 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Transponder Status:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>',transponderColor,transponderStatus)
         
         local tags = transponder_1.getTags()
-        tw = tw .. '<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.98 * screenHeight) ..'px;left: '.. tostring(.35 * screenWidth) ..'px;"><div style="float: left;color: rgba(255,255,255,1);">Transponder Tags: '
+        tw = tw .. '<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.98 * screenHeight) ..'px;left: '.. tostring(.40 * screenWidth) ..'px;"><div style="float: left;color: rgba(255,255,255,1);">Transponder Tags: '
         for i,tag in pairs(tags) do 
             tw = tw .. tag .. ' '
         end
@@ -339,35 +343,50 @@ function hpWidget()
     --Center Bottom Base
     hw = hw .. [[
             <path d="
-            M ]] .. tostring(.31*screenWidth) .. ' ' .. tostring(.999*screenHeight) ..[[ 
-            L ]] .. tostring(.69*screenWidth) .. ' ' .. tostring(.999*screenHeight) .. [[
-            L ]] .. tostring(.67*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-            L ]] .. tostring(.33*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-            L ]] .. tostring(.31*screenWidth) .. ' ' .. tostring(.999*screenHeight) .. [["
+            M ]] .. tostring(.38*screenWidth) .. ' ' .. tostring(.999*screenHeight) ..[[ 
+            L ]] .. tostring(.62*screenWidth) .. ' ' .. tostring(.999*screenHeight) .. [[
+            L ]] .. tostring(.60*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
+            L ]] .. tostring(.40*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
+            L ]] .. tostring(.38*screenWidth) .. ' ' .. tostring(.999*screenHeight) .. [["
             stroke="]]..lineColor..[[" stroke-width="2" fill="]]..bgColor..[[" />]]
 
     --Center Bottom Shield
     if shield_1 then 
         local shieldPercent = shield_1.getShieldHitpoints()/shield_1.getMaxShieldHitpoints()*100
+        if shieldPercent < 15 or showAlerts then
+            hw = hw .. string.format([[
+            <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.76 * screenHeight) ..[[" style="fill: red;">
+                ]]..warningSymbols['svgCritical']..[[
+            </svg>
+            <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.80 * screenHeight) ..[[" style="fill: red" font-size="3.42vh" font-weight="bold">SHIELD CRITICAL</text>
+            ]])
+        elseif shieldPercent < 30 or showAlerts then
+            hw = hw .. string.format([[
+            <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.76 * screenHeight) ..[[" style="fill: orange;">
+                ]]..warningSymbols['svgWarning']..[[
+            </svg>
+            <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.80 * screenHeight) ..[[" style="fill: orange" font-size="3.42vh" font-weight="bold">SHIELD LOW</text>
+            ]])
+        end
         hw = hw .. string.format([[<linearGradient id="shield" x1="100%%" y1="0%%" x2="0%%" y2="0%%">
         <stop offset="%.1f%%" style="stop-color:rgb(25, 247, 255);stop-opacity:1" />
         <stop offset="%.1f%%" style="stop-color:rgba(255, 60, 60, 1);stop-opacity:1" />
         </linearGradient>]],shieldPercent,shieldPercent)
         hw = hw ..[[
                 <path d="
-                M ]] .. tostring(.3195*screenWidth) .. ' ' .. tostring(.9755*screenHeight) ..[[ 
+                M ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.9755*screenHeight) ..[[ 
                 L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [[
                 L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-                L ]] .. tostring(.33*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-                L ]] .. tostring(.3195*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
+                L ]] .. tostring(.40*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
+                L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
                 stroke="]]..bottomHUDLineColorPVP..[[" stroke-width="1" fill="url(#shield)" />]]
         if shield_1.isVenting() == 0 then
             hw = hw .. [[
-                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">Shield: ]] .. string.format('%.2f%%',shieldPercent) .. [[</text>
+                <text x="]].. tostring(.42 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">Shield: ]] .. string.format('%.2f%%',shieldPercent) .. [[</text>
             ]]
         else 
             hw = hw .. [[
-                <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">Shield: VENTING</text>
+                <text x="]].. tostring(.42 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">Shield: VENTING</text>
             ]]
         end
     end
@@ -380,14 +399,14 @@ function hpWidget()
     </linearGradient>]],CCSPercent,CCSPercent)
     hw = hw ..[[
             <path d="
-            M ]] .. tostring(.6805*screenWidth) .. ' ' .. tostring(.9755*screenHeight) ..[[ 
+            M ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.9755*screenHeight) ..[[ 
             L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [[
             L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-            L ]] .. tostring(.67*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
-            L ]] .. tostring(.6805*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
+            L ]] .. tostring(.6*screenWidth) .. ' ' .. tostring(.95*screenHeight) .. [[
+            L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.9755*screenHeight) .. [["
             stroke="]]..bottomHUDLineColorPVP..[[" stroke-width="1" fill="url(#CCS)" />]]
     hw = hw .. [[
-        <text x="]].. tostring(.55 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">CCS: ]] .. string.format('%.2f%%',CCSPercent) .. [[</text>
+        <text x="]].. tostring(.51 * screenWidth) ..[[" y="]].. tostring(.968 * screenHeight) ..[[" style="fill: black" font-size="1.42vh" font-weight="bold">CCS: ]] .. string.format('%.2f%%',CCSPercent) .. [[</text>
     ]]
 
     hw = hw .. '</svg>'
@@ -467,12 +486,12 @@ function resistWidget()
     rw = rw .. '</svg>'
     local ventTimer = shield_1.getVentingCooldown()
     local ventTimerColor = 'rgb(25, 247, 255)'
-    if ventTimer > 0 then ventTimerColor = 'rgb(255, 60, 60)' end
+    if ventTimer > 0 then ventTimerColor = warning_outline_color end
     rw = rw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.855 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Vent Timer:&nbsp;</div><div style="float: left;color: %s;"> %.2fs </div></div>',ventTimerColor,ventTimer)
 
     local resistTimer = shield_1.getResistancesCooldown()
     local resistTimerColor = 'rgb(25, 247, 255)'
-    if resistTimer > 0 then resistTimerColor = 'rgb(255, 60, 60)' end 
+    if resistTimer > 0 then resistTimerColor = warning_outline_color end 
     rw = rw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.87 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Resist Timer:&nbsp;</div><div style="float: left;color: %s;"> %.2fs </div></div>',resistTimerColor,resistTimer)
     return rw
 end
@@ -482,37 +501,31 @@ function radarWidget()
     local friendlyShipNum = radarStats['friendly']['L'] + radarStats['friendly']['M'] + radarStats['friendly']['S'] + radarStats['friendly']['XS']
     local enemyShipNum = radarStats['enemy']['L'] + radarStats['enemy']['M'] + radarStats['enemy']['S'] + radarStats['enemy']['XS']
     rw = rw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.885 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Allied Ships:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>','rgb(25, 247, 255)',friendlyShipNum)
-    rw = rw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.9 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Enemy Ships:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>','rgb(255, 60, 60)',enemyShipNum)
+    rw = rw .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.9 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..'px;"><div style="float: left;color: rgba(0,0,0,1);">Enemy Ships:&nbsp;</div><div style="float: left;color: %s;"> %s </div></div>',warning_outline_color,enemyShipNum)
     rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.915 * screenHeight) ..'px;left: '.. tostring(.505 * screenWidth) ..[[px;">
-    <div style="float: left;color: rgba(0,0,0,1);">L:&nbsp;</div><div style="float: left;color: rgb(255, 60, 60);">%s&nbsp;&nbsp;&nbsp;</div>
-    <div style="float: left;color: rgba(0,0,0,1);">M:&nbsp;</div><div style="float: left;color: rgb(255, 60, 60);">%s&nbsp;&nbsp;&nbsp;</div>
-    <div style="float: left;color: rgba(0,0,0,1);">S:&nbsp;</div><div style="float: left;color: rgb(255, 60, 60);">%s&nbsp;&nbsp;&nbsp;</div>
-    <div style="float: left;color: rgba(0,0,0,1);">XS:&nbsp;</div><div style="float: left;color: rgb(255, 60, 60);">%s&nbsp;&nbsp;&nbsp;</div>
+    <div style="float: left;color: rgba(0,0,0,1);">L:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%s&nbsp;&nbsp;&nbsp;</div>
+    <div style="float: left;color: rgba(0,0,0,1);">M:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%s&nbsp;&nbsp;&nbsp;</div>
+    <div style="float: left;color: rgba(0,0,0,1);">S:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%s&nbsp;&nbsp;&nbsp;</div>
+    <div style="float: left;color: rgba(0,0,0,1);">XS:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%s&nbsp;&nbsp;&nbsp;</div>
     </div>]],radarStats['enemy']['L'],radarStats['enemy']['M'],radarStats['enemy']['S'],radarStats['enemy']['XS'])
 
     if attackedBy >= dangerWarning or showAlerts then
-        rw = rw .. [[ 
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.10 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
-            <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.125 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
-                ]]..string.format('%.0f Ships attacking',attackedBy)..[[</text>
-            </rect></svg>]]
+        warnings['attackedBy'] = 'svgWarning'
+    else
+        warnings['attackedBy'] = nil
     end
 
     if radarOverload or showAlerts then 
-        rw = rw .. [[ 
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.15 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
-            <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.175 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
-                ]]..string.format('Radar Overloaded')..[[</text>
-            </rect></svg>]]
+        warnings['radarOverload'] = 'svgCritical'
+    else
+        warnings['radarOverload'] = nil
     end
 
     rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.15 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
     <div style="float: left;color: ]]..'white'..[[;">Identified By:&nbsp;</div><div style="float: left;color: orange;">%.0f&nbsp;</div><div style="float: left;color: ]]..'white'..[[;">ships</div></div>]],identifiedBy)
 
     rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.165 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
-    <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Attacked By:&nbsp;</div><div style="float: left;color: rgb(255, 60, 60);">%.0f&nbsp;</div><div style="float: left;color: ]]..'white'..[[;">ships</div></div>]],attackedBy)
+    <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Attacked By:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%.0f&nbsp;</div><div style="float: left;color: ]]..'white'..[[;">ships</div></div>]],attackedBy)
 
     return rw
 end
@@ -539,6 +552,7 @@ function identifiedWidget()
         if not followingIdentified then db_1.clearValue('targetID') end
     end
     if not contains(identList,targetID) and targetID ~= 0 then table.insert(identList,targetID) end
+    if targetID == 0 then warnings['cored'] = nil warnings['friendly'] = nil end
     local targetIdentified = radar_1.isConstructIdentified(targetID) == 1
     local iw = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     local speedVec = vec3(construct.getWorldVelocity())
@@ -647,7 +661,7 @@ function identifiedWidget()
                 L ]] .. tostring(.02*screenWidth) .. ' ' .. tostring(.545*screenHeight) .. [["
                 stroke="]]..lineColor..[[" stroke-width="2" fill="]]..cardFill..[[" />
 
-                <line x1="]].. 0.02*screenWidth ..[[" y1="]].. 0.545*screenHeight ..[[" x2="]].. (0.17-0.15*(1-dmgRatio))*screenWidth ..[[" y2="]].. 0.545*screenHeight ..[[" style="stroke:rgb(255, 60, 60);stroke-width:1.5;opacity:]].. 1 ..[[;" />
+                <line x1="]].. 0.02*screenWidth ..[[" y1="]].. 0.545*screenHeight ..[[" x2="]].. (0.17-0.15*(1-dmgRatio))*screenWidth ..[[" y2="]].. 0.545*screenHeight ..[[" style="stroke:]]..warning_outline_color..[[;stroke-width:1.5;opacity:]].. 1 ..[[;" />
 
                 <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.495 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">]] .. tostring(uniqueName) .. [[</text>
                 <text x="]].. tostring(.100 * screenWidth) ..[[" y="]].. tostring(.495 * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-size="1.42vh" font-weight="bold">Ship Size: ]] .. tostring(size) .. [[</text>
@@ -696,7 +710,7 @@ function identifiedWidget()
             local targetSpeedString = '0.00 km/h -'
             local targetSpeedColor = neutralFontColor
             if speedDiff > 0 and math.abs(speedDiff) > 5 then targetSpeedString = string.format('%s &#8593;',speedString) targetSpeedColor = 'rgb(60, 255, 60);'
-            elseif speedDiff < 0 and math.abs(speedDiff) > 5 then targetSpeedString = string.format('%s &#8595;',speedString) targetSpeedColor = 'rgb(255, 60, 60)'
+            elseif speedDiff < 0 and math.abs(speedDiff) > 5 then targetSpeedString = string.format('%s &#8595;',speedString) targetSpeedColor = warning_outline_color
             elseif not targetIdentified then targetSpeedString = 'Not Identified'
             end
             targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.420 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
@@ -706,7 +720,7 @@ function identifiedWidget()
             local accelString = 'Stable'
             local accelColor = neutralFontColor
             if accelCompare == 'Accelerating' then accelString = 'Speeding Up &#8593;' accelColor = 'rgb(60, 255, 60);'
-            elseif accelCompare == 'Braking' then accelString = 'Slowing Down&#8595;' accelColor = 'rgb(255, 60, 60)'
+            elseif accelCompare == 'Braking' then accelString = 'Slowing Down&#8595;' accelColor = warning_outline_color
             elseif not targetIdentified then accelString = 'Not Identified'
             end
             targetString = targetString .. string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring(.440 * screenHeight) ..'px;left: '.. tostring(.30 * screenWidth) ..[[px;">
@@ -716,7 +730,7 @@ function identifiedWidget()
             local speedColor = neutralFontColor
             if not targetIdentified then speedDiff = 0 end
             if speedCompare == 'Closing' and math.abs(speedDiff) > 5 then speedColor = 'rgb(60, 255, 60);'
-            elseif speedCompare == 'Parting' and math.abs(speedDiff) > 5 then speedColor = 'rgb(255, 60, 60)'
+            elseif speedCompare == 'Parting' and math.abs(speedDiff) > 5 then speedColor = warning_outline_color
             end
             local fontColor = 'white'
             if speedColor == 'white' then fontColor = neutralFontColor end
@@ -750,20 +764,14 @@ function identifiedWidget()
             end
             
             if abandonded or showAlerts then
-                targetString = targetString .. [[ 
-                    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                    <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.20 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
-                    <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.225 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
-                        Target is Destroyed</text>
-                    </rect></svg>]]
+                warnings['cored'] = 'svgTarget'
+            else
+                warnings['cored'] = nil
             end
             if friendly or showAlerts then
-                targetString = targetString .. [[ 
-                    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                    <rect x="]].. tostring(.695 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.25 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(60, 255, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
-                    <text x="]].. tostring(.705 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.275 * screenHeight) ..[[" style="fill: ]]..'rgb(60, 255, 60);'..[[" font-size="]].. tostring(warning_size * 0.8)..[[vw" font-weight="bold">
-                        Target is Friendly</text>
-                    </rect></svg>]]
+                warnings['friendly'] = 'svgGroup'
+            else
+                warnings['friendly'] = nil
             end
         end
     end
@@ -783,6 +791,36 @@ function identifiedWidget()
     return iw
 end
 
+function warningsWidget()
+    local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local warningText = {}
+    warningText['attackedBy'] = string.format('%.0f ships attacking',attackedBy)
+    warningText['radarOverload'] = 'Radar Overloaded'
+    warningText['cored'] = 'Target is Destroyed'
+    warningText['friendly'] = 'Target is Friendly'
+
+    local warningColor = {}
+    warningColor['attackedBy'] = 'red'
+    warningColor['radarOverload'] = 'orange'
+    warningColor['cored'] = 'orange'
+    warningColor['friendly'] = 'green'
+
+    local count = 0
+    for k,v in pairs(warnings) do
+        if v ~= nil then
+            ww = ww .. string.format([[
+                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.65 * screenWidth) ..[[" y="]].. tostring(.06 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
+                    ]]..warningSymbols[v]..[[
+                </svg>
+                <text x="]].. tostring(.677 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
+                ]])
+            count = count + 1
+        end
+    end
+    ww = ww .. '</svg>'
+    return ww
+end
+
 function generateHTML()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
     if showScreen then
@@ -793,7 +831,7 @@ function generateHTML()
         if radar_1 then html = html .. radarWidget() end
     end
     if radar_1 then html = html .. identifiedWidget() end
-    
+    html = html .. warningsWidget()
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
 end

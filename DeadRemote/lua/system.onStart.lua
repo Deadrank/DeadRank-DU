@@ -55,6 +55,38 @@ function string.starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
 
+function formatNumber(val, numType)
+    if numType == 'speed' then
+        local speedString = ''
+        if type(val) == 'number' then speedString = string.format('%.0fkm/h',val)
+        else speedString = string.format('%skm/h',val)
+        end
+        return speedString
+    elseif numType == 'distance' then
+        local distString = ''
+        if type(val) == 'number' then
+            if val < 1000 then distString = string.format('%.2fm',val)
+            elseif val < 100000 then distString = string.format('%.2fkm',val/1000)
+            else distString = string.format('%.2fsu',val*.000005)
+            end
+        else
+            distString = string.format('%sm',val)
+        end
+        return distString
+    elseif numType == 'mass' then
+        local massStr = ''
+        if type(val) == 'number' then
+            if val < 1000 then massStr = string.format('%.2fkg',val)
+            elseif val < 1000000 then massStr = string.format('%.2ft',val/1000)
+            else massStr = string.format('%.2fkt',val/1000000)
+            end
+        else
+            massStr = string.format('%skg',val)
+        end
+        return massStr
+    end
+end
+
 function pipeDist(A,B,loc,reachable)
     local AB = vec3.new(B['x']-A['x'],B['y']-A['y'],B['z']-A['z'])
     local BE = vec3.new(loc['x']-B['x'],loc['y']-B['y'],loc['z']-B['z'])
@@ -153,14 +185,9 @@ function brakeWidget()
     local brakeON = brakeInput > 0
     local bw = ''
     if brakeON then
-        bw = [[ 
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(0.610 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.25 * screenHeight) ..[[" rx="]].. tostring(warning_size * 15)..[[" ry="]].. tostring(warning_size * 15)..[[" width="]].. tostring(warning_size * 8)..[[vw" height="]].. tostring(warning_size * 4)..[[vh" style="fill:rgba(60, 60, 255, 0.9);stroke:rgb(255, 60, 60);stroke-width:]].. tostring(warning_size * 5)..[[;opacity:0.9;" />
-            <text x="]].. tostring(0.622 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.275 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]].. tostring(warning_size * 1.42)..[[vh" font-weight="bold">
-            Brakes Engaged</text>
-            </rect></svg>
-            ]]
-        
+        warnings['brakes'] = 'svgBrakes'
+    else
+        warnings['brakes'] = nil
     end
     return bw
 end
@@ -170,7 +197,7 @@ function flightWidget()
     else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
     end
     local sw = ''
-    if maxBrakeStr ~= nil then
+    if speed ~= nil then
         --Center Top
         sw = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
@@ -208,19 +235,19 @@ function flightWidget()
                 L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
                 stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
 
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. speedStr .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Current Accel: ]] .. accelStr .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Brake Dist: ]] .. brakeDistStr .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Current Accel: ]] .. string.format('%.2f G',accel/9.81) .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Brake Dist: ]] .. formatNumber(brakeDist,'distance') .. [[</text>
                 
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Speed: ]] .. maxSpeedStr .. [[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Accel: ]] .. maxThrustStr ..[[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Brake: ]] .. maxBrakeStr .. [[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Speed: ]] .. formatNumber(maxSpeed,'speed') .. [[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Accel: ]] .. string.format('%.2f G',maxSpaceThrust/mass/9.81) ..[[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Brake: ]] .. string.format('%.2f G',maxBrake/mass/9.81) .. [[</text>
 
                 <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Mass </text>
-                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]]..massStr..[[</text>
+                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]]..formatNumber(mass,'mass')..[[</text>
 
                 <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Gravity </text>
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]].. gravityStr ..[[</text>
+                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]].. string.format('%.2f G',gravity/9.81) ..[[</text>
 
                 <text x="]].. tostring(.684 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(-10,]].. tostring(.684 * screenWidth) ..",".. tostring(.028 * screenHeight) ..[[)">]].. mode ..[[</text>
 
@@ -299,15 +326,9 @@ function fuelWidget()
     ]]
 
     if fuelTankWarning or fuelWarning or showAlerts then
-        local warningText = 'Fuel level &lt; 20%'
-        if not fuelWarning then warningText = 'A Fuel tank &lt; 20%' end
-        fw = fw .. [[ 
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(0.610 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.10 * screenHeight) ..[[" rx="]]..tostring(warning_size * 15)..[[" ry="]]..tostring(warning_size * 15)..[[" width="]]..tostring(warning_size * 8)..[[vw" height="]]..tostring(warning_size * 4)..[[vh" style="fill:rgba(50, 50, 50, 0.9);stroke:rgb(255, 60, 60);stroke-width:]]..tostring(warning_size * 5)..[[;opacity:0.9;" />
-            <text x="]].. tostring(0.620 * screenWidth) ..[[" y="]].. tostring(warning_size * 0.125 * screenHeight) ..[[" style="fill: ]]..'rgb(255, 60, 60)'..[[" font-size="]]..tostring(warning_size * 1.42)..[[vh" font-weight="bold">
-                ]]..string.format('%s',warningText)..[[</text>
-            </rect></svg>]]
-        
+        fuelWarningText = 'Fuel level &lt; 20%'
+        if not fuelWarning then fuelWarningText = 'A Fuel tank &lt; 20%%' end
+        warnings['lowFuel'] = 'svgWarning'
     end
 
     fw = fw .. '</svg>'
@@ -563,6 +584,32 @@ function travelIndicatorWidget()
     return tiw
 end
 
+function warningsWidget()
+    local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local warningText = {}
+    warningText['lowFuel'] = fuelWarningText
+    warningText['brakes'] = 'Brakes Locked'
+
+    local warningColor = {}
+    warningColor['lowFuel'] = 'red'
+    warningColor['brakes'] = 'orange'
+
+    local count = 0
+    for k,v in pairs(warnings) do
+        if v ~= nil then
+            ww = ww .. string.format([[
+                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.24 * screenWidth) ..[[" y="]].. tostring(.06 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
+                    ]]..warningSymbols[v]..[[
+                </svg>
+                <text x="]].. tostring(.267 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
+                ]])
+            count = count + 1
+        end
+    end
+    ww = ww .. '</svg>'
+    return ww
+end
+
 function generateScreen()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
     if showScreen then 
@@ -573,10 +620,15 @@ function generateScreen()
         html = html .. positionInfoWidget()
         html = html .. engineWidget()
         html = html .. shipNameWidget()
+        if useLogo then
+            html = html .. [[<svg width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logo .. [[
+                </svg>]]
+        end
     end
     html = html .. planetARWidget()
     html = html .. helpWidget()
     html = html .. travelIndicatorWidget()
+    html = html .. warningsWidget()
 
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
@@ -614,6 +666,9 @@ function globalDB(action)
             if db_1.hasKey('EngineTagColor') == 1 then EngineTagColor = db_1.getStringValue('EngineTagColor') end
             if db_1.hasKey('Indicator_Width') == 1 then Indicator_Width = db_1.getFloatValue('Indicator_Width') end
             if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
+            if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
+            if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
+            if db_1.hasKey('useLogo') == 1 then useLogo = db_1.getIntValue('useLogo') == 1 end
         elseif action == 'save' then
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
@@ -644,6 +699,9 @@ function globalDB(action)
             db_1.setFloatValue('Indicator_Width',Indicator_Width)
             db_1.setFloatValue('warning_size',warning_size)
             if AR_Exclude_Moons then db_1.setIntValue('AR_Exclude_Moons',1) else db_1.setIntValue('AR_Exclude_Moons',0) end
+            db_1.setStringValue('warning_outline_color',warning_outline_color)
+            db_1.setStringValue('warning_fill_color',warning_fill_color)
+            if useLogo then db_1.setIntValue('useLogo',1) else db_1.setIntValue('useLogo',0) end
         end
     end
 end

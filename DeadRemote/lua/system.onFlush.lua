@@ -41,20 +41,6 @@ brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speed/3.6,0,mass + docked
 accelVec = vec3(construct.getWorldAcceleration())
 accel = accelVec:len()
 
-speedStr = string.format('%.2f km/h',speed)
-gravityStr = string.format('%.2f G',gravity/9.81)
-if mass < 1000 then massStr = string.format('%.2f kg',mass)
-elseif mass < 1000000 then massStr = string.format('%.2f ton',mass/1000)
-else massStr = string.format('%.2f kton',mass/1000000)
-end
-maxBrakeStr = string.format('%.2f G',maxBrake/mass/9.81)
-maxThrustStr = string.format('%.2f G',maxSpaceThrust/mass/9.81)
-if brakeDist < 1000 then brakeDistStr = string.format('%.2f m',brakeDist)
-elseif brakeDist < 100000 then brakeDistStr = string.format('%.2f km',brakeDist/1000)
-else brakeDistStr = string.format('%.2f su',brakeDist*.000005)
-end
-accelStr = string.format('%.2f G',accel/9.81)
-maxSpeedStr = string.format('%.2f km/h',maxSpeed)
 ------------------------------------
 
 

@@ -12,16 +12,8 @@ end
 -- Closest Planet/Pipe info --
 closestPlanetName,closestPlanetDist = closestPlanet()
 closestPipeName,closestPipeDistance = closestPipe()
-closestPipeStr = ''
-if closestPipeDistance < 1000 then closestPipeStr = string.format('%s (%.2f m)',closestPipeName,closestPipeDistance)
-elseif closestPipeDistance < 100000 then closestPipeStr = string.format('%s (%.2f km)',closestPipeName,closestPipeDistance/1000)
-else closestPipeStr = string.format('%s (%.2f SU)',closestPipeName,closestPipeDistance*.000005)
-end
-closestPlanetStr = ''
-if closestPlanetDist < 1000 then closestPlanetStr = string.format('%s (%.2f m)',closestPlanetName,closestPlanetDist)
-elseif closestPlanetDist < 100000 then closestPlanetStr = string.format('%s (%.2f km)',closestPlanetName,closestPlanetDist/1000)
-else closestPlanetStr = string.format('%s (%.2f SU)',closestPlanetName,closestPlanetDist*.000005)
-end
+closestPipeStr = string.format('%s (%s)',closestPipeName,formatNumber(closestPipeDistance,'distance'))
+closestPlanetStr = string.format('%s (%s)',closestPlanetName,formatNumber(closestPlanetDist,'distance'))
 
 -- Disable AutoPilot if to close to planet --
 if closestPlanetDist < 40000 and autopilot then 
@@ -263,5 +255,5 @@ end
 
 
 -- Generate Screen overlay --
-if maxBrakeStr ~= nil then generateScreen() end
+if speed ~= nil then generateScreen() end
 -----------------------------
