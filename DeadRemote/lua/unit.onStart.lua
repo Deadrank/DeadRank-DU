@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v2.0.2'
+hudVersion = 'v2.0.3'
 validatePilot = false --export
 useDB = true --export
 showRemotePanel = false --export

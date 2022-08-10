@@ -621,7 +621,7 @@ function generateScreen()
         html = html .. engineWidget()
         html = html .. shipNameWidget()
         if useLogo then
-            html = html .. [[<svg width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
+            html = html .. [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
                 </svg>]]
         end
     end
