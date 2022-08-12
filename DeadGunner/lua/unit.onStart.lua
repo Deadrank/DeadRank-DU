@@ -143,57 +143,6 @@ if validatePilot then
     end
 end
 
-warningHTML = ''
-if radar_1 == nil then
-    system.print('ERROR: NO RADAR LINKED')
-    warningHTML = [[ 
-        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-        <rect x="]].. tostring(.02 * screenWidth) ..[[" y="]].. tostring(.04 * screenHeight) ..[[" rx="15" ry="15" width="7vw" height="4vh" style="fill:rgba(50, 50, 50, 0.9);stroke:red;stroke-width:5;opacity:0.9;" />
-        <text x="]].. tostring(.025 * screenWidth) ..[[" y="]].. tostring(.065 * screenHeight) ..[[" style="fill: ]]..'red'..[[" font-size=".8vw" font-weight="bold">
-            NO RADAR LINKED</text>
-        </rect></svg>]]
-end
-instructionHTML = ''
-if generateAutoCode then
-    system.print('-- ENTER ACTIVATION CODE --')
-    local textColor = 'white'
-    instructionHTML = [[
-    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="50vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
-                Gunner Chair Startup Instructions</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                1) Press "enter" key and go to lua chat channel</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                2) Enter the number you would like to use as your unique transponder seed</text>
-            <text x="]].. tostring(.265 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                (or 0 if you do not want auto generated codes)</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                3) After entering the code, the seat will start</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
-                Notes:</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                 - The code entered will create an auto-generated transponder code that changes every ~15 minutes.</text>
-            <text x="]].. tostring(.27 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                Anyone using this HUD and entering the same startup code will have matching transponders</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                 - Manually link a data bank to the seat to enable shared functions between the DeadGunner HUD and the DeadRemote HUD</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                 - Make sure to run the seat config AFTER linking all radar and weapons to the seat</text>
-            </rect>
-            </svg>]]
-else
-    unit.setTimer('booting',1)
-    codeSeed = 0
-end
-
-html = [[<html> <body style="font-family: Calibri;">]]
-html = html .. instructionHTML .. warningHTML .. [[</body></html>]]
-system.setScreen(html)
-system.showScreen(1)
-
-showScreen = true
-
 warnings = {}
 warningSymbols = {}
 warningSymbols['svgCritical'] = [[
@@ -270,8 +219,56 @@ warningSymbols['svgGroup'] = [[
                         </g>
                     </g>
                 </svg>
-            ]]
+    ]]
 
+
+
+if radar_1 == nil then
+    system.print('ERROR: NO RADAR LINKED')
+    warnings['noRadar'] = 'svgWarning'
+else
+    warnings['noRadar'] = nil
+end
+instructionHTML = ''
+if generateAutoCode then
+    system.print('-- ENTER ACTIVATION CODE --')
+    local textColor = 'white'
+    instructionHTML = [[
+    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+            <rect x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="50vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
+                Gunner Chair Startup Instructions</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                1) Press "enter" key and go to lua chat channel</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                2) Enter the number you would like to use as your unique transponder seed</text>
+            <text x="]].. tostring(.265 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                (or 0 if you do not want auto generated codes)</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                3) After entering the code, the seat will start</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
+                Notes:</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                 - The code entered will create an auto-generated transponder code that changes every ~15 minutes.</text>
+            <text x="]].. tostring(.27 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                Anyone using this HUD and entering the same startup code will have matching transponders</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                 - Manually link a data bank to the seat to enable shared functions between the DeadGunner HUD and the DeadRemote HUD</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                 - Make sure to run the seat config AFTER linking all radar and weapons to the seat</text>
+            </rect>
+            </svg>]]
+else
+    unit.setTimer('booting',1)
+    codeSeed = 0
+end
+
+html = [[<html> <body style="font-family: Calibri;">]]
+html = html .. instructionHTML .. [[</body></html>]]
+system.setScreen(html)
+system.showScreen(1)
+
+showScreen = true
 
 radarRange = 0
 if radar_1 ~= nil then

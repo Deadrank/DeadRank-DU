@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v2.0.4'
+hudVersion = 'v2.0.5'
 validatePilot = false --export
 useDB = true --export
 showRemotePanel = false --export
@@ -174,6 +174,7 @@ if vec3(construct.getWorldVelocity()):len() * 3.6 < 500 then
 end
 
 lShift = false
+lAlt = false
 
 -- Validate pilot mode --
 if validatePilot then

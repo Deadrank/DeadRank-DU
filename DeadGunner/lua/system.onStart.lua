@@ -798,12 +798,14 @@ function warningsWidget()
     warningText['radarOverload'] = 'Radar Overloaded'
     warningText['cored'] = 'Target is Destroyed'
     warningText['friendly'] = 'Target is Friendly'
+    warningText['noRadar'] = 'No Radar Linked'
 
     local warningColor = {}
     warningColor['attackedBy'] = 'red'
     warningColor['radarOverload'] = 'orange'
     warningColor['cored'] = 'orange'
     warningColor['friendly'] = 'green'
+    warningColor['noRadar'] = 'red'
 
     local count = 0
     for k,v in pairs(warnings) do

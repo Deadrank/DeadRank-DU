@@ -1,2 +1,2 @@
 lShift = true
-showScreen = false
+if not lAlt then showScreen = false end
