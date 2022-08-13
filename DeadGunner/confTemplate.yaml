@@ -1,4 +1,4 @@
-name: DeadGunner v2.2.3
+name: DeadGunner v2.2.4
 pvp: true
 
 slots:
@@ -40,19 +40,19 @@ handlers:
     onTimer:
       args: ['radar']
       lua: |
-{{unit.onTimer_radar.lua}}
+{{unit.onTimer.radar.lua}}
     onTimer:
       args: ['booting']
       lua: |
-{{unit.onTimer_booting.lua}}
+{{unit.onTimer.booting.lua}}
     onTimer:
       args: ['code']
       lua: |
-{{unit.onTimer_code.lua}}
+{{unit.onTimer.code.lua}}
     onTimer:
       args: ['overlap']
       lua: |
-{{unit.onTimer_overlap.lua}}
+{{unit.onTimer.overlap.lua}}
   system:
     onStart:
       lua: |
@@ -66,7 +66,7 @@ handlers:
     onActionStart:
       args: ['option7']
       lua: |
-{{system.onActionStart_opt7.lua}}
+{{system.onActionStart.opt7.lua}}
     onActionStart:
       args: ['option8']
       lua: |
