@@ -36,13 +36,13 @@ warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
 -- HP (Shield/CCS) widget --
 hpWidgetX = 35 --export
 hpWidgetY = 88 --export
-hpWidgetScale = 16 --export
+hpWidgetScale = 17 --export
 shieldHPColor = 'rgb(25, 247, 255)' --export
 ccsHPColor = 'rgb(60, 255, 60)' --export
 -- Resist Widget --
 resistWidgetX = 47 --export
 resistWidgetY = 82 --export
-resistWidgetScale = 7 --export
+resistWidgetScale = 9 --export
 antiMatterColor = 'rgb(56, 255, 56)' --export
 electroMagneticColor = 'rgb(27, 255, 217)' --export
 kineticColor = 'rgb(255, 75, 75)' --export
