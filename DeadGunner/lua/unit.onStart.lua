@@ -19,7 +19,7 @@ bottomHUDLineColorPVP = 'lightgrey' --export
 bottomHUDFillColorPVP = 'rgba(255, 0, 0, 0.75)' --export
 textColorPVP = 'black' --export
 neutralLineColor = 'lightgrey' --export
-neutralFontColor = 'darkgrey' --export
+neutralFontColor = 'white' --export
 generateAutoCode = false --export
 autoVent = true --export Autovent shield at 0 hp
 L_Shield_HP = 11500000 --export
@@ -32,7 +32,31 @@ radarBuffer = 0.00001
 warning_size = 0.75 --export How large the warning indicators should be
 warning_outline_color = 'rgb(255, 60, 60)' --export
 warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
-----------------
+
+-- HP (Shield/CCS) widget --
+hpWidgetX = 35
+hpWidgetY = 88
+hpWidgetScale = 16
+shieldHPColor = 'rgb(25, 247, 255)'
+ccsHPColor = 'rgb(60, 255, 60)'
+-- Resist Widget --
+resistWidgetX = 47
+resistWidgetY = 82
+resistWidgetScale = 10
+antiMatterColor = 'rgb(56, 255, 56)'
+electroMagneticColor = 'rgb(27, 255, 217)'
+kineticColor = 'rgb(255, 75, 75)'
+thermicColor = 'rgb(255, 234, 41)'
+-- Transponder Widget --
+transponderWidgetX = 29
+transponderWidgetY = 70
+transponderWidgetScale = 11.25
+-- Radar Info Widget --
+radarInfoWidgetX = 40
+radarInfoWidgetY = 70
+radarInfoWidgetScale = 11.25
+
+
 
 userCode = {}
 userCode[validPilotCode] = pilotName
@@ -229,6 +253,7 @@ if radar_1 == nil then
 else
     warnings['noRadar'] = nil
 end
+
 instructionHTML = ''
 if generateAutoCode then
     system.print('-- ENTER ACTIVATION CODE --')
@@ -262,6 +287,7 @@ else
     unit.setTimer('booting',1)
     codeSeed = 0
 end
+
 
 html = [[<html> <body style="font-family: Calibri;">]]
 html = html .. instructionHTML .. [[</body></html>]]
