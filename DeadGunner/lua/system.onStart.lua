@@ -261,6 +261,29 @@ function globalDB(action)
             if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
             if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
             if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
+
+            if db_1.hasKey('hpWidgetX') == 1 then hpWidgetX = db_1.getIntValue('hpWidgetX') end
+            if db_1.hasKey('hpWidgetY') == 1 then hpWidgetY = db_1.getIntValue('hpWidgetY') end
+            if db_1.hasKey('hpWidgetScale') == 1 then hpWidgetScale = db_1.getIntValue('hpWidgetScale') end
+            if db_1.hasKey('shieldHPColor') == 1 then shieldHPColor = db_1.getStringValue('shieldHPColor') end
+            if db_1.hasKey('ccsHPColor') == 1 then ccsHPColor = db_1.getStringValue('ccsHPColor') end
+
+            if db_1.hasKey('resistWidgetX') == 1 then resistWidgetX = db_1.getIntValue('resistWidgetX') end
+            if db_1.hasKey('resistWidgetY') == 1 then resistWidgetY = db_1.getIntValue('resistWidgetY') end
+            if db_1.hasKey('resistWidgetScale') == 1 then resistWidgetScale = db_1.getIntValue('resistWidgetScale') end
+            if db_1.hasKey('antiMatterColor') == 1 then antiMatterColor = db_1.getStringValue('antiMatterColor') end
+            if db_1.hasKey('electroMagneticColor') == 1 then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
+            if db_1.hasKey('kineticColor') == 1 then kineticColor = db_1.getStringValue('kineticColor') end
+            if db_1.hasKey('thermicColor') == 1 then thermicColor = db_1.getStringValue('thermicColor') end
+
+            if db_1.hasKey('transponderWidgetX') == 1 then transponderWidgetX = db_1.getIntValue('transponderWidgetX') end
+            if db_1.hasKey('transponderWidgetY') == 1 then transponderWidgetY = db_1.getIntValue('transponderWidgetY') end
+            if db_1.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = db_1.getIntValue('transponderWidgetScale') end
+
+            if db_1.hasKey('radarInfoWidgetX') == 1 then radarInfoWidgetX = db_1.getIntValue('radarInfoWidgetX') end
+            if db_1.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = db_1.getIntValue('radarInfoWidgetY') end
+            if db_1.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = db_1.getIntValue('radarInfoWidgetScale') end
+
         elseif action == 'save' then
             db_1.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
@@ -284,6 +307,28 @@ function globalDB(action)
             db_1.setFloatValue('warning_size',warning_size)
             db_1.setStringValue('warning_outline_color',warning_outline_color)
             db_1.setStringValue('warning_fill_color',warning_fill_color)
+
+            db_1.setIntValue('hpWidgetX',hpWidgetX)
+            db_1.setIntValue('hpWidgetY',hpWidgetY)
+            db_1.setIntValue('hpWidgetScale',hpWidgetScale)
+            db_1.setStringValue('shieldHPColor',shieldHPColor)
+            db_1.setStringValue('ccsHPColor',ccsHPColor)
+
+            db_1.setIntValue('resistWidgetX',resistWidgetX)
+            db_1.setIntValue('resistWidgetY',resistWidgetY)
+            db_1.setIntValue('resistWidgetScale',resistWidgetScale)
+            db_1.setStringValue('antiMatterColor',antiMatterColor)
+            db_1.setStringValue('electroMagneticColor',electroMagneticColor)
+            db_1.setStringValue('kineticColor',kineticColor)
+            db_1.setStringValue('thermicColor',thermicColor)
+
+            db_1.setIntValue('transponderWidgetX',transponderWidgetX)
+            db_1.setIntValue('transponderWidgetY',transponderWidgetY)
+            db_1.setIntValue('transponderWidgetScale',transponderWidgetScale)
+
+            db_1.setIntValue('radarInfoWidgetX',radarInfoWidgetX)
+            db_1.setIntValue('radarInfoWidgetY',radarInfoWidgetY)
+            db_1.setIntValue('radarInfoWidgetScale',radarInfoWidgetScale)
         end
     end
 end
