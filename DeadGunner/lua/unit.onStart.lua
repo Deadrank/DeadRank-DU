@@ -5,7 +5,7 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-showAlerts = true
+showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
