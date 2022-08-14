@@ -116,11 +116,11 @@ function updateRadar(filter)
     local enemyLShips = 0
     local friendlyLShips = 0
     local constructList = {}
-    local eShips = {}
-    eShips['XS'] = {}
-    eShips['S'] = {}
-    eShips['M'] = {}
-    eShips['L'] = {}
+    local shipsBySize = {}
+    shipsBySize['XS'] = {}
+    shipsBySize['S'] = {}
+    shipsBySize['M'] = {}
+    shipsBySize['L'] = {}
 
     identifiedBy = 0
     attackedBy = 0
@@ -185,15 +185,21 @@ function updateRadar(filter)
                     local replacedData = str:gsub(nameOrig,uniqueName)
                     if identified then
                         table.insert(constructList,1,replacedData)
+                    elseif radarSort == 'Size' then
+                        table.insert(shipsBySize[shipSize],replacedData)
                     else
-                        table.insert(eShips[shipSize],replacedData)
+                        table.insert(constructList,replacedData)
                     end
                 end
             elseif filter == 'identified' and identified then
                 local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                 for str in rawData do
                     local replacedData = str:gsub(nameOrig,uniqueName)
-                    table.insert(constructList,replacedData)
+                    if radarSort == 'Size' then
+                        table.insert(shipsBySize[shipSize],replacedData)
+                    else
+                        table.insert(constructList,replacedData)
+                    end
                 end
             elseif filter == 'friendly' and friendly then
                 local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
@@ -201,6 +207,8 @@ function updateRadar(filter)
                     local replacedData = str:gsub(nameOrig,uniqueName)
                     if identified then
                         table.insert(constructList,1,replacedData)
+                    elseif radarSort == 'Size' then
+                        table.insert(shipsBySize[shipSize],replacedData)
                     else
                         table.insert(constructList,replacedData)
                     end
@@ -211,6 +219,8 @@ function updateRadar(filter)
                     local replacedData = str:gsub(nameOrig,uniqueName)
                     if identified then
                         table.insert(constructList,1,replacedData)
+                    elseif radarSort == 'Size' then
+                        table.insert(shipsBySize[shipSize],replacedData)
                     else
                         table.insert(constructList,replacedData)
                     end
@@ -221,6 +231,8 @@ function updateRadar(filter)
                     local replacedData = str:gsub(nameOrig,uniqueName)
                     if identified then
                         table.insert(constructList,1,replacedData)
+                    elseif radarSort == 'Size' then
+                        table.insert(shipsBySize[shipSize],replacedData)
                     else
                         table.insert(constructList,replacedData)
                     end
@@ -229,12 +241,12 @@ function updateRadar(filter)
         end
     end
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
-    data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'"')
-    if filter == 'enemy' then
-        for _,ship in pairs(eShips['XS']) do table.insert(constructList,ship) end
-        for _,ship in pairs(eShips['S']) do table.insert(constructList,ship) end
-        for _,ship in pairs(eShips['M']) do table.insert(constructList,ship) end
-        for _,ship in pairs(eShips['L']) do table.insert(constructList,ship) end
+    data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
+    if radarSort == 'Size' then
+        for _,ship in pairs(shipsBySize['XS']) do table.insert(constructList,ship) end
+        for _,ship in pairs(shipsBySize['S']) do table.insert(constructList,ship) end
+        for _,ship in pairs(shipsBySize['M']) do table.insert(constructList,ship) end
+        for _,ship in pairs(shipsBySize['L']) do table.insert(constructList,ship) end
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
     else
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')

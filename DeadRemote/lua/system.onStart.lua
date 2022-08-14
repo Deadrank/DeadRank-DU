@@ -467,7 +467,7 @@ function helpWidget()
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+6: Set AutoPilot destination to the nearest safe zone</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+7: Toggles radar widget filtering mode (Show all, Show Enemy, Show Identified, Show Friendly)</text>
+                Alt+7: Toggles radar widget filtering mode (Show all, Show Enemy, Show Identified, Show Friendly)(Alt+Shift+7 toggles radar widget sorting between distance and construct size)</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+8: Toggle Shield vent. Start venting if available. Stop venting if currently venting</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">

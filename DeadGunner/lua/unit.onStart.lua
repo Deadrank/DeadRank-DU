@@ -80,12 +80,7 @@ table.insert(filterSize,'XS')
 friendlySIDs = {}
 useShipID = true
 radarFilter = 'All'
-radarToggles = {}
-table.insert(radarToggles,'All')
-table.insert(radarToggles,'enemy')
-table.insert(radarToggles,'identified')
-table.insert(radarToggles,'friendly')
-table.insert(radarToggles,'primary')
+radarSort = 'Distance'
 validSizes = {}
 table.insert(validSizes,'L')
 table.insert(validSizes,'M')
@@ -295,6 +290,7 @@ system.setScreen(html)
 system.showScreen(1)
 
 showScreen = true
+lShift = false
 
 radarRange = 0
 if radar_1 ~= nil then
