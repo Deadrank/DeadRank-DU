@@ -34,26 +34,26 @@ warning_outline_color = 'rgb(255, 60, 60)' --export
 warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
 
 -- HP (Shield/CCS) widget --
-hpWidgetX = 35 --export
+hpWidgetX = 33 --export
 hpWidgetY = 88 --export
 hpWidgetScale = 17 --export
 shieldHPColor = 'rgb(25, 247, 255)' --export
 ccsHPColor = 'rgb(60, 255, 60)' --export
 -- Resist Widget --
-resistWidgetX = 47 --export
+resistWidgetX = 45 --export
 resistWidgetY = 82 --export
-resistWidgetScale = 9 --export
+resistWidgetScale = 8.5 --export
 antiMatterColor = 'rgb(56, 255, 56)' --export
 electroMagneticColor = 'rgb(27, 255, 217)' --export
 kineticColor = 'rgb(255, 75, 75)' --export
 thermicColor = 'rgb(255, 234, 41)' --export
 -- Transponder Widget --
 transponderWidgetX = 29 --export
-transponderWidgetY = 70 --export
+transponderWidgetY = 67 --export
 transponderWidgetScale = 11.25 --export
 -- Radar Info Widget --
 radarInfoWidgetX = 40 --export
-radarInfoWidgetY = 70 --export
+radarInfoWidgetY = 67 --export
 radarInfoWidgetScale = 11.25 --export
 
 

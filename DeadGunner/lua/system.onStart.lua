@@ -116,6 +116,12 @@ function updateRadar(filter)
     local enemyLShips = 0
     local friendlyLShips = 0
     local constructList = {}
+    local eShips = {}
+    eShips['XS'] = {}
+    eShips['S'] = {}
+    eShips['M'] = {}
+    eShips['L'] = {}
+
     identifiedBy = 0
     attackedBy = 0
     radarStats = {
@@ -180,7 +186,7 @@ function updateRadar(filter)
                     if identified then
                         table.insert(constructList,1,replacedData)
                     else
-                        table.insert(constructList,replacedData)
+                        table.insert(eShips[shipSize],replacedData)
                     end
                 end
             elseif filter == 'identified' and identified then
@@ -224,7 +230,15 @@ function updateRadar(filter)
     end
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
     data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'"')
-    data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
+    if filter == 'enemy' then
+        for _,ship in pairs(eShips['XS']) do table.insert(constructList,ship) end
+        for _,ship in pairs(eShips['S']) do table.insert(constructList,ship) end
+        for _,ship in pairs(eShips['M']) do table.insert(constructList,ship) end
+        for _,ship in pairs(eShips['L']) do table.insert(constructList,ship) end
+        data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
+    else
+        data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
+    end
     return data
 end
 
@@ -262,27 +276,29 @@ function globalDB(action)
             if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
             if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
 
-            if db_1.hasKey('hpWidgetX') == 1 then hpWidgetX = db_1.getIntValue('hpWidgetX') end
-            if db_1.hasKey('hpWidgetY') == 1 then hpWidgetY = db_1.getIntValue('hpWidgetY') end
-            if db_1.hasKey('hpWidgetScale') == 1 then hpWidgetScale = db_1.getIntValue('hpWidgetScale') end
+            if db_1.hasKey('hpWidgetX') == 1 then hpWidgetX = db_1.getFloatValue('hpWidgetX') end
+            if db_1.hasKey('hpWidgetY') == 1 then hpWidgetY = db_1.getFloatValue('hpWidgetY') end
+            if db_1.hasKey('hpWidgetScale') == 1 then hpWidgetScale = db_1.getFloatValue('hpWidgetScale') end
             if db_1.hasKey('shieldHPColor') == 1 then shieldHPColor = db_1.getStringValue('shieldHPColor') end
             if db_1.hasKey('ccsHPColor') == 1 then ccsHPColor = db_1.getStringValue('ccsHPColor') end
 
-            if db_1.hasKey('resistWidgetX') == 1 then resistWidgetX = db_1.getIntValue('resistWidgetX') end
-            if db_1.hasKey('resistWidgetY') == 1 then resistWidgetY = db_1.getIntValue('resistWidgetY') end
-            if db_1.hasKey('resistWidgetScale') == 1 then resistWidgetScale = db_1.getIntValue('resistWidgetScale') end
+            if db_1.hasKey('resistWidgetX') == 1 then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
+            if db_1.hasKey('resistWidgetY') == 1 then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
+            if db_1.hasKey('resistWidgetScale') == 1 then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
             if db_1.hasKey('antiMatterColor') == 1 then antiMatterColor = db_1.getStringValue('antiMatterColor') end
             if db_1.hasKey('electroMagneticColor') == 1 then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
             if db_1.hasKey('kineticColor') == 1 then kineticColor = db_1.getStringValue('kineticColor') end
             if db_1.hasKey('thermicColor') == 1 then thermicColor = db_1.getStringValue('thermicColor') end
 
-            if db_1.hasKey('transponderWidgetX') == 1 then transponderWidgetX = db_1.getIntValue('transponderWidgetX') end
-            if db_1.hasKey('transponderWidgetY') == 1 then transponderWidgetY = db_1.getIntValue('transponderWidgetY') end
-            if db_1.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = db_1.getIntValue('transponderWidgetScale') end
+            if db_1.hasKey('transponderWidgetX') == 1 then transponderWidgetX = db_1.getFloatValue('transponderWidgetX') end
+            if db_1.hasKey('transponderWidgetY') == 1 then transponderWidgetY = db_1.getFloatValue('transponderWidgetY') end
+            if db_1.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = db_1.getFloatValue('transponderWidgetScale') end
 
-            if db_1.hasKey('radarInfoWidgetX') == 1 then radarInfoWidgetX = db_1.getIntValue('radarInfoWidgetX') end
-            if db_1.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = db_1.getIntValue('radarInfoWidgetY') end
-            if db_1.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = db_1.getIntValue('radarInfoWidgetScale') end
+            if db_1.hasKey('radarInfoWidgetX') == 1 then radarInfoWidgetX = db_1.getFloatValue('radarInfoWidgetX') end
+            if db_1.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = db_1.getFloatValue('radarInfoWidgetY') end
+            if db_1.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = db_1.getFloatValue('radarInfoWidgetScale') end
+
+            system.print(transponderWidgetScale)
 
         elseif action == 'save' then
             db_1.setStringValue('uc-'..validPilotCode,pilotName)
@@ -308,27 +324,27 @@ function globalDB(action)
             db_1.setStringValue('warning_outline_color',warning_outline_color)
             db_1.setStringValue('warning_fill_color',warning_fill_color)
 
-            db_1.setIntValue('hpWidgetX',hpWidgetX)
-            db_1.setIntValue('hpWidgetY',hpWidgetY)
-            db_1.setIntValue('hpWidgetScale',hpWidgetScale)
+            db_1.setFloatValue('hpWidgetX',hpWidgetX)
+            db_1.setFloatValue('hpWidgetY',hpWidgetY)
+            db_1.setFloatValue('hpWidgetScale',hpWidgetScale)
             db_1.setStringValue('shieldHPColor',shieldHPColor)
             db_1.setStringValue('ccsHPColor',ccsHPColor)
 
-            db_1.setIntValue('resistWidgetX',resistWidgetX)
-            db_1.setIntValue('resistWidgetY',resistWidgetY)
-            db_1.setIntValue('resistWidgetScale',resistWidgetScale)
+            db_1.setFloatValue('resistWidgetX',resistWidgetX)
+            db_1.setFloatValue('resistWidgetY',resistWidgetY)
+            db_1.setFloatValue('resistWidgetScale',resistWidgetScale)
             db_1.setStringValue('antiMatterColor',antiMatterColor)
             db_1.setStringValue('electroMagneticColor',electroMagneticColor)
             db_1.setStringValue('kineticColor',kineticColor)
             db_1.setStringValue('thermicColor',thermicColor)
 
-            db_1.setIntValue('transponderWidgetX',transponderWidgetX)
-            db_1.setIntValue('transponderWidgetY',transponderWidgetY)
-            db_1.setIntValue('transponderWidgetScale',transponderWidgetScale)
+            db_1.setFloatValue('transponderWidgetX',transponderWidgetX)
+            db_1.setFloatValue('transponderWidgetY',transponderWidgetY)
+            db_1.setFloatValue('transponderWidgetScale',transponderWidgetScale)
 
-            db_1.setIntValue('radarInfoWidgetX',radarInfoWidgetX)
-            db_1.setIntValue('radarInfoWidgetY',radarInfoWidgetY)
-            db_1.setIntValue('radarInfoWidgetScale',radarInfoWidgetScale)
+            db_1.setFloatValue('radarInfoWidgetX',radarInfoWidgetX)
+            db_1.setFloatValue('radarInfoWidgetY',radarInfoWidgetY)
+            db_1.setFloatValue('radarInfoWidgetScale',radarInfoWidgetScale)
         end
     end
 end
