@@ -310,8 +310,6 @@ function globalDB(action)
             if db_1.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = db_1.getFloatValue('radarInfoWidgetY') end
             if db_1.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = db_1.getFloatValue('radarInfoWidgetScale') end
 
-            system.print(transponderWidgetScale)
-
         elseif action == 'save' then
             db_1.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
