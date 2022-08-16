@@ -329,6 +329,8 @@ function fuelWidget()
         fuelWarningText = 'Fuel level &lt; 20%'
         if not fuelWarning then fuelWarningText = 'A Fuel tank &lt; 20%%' end
         warnings['lowFuel'] = 'svgWarning'
+    else
+        warnings['lowFuel'] = nil
     end
 
     fw = fw .. '</svg>'
