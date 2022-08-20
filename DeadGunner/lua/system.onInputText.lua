@@ -164,3 +164,38 @@ end
 if text:lower() == 'coreid' then
     system.print(string.format('-- %.0f --',construct.getId()))
 end
+if text:lower() == 'clear damage' then
+    system.print('-- Clearing damage dealt to target --')
+    local targetID = radar_1.getTargetId()
+    if targetID == 0 then
+        system.print('-- No target selected --')
+    else
+        if db_1 then
+            if db_1.hasKey('damage - ' .. tostring(targetID)) then
+                db_1.clearValue('damage - ' .. tostring(targetID))
+            end
+        end
+        dmgTracker[tostring(targetID)] = nil
+    end
+end
+if text:lower() == 'clear all damage' then
+    system.print('-- Clearing all damage dealt --')
+    dmgTracker = {}
+    if db_1 then
+        for _,key in pairs(db_1.getKeyList()) do
+            if string.starts(key,'damage - ') then
+                db_1.clearValue(key)
+            end
+        end
+    end
+end
+if text:lower() == 'print damage' then
+    system.print('-- Printing all damage dealt --')
+    if db_1 then
+        for _,key in pairs(db_1.getKeyList()) do
+            if string.starts(key,'damage - ') then
+                system.print(string.format('%s: %.2f',key,db_1.getFloatValue(key)))
+            end
+        end
+    end
+end
