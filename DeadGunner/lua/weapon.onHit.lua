@@ -9,5 +9,5 @@ else
 end
 
 if db_1 then
-    db_1.setFloatValue('damage - ' .. tostring(targetId) .. ' - ' .. pilotName ,dmgTracker[tostring(targetId)])
+    db_1.setFloatValue('damage - ' .. tostring(targetId) .. ' - ' .. pilotName,dmgTracker[tostring(targetId)])
 end

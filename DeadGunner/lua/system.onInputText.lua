@@ -171,8 +171,8 @@ if text:lower() == 'clear damage' then
         system.print('-- No target selected --')
     else
         if db_1 then
-            if db_1.hasKey('damage - ' .. tostring(targetID)) then
-                db_1.clearValue('damage - ' .. tostring(targetID))
+            if db_1.hasKey('damage - ' .. tostring(targetId) .. ' - ' .. pilotName) then
+                db_1.clearValue('damage - ' .. tostring(targetId) .. ' - ' .. pilotName)
             end
         end
         dmgTracker[tostring(targetID)] = nil
