@@ -779,12 +779,15 @@ function identifiedWidget()
         local dmgRatio = 0
         local dmg = 0
         if db_1 then
-            if db_1.hasKey('damage - ' .. tostring(id)) then
-                dmgTracker[tostring(id)] = db_1.getFloatValue('damage - ' .. tostring(id))
+            for _,key in pairs(db_1.getKeyList()) do
+                if string.starts(key,'damage - ' .. tostring(id)) then
+                    dmg = dmg + db_1.getFloatValue(key)
+                end
             end
-        end
-        if dmgTracker[tostring(id)] then
+        else
             dmg = dmgTracker[tostring(id)]
+        end
+        if dmg > 0 then
             dmgRatio = clamp(dmg/shieldDmgTrack[size],0,1)
             if dmg < 1000 then dmg = string.format('%.2f',dmg)
             elseif dmg < 1000000 then dmg = string.format('%.2fk',dmg/1000)
