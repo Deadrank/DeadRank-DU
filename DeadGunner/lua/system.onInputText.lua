@@ -32,12 +32,12 @@ if string.starts(text:lower(),'addships') then
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     for _,ship in ipairs(erDisplay) do
         friendlySIDs[ship.id] = 'Auto Add'
-        db_1.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
+        write_db.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
         system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',ship.name,ship.id))
     end
     for _,ship in ipairs(frDisplay) do
         friendlySIDs[ship.id] = 'Auto Add'
-        db_1.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
+        write_db.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
         system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',ship.name,ship.id))
     end
 end
@@ -46,11 +46,11 @@ if string.starts(text:lower(),'addshipid') then
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     if #matches == 3 then
         friendlySIDs[tonumber(matches[2])] = matches[3]
-        db_1.setStringValue(string.format('sc-%s',matches[2]),matches[3])
+        write_db.setStringValue(string.format('sc-%s',matches[2]),matches[3])
         system.print(string.format('-- ShipID %s (%s) added to friendly list --',matches[2],matches[3]))
     elseif #matches == 2 then
         friendlySIDs[tonumber(matches[2])] = radar_1.getConstructName(matches[2])
-        db_1.setStringValue(string.format('sc-%s',matches[2]),'nil')
+        write_db.setStringValue(string.format('sc-%s',matches[2]),'nil')
         system.print(string.format('-- ShipID %s (%s) added to friendly list --',matches[2],radar_1.getConstructName(matches[2])))
     else
         system.print('-- Invalid command "addFreindlyID <shipID> <pilotname>" --')
@@ -63,8 +63,8 @@ if string.starts(text:lower(),'delshipid') then
     local r = nil
     for k,v in pairs(friendlySIDs) do if k == matches[2] then r = k end end
     if r ~= nil then friendlySIDs[r] = nil end
-    if db_1 ~= nil and #matches == 2 then
-        if db_1.hasKey('sc-' .. tostring(matches[2])) == 1 then db_1.setStringValue('sc-' .. tostring(matches[2]),nil) end
+    if write_db ~= nil and #matches == 2 then
+        if write_db.hasKey('sc-' .. tostring(matches[2])) == 1 then write_db.setStringValue('sc-' .. tostring(matches[2]),nil) end
     end
     system.print('-- Construct removed from Friendly ID list --')
 end
@@ -141,11 +141,11 @@ if string.starts(text:lower(),'hide ') and not string.starts(text,'hide code') t
     end
 end
 if text:lower() == 'print db' then
-    if db_1 ~= nil then
+    if write_db ~= nil then
         system.print('-- DB READOUT START --')
-        for _,key in pairs(db_1.getKeyList()) do
-            if string.find(db_1.getStringValue(key),'::pos') ~= nil or true then
-                system.print(string.format('%s: %s',key,db_1.getStringValue(key)))
+        for _,key in pairs(write_db.getKeyList()) do
+            if string.find(write_db.getStringValue(key),'::pos') ~= nil or true then
+                system.print(string.format('%s: %s',key,write_db.getStringValue(key)))
             end
         end
         system.print('-- DB READOUT END --')
@@ -154,8 +154,8 @@ if text:lower() == 'print db' then
     end
 end
 if text:lower() == 'clear db' then
-    if db_1 ~= nil then
-        db_1.clear()
+    if write_db ~= nil then
+        write_db.clear()
         system.print('-- DB CLEARED --')
     else
         system.print('-- NO DB ATTACHED --')
@@ -165,14 +165,14 @@ if text:lower() == 'coreid' then
     system.print(string.format('-- %.0f --',construct.getId()))
 end
 if text:lower() == 'clear damage' then
-    system.print('-- Clearing damage dealt to target --')
+    system.print('-- Clearing damage dealt to target (this seat only) --')
     local targetID = radar_1.getTargetId()
     if targetID == 0 then
         system.print('-- No target selected --')
     else
-        if db_1 then
-            if db_1.hasKey('damage - ' .. tostring(targetID) .. ' - ' .. pilotName) then
-                db_1.clearValue('damage - ' .. tostring(targetID) .. ' - ' .. pilotName)
+        if write_db then
+            if write_db.hasKey('damage - ' .. tostring(targetID) .. ' - ' .. pilotName) then
+                write_db.clearValue('damage - ' .. tostring(targetID) .. ' - ' .. pilotName)
                 system.print('Cleared: ' .. 'damage - ' .. tostring(targetID) .. ' - ' .. pilotName)
             end
         end
@@ -181,22 +181,22 @@ if text:lower() == 'clear damage' then
     end
 end
 if text:lower() == 'clear all damage' then
-    system.print('-- Clearing all damage dealt --')
+    system.print('-- Clearing all damage dealt (this seat only) --')
     dmgTracker = {}
-    if db_1 then
-        for _,key in pairs(db_1.getKeyList()) do
+    for _,dbName in pairs(db) do
+        for _,key in pairs(dbName.getKeyList()) do
             if string.starts(key,'damage - ') then
-                db_1.clearValue(key)
+                dbName.clearValue(key)
             end
         end
     end
 end
 if text:lower() == 'print damage' then
     system.print('-- Printing all damage dealt --')
-    if db_1 then
-        for _,key in pairs(db_1.getKeyList()) do
+    for _,dbName in pairs(db) do
+        for _,key in pairs(dbName.getKeyList()) do
             if string.starts(key,'damage - ') then
-                system.print(string.format('%s: %.2f',key,db_1.getFloatValue(key)))
+                system.print(string.format('%s: %.2f',key,dbName.getFloatValue(key)))
             end
         end
     end

@@ -7,7 +7,3 @@ if dmgTracker[tostring(targetId)] then
 else
     dmgTracker[tostring(targetId)] = damage
 end
-
-if db_1 then
-    db_1.setFloatValue('damage - ' .. tostring(targetId) .. ' - ' .. pilotName,dmgTracker[tostring(targetId)])
-end

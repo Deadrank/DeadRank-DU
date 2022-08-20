@@ -5,11 +5,13 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
+chairID = tostring(player.getSeatId())
 showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
 printCombatLog = true --export Print weapon hits/misses to lua
+captainChair = false --export This chair will show combined dmg, but also must be linked to other seats databanks
 dangerWarning = 4 --export
 validatePilot = false --export
 bottomHUDLineColorSZ = 'rgba(125, 150, 160, 1)' --export
@@ -55,12 +57,33 @@ transponderWidgetScale = 11.25 --export
 radarInfoWidgetX = 40 --export
 radarInfoWidgetY = 67 --export
 radarInfoWidgetScale = 11.25 --export
+-----------------------------------------
 
-
+-- Choose DB for seat --
+write_db = nil
+local found = false
+for i,dbName in pairs(db) do
+    if dbName.getStringValue('usedBy') == chairID then
+        write_db = dbName
+        found = true
+        break
+    end
+end
+if not found then
+    for i,dbName in pairs(db) do
+        if dbName.hasKey('usedBy') == 0 then
+            write_db = dbName
+            write_db.setStringValue('usedBy',chairID)
+            found = true
+        end
+    end
+end
+if not found then system.print('-- No usable DB found --') end
+------------------------
 
 userCode = {}
 userCode[validPilotCode] = pilotName
-if useDB and db_1 ~= nil then
+if useDB and write_db ~= nil then
     globalDB('get')
 end
 
@@ -116,10 +139,10 @@ screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 --------------------------
 
-if db_1 ~= nil then
-    for _,key in pairs(db_1.getKeyList()) do
-        if db_1.getStringValue(key) ~= nil and db_1.getStringValue(key) ~= '' and string.starts(key,'uc-') then 
-            userCode[string.sub(key,4)] = db_1.getStringValue(key)
+if write_db ~= nil then
+    for _,key in pairs(write_db.getKeyList()) do
+        if write_db.getStringValue(key) ~= nil and write_db.getStringValue(key) ~= '' and string.starts(key,'uc-') then 
+            userCode[string.sub(key,4)] = write_db.getStringValue(key)
         end
     end
 end

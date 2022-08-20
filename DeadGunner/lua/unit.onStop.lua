@@ -12,4 +12,4 @@ if transponder_1 ~= nil then
     transponder_1.setTags(tags)
 end
 
-if db_1 ~= nil then db_1.clearValue('targetSpeed') db_1.clearValue('targetFollowDist') db_1.clearValue('targetID') globalDB('save') end
+if write_db ~= nil then write_db.clearValue('targetSpeed') write_db.clearValue('targetFollowDist') write_db.clearValue('targetID') globalDB('save') end

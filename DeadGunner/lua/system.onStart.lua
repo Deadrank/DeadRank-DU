@@ -264,97 +264,97 @@ function RadarWidgetCreate()
 end
 
 function globalDB(action)
-    if db_1 ~= nil then
+    if write_db ~= nil then
         if action == 'get' then
-            if db_1.hasKey('printCombatLog') == 1 then printCombatLog = db_1.getIntValue('printCombatLog') == 1 end
-            if db_1.hasKey('dangerWarning') == 1 then dangerWarning = db_1.getIntValue('dangerWarning') end
-            if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
-            if db_1.hasKey('bottomHUDLineColorSZ') == 1 then bottomHUDLineColorSZ = db_1.getStringValue('bottomHUDLineColorSZ') end
-            if db_1.hasKey('bottomHUDFillColorSZ') == 1 then bottomHUDFillColorSZ = db_1.getStringValue('bottomHUDFillColorSZ') end
-            if db_1.hasKey('textColorSZ') == 1 then textColorSZ = db_1.getStringValue('textColorSZ') end
-            if db_1.hasKey('bottomHUDLineColorPVP') == 1 then bottomHUDLineColorPVP = db_1.getStringValue('bottomHUDLineColorPVP') end
-            if db_1.hasKey('bottomHUDFillColorPVP') == 1 then bottomHUDFillColorPVP = db_1.getStringValue('bottomHUDFillColorPVP') end
-            if db_1.hasKey('textColorPVP') == 1 then textColorPVP = db_1.getStringValue('textColorPVP') end
-            if db_1.hasKey('neutralLineColor') == 1 then neutralLineColor = db_1.getStringValue('neutralLineColor') end
-            if db_1.hasKey('neutralFontColor') == 1 then neutralFontColor = db_1.getStringValue('neutralFontColor') end
-            if db_1.hasKey('generateAutoCode') == 1 then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
-            if db_1.hasKey('autoVent') == 1 then autoVent = db_1.getIntValue('autoVent') == 1 end
-            if db_1.hasKey('L_Shield_HP') == 1 then L_Shield_HP = db_1.getIntValue('L_Shield_HP') end
-            if db_1.hasKey('M_Shield_HP') == 1 then M_Shield_HP = db_1.getIntValue('M_Shield_HP') end
-            if db_1.hasKey('S_Shield_HP') == 1 then S_Shield_HP = db_1.getIntValue('S_Shield_HP') end
-            if db_1.hasKey('XS_Shield_HP') == 1 then XS_Shield_HP = db_1.getIntValue('XS_Shield_HP') end
-            if db_1.hasKey('max_radar_load') == 1 then max_radar_load = db_1.getIntValue('max_radar_load') end
-            if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
-            if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
-            if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
+            if write_db.hasKey('printCombatLog') == 1 then printCombatLog = write_db.getIntValue('printCombatLog') == 1 end
+            if write_db.hasKey('dangerWarning') == 1 then dangerWarning = write_db.getIntValue('dangerWarning') end
+            if write_db.hasKey('validatePilot') == 1 then validatePilot = write_db.getIntValue('validatePilot') == 1 end
+            if write_db.hasKey('bottomHUDLineColorSZ') == 1 then bottomHUDLineColorSZ = write_db.getStringValue('bottomHUDLineColorSZ') end
+            if write_db.hasKey('bottomHUDFillColorSZ') == 1 then bottomHUDFillColorSZ = write_db.getStringValue('bottomHUDFillColorSZ') end
+            if write_db.hasKey('textColorSZ') == 1 then textColorSZ = write_db.getStringValue('textColorSZ') end
+            if write_db.hasKey('bottomHUDLineColorPVP') == 1 then bottomHUDLineColorPVP = write_db.getStringValue('bottomHUDLineColorPVP') end
+            if write_db.hasKey('bottomHUDFillColorPVP') == 1 then bottomHUDFillColorPVP = write_db.getStringValue('bottomHUDFillColorPVP') end
+            if write_db.hasKey('textColorPVP') == 1 then textColorPVP = write_db.getStringValue('textColorPVP') end
+            if write_db.hasKey('neutralLineColor') == 1 then neutralLineColor = write_db.getStringValue('neutralLineColor') end
+            if write_db.hasKey('neutralFontColor') == 1 then neutralFontColor = write_db.getStringValue('neutralFontColor') end
+            if write_db.hasKey('generateAutoCode') == 1 then generateAutoCode = write_db.getIntValue('generateAutoCode') == 1 end
+            if write_db.hasKey('autoVent') == 1 then autoVent = write_db.getIntValue('autoVent') == 1 end
+            if write_db.hasKey('L_Shield_HP') == 1 then L_Shield_HP = write_db.getIntValue('L_Shield_HP') end
+            if write_db.hasKey('M_Shield_HP') == 1 then M_Shield_HP = write_db.getIntValue('M_Shield_HP') end
+            if write_db.hasKey('S_Shield_HP') == 1 then S_Shield_HP = write_db.getIntValue('S_Shield_HP') end
+            if write_db.hasKey('XS_Shield_HP') == 1 then XS_Shield_HP = write_db.getIntValue('XS_Shield_HP') end
+            if write_db.hasKey('max_radar_load') == 1 then max_radar_load = write_db.getIntValue('max_radar_load') end
+            if write_db.hasKey('warning_size') == 1 then warning_size = write_db.getFloatValue('warning_size') end
+            if write_db.hasKey('warning_outline_color') == 1 then warning_outline_color = write_db.getStringValue('warning_outline_color') end
+            if write_db.hasKey('warning_fill_color') == 1 then warning_fill_color = write_db.getStringValue('warning_fill_color') end
 
-            if db_1.hasKey('hpWidgetX') == 1 then hpWidgetX = db_1.getFloatValue('hpWidgetX') end
-            if db_1.hasKey('hpWidgetY') == 1 then hpWidgetY = db_1.getFloatValue('hpWidgetY') end
-            if db_1.hasKey('hpWidgetScale') == 1 then hpWidgetScale = db_1.getFloatValue('hpWidgetScale') end
-            if db_1.hasKey('shieldHPColor') == 1 then shieldHPColor = db_1.getStringValue('shieldHPColor') end
-            if db_1.hasKey('ccsHPColor') == 1 then ccsHPColor = db_1.getStringValue('ccsHPColor') end
+            if write_db.hasKey('hpWidgetX') == 1 then hpWidgetX = write_db.getFloatValue('hpWidgetX') end
+            if write_db.hasKey('hpWidgetY') == 1 then hpWidgetY = write_db.getFloatValue('hpWidgetY') end
+            if write_db.hasKey('hpWidgetScale') == 1 then hpWidgetScale = write_db.getFloatValue('hpWidgetScale') end
+            if write_db.hasKey('shieldHPColor') == 1 then shieldHPColor = write_db.getStringValue('shieldHPColor') end
+            if write_db.hasKey('ccsHPColor') == 1 then ccsHPColor = write_db.getStringValue('ccsHPColor') end
 
-            if db_1.hasKey('resistWidgetX') == 1 then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
-            if db_1.hasKey('resistWidgetY') == 1 then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
-            if db_1.hasKey('resistWidgetScale') == 1 then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
-            if db_1.hasKey('antiMatterColor') == 1 then antiMatterColor = db_1.getStringValue('antiMatterColor') end
-            if db_1.hasKey('electroMagneticColor') == 1 then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
-            if db_1.hasKey('kineticColor') == 1 then kineticColor = db_1.getStringValue('kineticColor') end
-            if db_1.hasKey('thermicColor') == 1 then thermicColor = db_1.getStringValue('thermicColor') end
+            if write_db.hasKey('resistWidgetX') == 1 then resistWidgetX = write_db.getFloatValue('resistWidgetX') end
+            if write_db.hasKey('resistWidgetY') == 1 then resistWidgetY = write_db.getFloatValue('resistWidgetY') end
+            if write_db.hasKey('resistWidgetScale') == 1 then resistWidgetScale = write_db.getFloatValue('resistWidgetScale') end
+            if write_db.hasKey('antiMatterColor') == 1 then antiMatterColor = write_db.getStringValue('antiMatterColor') end
+            if write_db.hasKey('electroMagneticColor') == 1 then electroMagneticColor = write_db.getStringValue('electroMagneticColor') end
+            if write_db.hasKey('kineticColor') == 1 then kineticColor = write_db.getStringValue('kineticColor') end
+            if write_db.hasKey('thermicColor') == 1 then thermicColor = write_db.getStringValue('thermicColor') end
 
-            if db_1.hasKey('transponderWidgetX') == 1 then transponderWidgetX = db_1.getFloatValue('transponderWidgetX') end
-            if db_1.hasKey('transponderWidgetY') == 1 then transponderWidgetY = db_1.getFloatValue('transponderWidgetY') end
-            if db_1.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = db_1.getFloatValue('transponderWidgetScale') end
+            if write_db.hasKey('transponderWidgetX') == 1 then transponderWidgetX = write_db.getFloatValue('transponderWidgetX') end
+            if write_db.hasKey('transponderWidgetY') == 1 then transponderWidgetY = write_db.getFloatValue('transponderWidgetY') end
+            if write_db.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = write_db.getFloatValue('transponderWidgetScale') end
 
-            if db_1.hasKey('radarInfoWidgetX') == 1 then radarInfoWidgetX = db_1.getFloatValue('radarInfoWidgetX') end
-            if db_1.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = db_1.getFloatValue('radarInfoWidgetY') end
-            if db_1.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = db_1.getFloatValue('radarInfoWidgetScale') end
+            if write_db.hasKey('radarInfoWidgetX') == 1 then radarInfoWidgetX = write_db.getFloatValue('radarInfoWidgetX') end
+            if write_db.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = write_db.getFloatValue('radarInfoWidgetY') end
+            if write_db.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = write_db.getFloatValue('radarInfoWidgetScale') end
 
         elseif action == 'save' then
-            db_1.setStringValue('uc-'..validPilotCode,pilotName)
-            if printCombatLog then db_1.setIntValue('printCombatLog',1) else db_1.setIntValue('printCombatLog',0) end
-            db_1.setIntValue('dangerWarning',dangerWarning)
-            if validatePilot then db_1.setIntValue('validatePilot',1) else db_1.setIntValue('validatePilot',0) end
-            db_1.setStringValue('bottomHUDLineColorSZ',bottomHUDLineColorSZ)
-            db_1.setStringValue('bottomHUDFillColorSZ',bottomHUDFillColorSZ)
-            db_1.setStringValue('textColorSZ',textColorSZ)
-            db_1.setStringValue('bottomHUDLineColorPVP',bottomHUDLineColorPVP)
-            db_1.setStringValue('bottomHUDFillColorPVP',bottomHUDFillColorPVP)
-            db_1.setStringValue('textColorPVP',textColorPVP)
-            db_1.setStringValue('neutralLineColor',neutralLineColor)
-            db_1.setStringValue('neutralFontColor',neutralFontColor)
-            if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
-            if autoVent then db_1.setIntValue('autoVent',1) else db_1.setIntValue('autoVent',0) end
-            db_1.setIntValue('L_Shield_HP',L_Shield_HP)
-            db_1.setIntValue('M_Shield_HP',M_Shield_HP)
-            db_1.setIntValue('S_Shield_HP',S_Shield_HP)
-            db_1.setIntValue('XS_Shield_HP',XS_Shield_HP)
-            db_1.setIntValue('max_radar_load',max_radar_load)
-            db_1.setFloatValue('warning_size',warning_size)
-            db_1.setStringValue('warning_outline_color',warning_outline_color)
-            db_1.setStringValue('warning_fill_color',warning_fill_color)
+            write_db.setStringValue('uc-'..validPilotCode,pilotName)
+            if printCombatLog then write_db.setIntValue('printCombatLog',1) else write_db.setIntValue('printCombatLog',0) end
+            write_db.setIntValue('dangerWarning',dangerWarning)
+            if validatePilot then write_db.setIntValue('validatePilot',1) else write_db.setIntValue('validatePilot',0) end
+            write_db.setStringValue('bottomHUDLineColorSZ',bottomHUDLineColorSZ)
+            write_db.setStringValue('bottomHUDFillColorSZ',bottomHUDFillColorSZ)
+            write_db.setStringValue('textColorSZ',textColorSZ)
+            write_db.setStringValue('bottomHUDLineColorPVP',bottomHUDLineColorPVP)
+            write_db.setStringValue('bottomHUDFillColorPVP',bottomHUDFillColorPVP)
+            write_db.setStringValue('textColorPVP',textColorPVP)
+            write_db.setStringValue('neutralLineColor',neutralLineColor)
+            write_db.setStringValue('neutralFontColor',neutralFontColor)
+            if generateAutoCode then write_db.setIntValue('generateAutoCode',1) else write_db.setIntValue('generateAutoCode',0) end
+            if autoVent then write_db.setIntValue('autoVent',1) else write_db.setIntValue('autoVent',0) end
+            write_db.setIntValue('L_Shield_HP',L_Shield_HP)
+            write_db.setIntValue('M_Shield_HP',M_Shield_HP)
+            write_db.setIntValue('S_Shield_HP',S_Shield_HP)
+            write_db.setIntValue('XS_Shield_HP',XS_Shield_HP)
+            write_db.setIntValue('max_radar_load',max_radar_load)
+            write_db.setFloatValue('warning_size',warning_size)
+            write_db.setStringValue('warning_outline_color',warning_outline_color)
+            write_db.setStringValue('warning_fill_color',warning_fill_color)
 
-            db_1.setFloatValue('hpWidgetX',hpWidgetX)
-            db_1.setFloatValue('hpWidgetY',hpWidgetY)
-            db_1.setFloatValue('hpWidgetScale',hpWidgetScale)
-            db_1.setStringValue('shieldHPColor',shieldHPColor)
-            db_1.setStringValue('ccsHPColor',ccsHPColor)
+            write_db.setFloatValue('hpWidgetX',hpWidgetX)
+            write_db.setFloatValue('hpWidgetY',hpWidgetY)
+            write_db.setFloatValue('hpWidgetScale',hpWidgetScale)
+            write_db.setStringValue('shieldHPColor',shieldHPColor)
+            write_db.setStringValue('ccsHPColor',ccsHPColor)
 
-            db_1.setFloatValue('resistWidgetX',resistWidgetX)
-            db_1.setFloatValue('resistWidgetY',resistWidgetY)
-            db_1.setFloatValue('resistWidgetScale',resistWidgetScale)
-            db_1.setStringValue('antiMatterColor',antiMatterColor)
-            db_1.setStringValue('electroMagneticColor',electroMagneticColor)
-            db_1.setStringValue('kineticColor',kineticColor)
-            db_1.setStringValue('thermicColor',thermicColor)
+            write_db.setFloatValue('resistWidgetX',resistWidgetX)
+            write_db.setFloatValue('resistWidgetY',resistWidgetY)
+            write_db.setFloatValue('resistWidgetScale',resistWidgetScale)
+            write_db.setStringValue('antiMatterColor',antiMatterColor)
+            write_db.setStringValue('electroMagneticColor',electroMagneticColor)
+            write_db.setStringValue('kineticColor',kineticColor)
+            write_db.setStringValue('thermicColor',thermicColor)
 
-            db_1.setFloatValue('transponderWidgetX',transponderWidgetX)
-            db_1.setFloatValue('transponderWidgetY',transponderWidgetY)
-            db_1.setFloatValue('transponderWidgetScale',transponderWidgetScale)
+            write_db.setFloatValue('transponderWidgetX',transponderWidgetX)
+            write_db.setFloatValue('transponderWidgetY',transponderWidgetY)
+            write_db.setFloatValue('transponderWidgetScale',transponderWidgetScale)
 
-            db_1.setFloatValue('radarInfoWidgetX',radarInfoWidgetX)
-            db_1.setFloatValue('radarInfoWidgetY',radarInfoWidgetY)
-            db_1.setFloatValue('radarInfoWidgetScale',radarInfoWidgetScale)
+            write_db.setFloatValue('radarInfoWidgetX',radarInfoWidgetX)
+            write_db.setFloatValue('radarInfoWidgetY',radarInfoWidgetY)
+            write_db.setFloatValue('radarInfoWidgetScale',radarInfoWidgetScale)
         end
     end
 end
@@ -679,16 +679,16 @@ function identifiedWidget()
     local targetID = radar_1.getTargetId()
     local followingIdentified = false
     local followingID = 0
-    if db_1 ~= nil then 
-        if db_1.hasKey('followingID') then
-            followingID = db_1.getIntValue('followingID')
+    if write_db ~= nil then 
+        if write_db.hasKey('followingID') then
+            followingID = write_db.getIntValue('followingID')
         end
         if not contains(identList,followingID) then
-            db_1.setIntValue('targetID',0) 
+            write_db.setIntValue('targetID',0) 
         else
             followingIdentified = true
         end
-        if not followingIdentified then db_1.clearValue('targetID') end
+        if not followingIdentified then write_db.clearValue('targetID') end
     end
     if not contains(identList,targetID) and targetID ~= 0 then table.insert(identList,targetID) end
     if targetID == 0 then warnings['cored'] = nil warnings['friendly'] = nil end
@@ -776,24 +776,29 @@ function identifiedWidget()
         end
         uniqueName = uniqueName:sub(0,21)
         
-        local dmgRatio = 0
         local dmg = 0
-        if db_1 then
-            for _,key in pairs(db_1.getKeyList()) do
-                if string.starts(key,'damage - ' .. tostring(id)) then
-                    dmg = dmg + db_1.getFloatValue(key)
+        if write_db and dmgTracker[tostring(id)] then
+            write_db.setFloatValue('damage - ' .. tostring(id) .. ' - ' .. pilotName,dmgTracker[tostring(id)])
+        end
+        if #db > 0 then
+            for _,dbName in pairs(db) do
+                for _,key in pairs(dbName.getKeyList()) do
+                    if string.starts(key,'damage - ' .. tostring(id)) then
+                        dmg = dmg + dbName.getFloatValue(key)
+                    end
                 end
             end
-        else
+        end
+        if (dmg == 0 or not write_db) and dmgTracker[tostring(id)] then
             dmg = dmgTracker[tostring(id)]
         end
-        if dmg > 0 then
-            dmgRatio = clamp(dmg/shieldDmgTrack[size],0,1)
-            if dmg < 1000 then dmg = string.format('%.2f',dmg)
-            elseif dmg < 1000000 then dmg = string.format('%.2fk',dmg/1000)
-            else dmg = string.format('%.2fm',dmg/1000000)
-            end
+
+        local dmgRatio = clamp(dmg/shieldDmgTrack[size],0,1)
+        if dmg < 1000 then dmg = string.format('%.2f',dmg)
+        elseif dmg < 1000000 then dmg = string.format('%.2fk',dmg/1000)
+        else dmg = string.format('%.2fm',dmg/1000000)
         end
+
 
         local cardFill = 'rgba(211,211,211,.1)'
         if friendly then cardFill = 'rgba(49, 182, 60,.2)' end
@@ -828,21 +833,21 @@ function identifiedWidget()
         end
 
         -- update following data --
-        if db_1 ~= nil then
-            if db_1.getIntValue('following') == 1 and id == followingID and followingIdentified then
-                db_1.setIntValue('targetID',id)
-                db_1.setFloatValue('targetSpeed',speed)
-                db_1.setFloatValue('targetDistance',distance)
+        if write_db ~= nil then
+            if write_db.getIntValue('following') == 1 and id == followingID and followingIdentified then
+                write_db.setIntValue('targetID',id)
+                write_db.setFloatValue('targetSpeed',speed)
+                write_db.setFloatValue('targetDistance',distance)
                 local weaponMin = radarRange - 10000
                 for _,w in pairs(weapon) do if w.getOptimalDistance() - 10000 < weaponMin then weaponMin = w.getOptimalDistance() - 10000 end end
-                db_1.setFloatValue('followDistance',weaponMin)
+                write_db.setFloatValue('followDistance',weaponMin)
             elseif followingID == 0 then
-                db_1.setIntValue('targetID',id)
-                db_1.setFloatValue('targetSpeed',speed)
-                db_1.setFloatValue('targetDistance',distance)
+                write_db.setIntValue('targetID',id)
+                write_db.setFloatValue('targetSpeed',speed)
+                write_db.setFloatValue('targetDistance',distance)
                 weaponMin = radarRange - 10000
                 for _,w in pairs(weapon) do if w.getOptimalDistance() - 10000 < weaponMin then weaponMin = w.getOptimalDistance() - 10000 end end
-                db_1.setFloatValue('followDistance',weaponMin)
+                write_db.setFloatValue('followDistance',weaponMin)
             end
         end
 

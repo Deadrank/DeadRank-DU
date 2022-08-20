@@ -1,70 +1,70 @@
 {
     "slots": {
         "0": {
-            "name": "slot2",
+            "name": "db_1",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "1": {
-            "name": "slot2",
+            "name": "db_2",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "2": {
-            "name": "slot3",
+            "name": "db_3",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "3": {
-            "name": "slot4",
+            "name": "db_4",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "4": {
-            "name": "slot5",
+            "name": "db_5",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "5": {
-            "name": "slot6",
+            "name": "db_6",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "6": {
-            "name": "slot7",
+            "name": "db_7",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "7": {
-            "name": "slot8",
+            "name": "db_8",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "8": {
-            "name": "slot9",
+            "name": "db_9",
             "type": {
                 "events": [],
                 "methods": []
             }
         },
         "9": {
-            "name": "slot10",
+            "name": "db_10",
             "type": {
                 "events": [],
                 "methods": []
