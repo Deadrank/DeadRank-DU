@@ -16,7 +16,7 @@ The gunner seat will control and/or read data from:
  - Weapons (manual link)
  - Radar (manual link)
  - Transponder (auto link if present)
- - Databank (manually linked, optional)
+ - Databank (auto link if present, optional) (links to all databanks on the construct, but only writes to one)
  - Shield (manually linked, optional)
 
 Any items listed above as manual link, must be linked *before* running  the autoconfiguration
@@ -35,9 +35,6 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `hide codes`: Changes visual display of transponder tags on the HUD to "redacted". This is useful if you are streaming and do not want your tags displayed on-stream
  - `show codes`: Changes the visual display of transponder codes back to their actual values
  - `delcode <transponder tag>`: Removes the transponder tag specified from your transponder
- - `addships`: Adds all ships currently on your radar to a "friendly" ship list so that they will be filtered out of certain radar views even if they do not have matching transponder tags (if a databank is linked, will also store the construct IDs in the databank for future use) *NOTE: this feature is currently not working, will remove this note when fixed*
- - `addshipid <construct id> [owner/name]`: Adds an individual ship to the "friendly" ship list. The ship is tagged will be tagged with the specified owners name (optional).
- - `delshipid <construct id>`: Removes the specified construct ID from the "friendly" ship list
  - `<3 digit target number>`: Enter the 3 digit number of your desired target to set it as your "primary"  (can be used with radar widget filter for quicker targeting).
  - `0`: Entering "0" will clear the current active primary target
  - `agc <any whole number>`: Changes the code seed value of the automatically generated transponder codes (if enabled)
@@ -45,9 +42,13 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `hide <core size>`: Filters out the selected core size from the radar widget (core sizes need to be in uppercase)
  - `print db`: Prints out all key value pairs of string values in the databank (if connected)
  - `clear db`: Clears all key value pairs stored in the databank
+ - `coreid`: Prints your ships core ID
+ - `clear damage`: Clears damage from the current chair against the current target
+ - `clear all damage`: Clears all damage from the current chair against all targets
 
 ### Lua Parameters
  - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters (Default = enabled)
+ - `minimalWidgets`:  Whether widget locations should use the minimalist settings or not (Default = disabled, overriddent by remote if attached to same DB)
  - `printCombatLog`: Print out weapon hits and misses (including damage dealt) in the lua channel. Useful so so that you do not have to switch between the combat log and lua channel for commands. (Default = enabled)
  - `dangerWarning`: The number of ships that need to start attacking you before a warning is displayed on screen (Default = 4)
  - `validatePilot`: If enabled, will ensure that the player using the seat matches the ID entered into the lua code. To enable this, first ensure that you know your playerID, then edit the lua inside of "unit start" and replace the following with your player ID (Default = disabled):<br>
@@ -68,6 +69,10 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `neutralLineColor`: HUD Color customizations (Default = 'lightgrey')
  - `neutralFontColor`: HUD Color customizations (Default = 'darkgrey')
  - `warning_size`: Size of warning indicators in the upper right
+ - `radarBuffer`: Small buffer between safe and PvP zone on when to alert for new radar contacts
+ - WidgetX,Y and Scale: Widgets have an X, Y and Scale option which allows you to move them around on your screen and resize them.
+ - Widget Related Colors: some widgets have color options for changing the feel/look of the HUD
+ 
 
 ### Weapons
 Weapons are controllable from 3rd persion view using the weapon widgets. With the widget, you can start firing, stop firing and reload the weapons. I the lower left of the screen the HUD displays the hit chance of each weapon linked.
@@ -90,20 +95,22 @@ Additional data is gathered from the radar to help determine engagement actions.
 ![Radar Data](https://user-images.githubusercontent.com/17240745/179417814-99cb9291-6334-43b4-aa09-0d10dfe3355e.png)
 
 The bottom middle information box also includes how many friendly and enemy *dynamic* constructs are currently on radar.
-![image](https://user-images.githubusercontent.com/17240745/179418021-c6132e7f-c5e7-41f9-8457-46a0ad51c013.png)
+![image](https://user-images.githubusercontent.com/17240745/185774152-bbe26a39-79e0-4efa-8420-4730b987e8f9.png)
 
 Finally, the radar provides script overload protection. If there are two many constructs on radar at once, the script will disable the specialized radar functionality (i.e. unique code in the radar widget) and the radar widget will display targets like it would in a vanilla controller.
 
 ### Shield
-If there is a shield on the construct it will be auto-linked when the configuration is run. If enabled (which it is by default), the gunner script will auto-vent the shield as soon as it reaches 0% health. If the sheild is venting and the CCS reaching less than 10%, the script will cancel the rest of the vent in order to try and save the ship from being destroyed by CCS depletion.
+If there is a shield on the construct it will be auto-linked when the configuration is run. If enabled (which it is by default), the gunner script will auto-vent the shield as soon as it reaches 0% health. If the sheild is venting and the CCS reaching less than 10%, the script will cancel the rest of the vent in order to try and save the ship from being destroyed by CCS depletion.<br>
+![Shield/CCS](https://user-images.githubusercontent.com/17240745/185774141-83fc1bc6-3d75-4e0a-92e4-18c50a074ceb.png)
+
 
 The shield will also automatically set resistance levels to match the incoming damage (assuming the resistence timer isn't on a cooldown).
-![Resist data](https://user-images.githubusercontent.com/17240745/179417983-f3f24c88-c03b-464b-b14b-f4f6b5f70712.png)
+![Resist data](https://user-images.githubusercontent.com/17240745/185774123-dc4e5d9a-d149-451b-86cb-e09e27ce05ef.png)
 
 
 ### Transponder
 If there is a transponder on the construct it will be auto-linked when the configuration script is run. If enabled (which it is not by default), the script will automatically generate a time based transponder tag. These auto-generated tags will start with the first three characters of `AGC` to indicate that they are "auto generated codes". These auto-generated codes will rotate every 1000 seconds. If this feature is enabled, the gunner seat will require you to enter a whole number when it first starts up. This number is your unique seed for the auto-code generation. Anyone else using this HUD that enters the same number will always have the same auto-generated code as you and therefor be seen as having matching transponder tags. This allows fleets to have matching transponder tags without the risk of their tag being comprimised even if the enemy gets a hold of their transponder.
-![image](https://user-images.githubusercontent.com/17240745/179420260-ffe2b6f6-9cc0-4874-9896-1489a0863306.png)
+![Transponder](https://user-images.githubusercontent.com/17240745/185774169-098d7bf4-5545-4671-b7b9-ac37320d2883.png)
 Further, the HUD provides the ability to enter manual codes if needed without actually opening the transponder interface directly (see lua commands section).
 
 ## DeadRemote.conf (Remote Controller Script)
