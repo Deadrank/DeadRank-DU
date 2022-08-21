@@ -9,4 +9,5 @@ if not lShift then
     end
 else
     minimalWidgets = not minimalWidgets
+    if minimalWidgets then db_1.setIntValue('minimalWidgets',1) else db_1.setIntValue('minimalWidgets',0) end
 end

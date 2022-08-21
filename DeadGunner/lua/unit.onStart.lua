@@ -10,6 +10,7 @@ showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
+minimalWidgets = false --export
 printCombatLog = true --export Print weapon hits/misses to lua
 dangerWarning = 4 --export
 validatePilot = false --export
@@ -52,10 +53,18 @@ thermicColor = 'rgb(255, 234, 41)' --export
 transponderWidgetX = 40 --export
 transponderWidgetY = 67 --export
 transponderWidgetScale = 11.25 --export
+
+transponderWidgetXmin = 58.5 --export
+transponderWidgetYmin = -0.9 --export
+transponderWidgetScalemin = 10 --export
 -- Radar Info Widget --
 radarInfoWidgetX = 29 --export
 radarInfoWidgetY = 67 --export
 radarInfoWidgetScale = 11.25 --export
+
+radarInfoWidgetXmin = 67.5 --export
+radarInfoWidgetYmin = -0.9 --export
+radarInfoWidgetScalemin = 10 --export
 -----------------------------------------
 
 -- Choose DB for seat --

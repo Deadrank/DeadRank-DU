@@ -305,10 +305,18 @@ function globalDB(action)
             if write_db.hasKey('transponderWidgetX') == 1 then transponderWidgetX = write_db.getFloatValue('transponderWidgetX') end
             if write_db.hasKey('transponderWidgetY') == 1 then transponderWidgetY = write_db.getFloatValue('transponderWidgetY') end
             if write_db.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = write_db.getFloatValue('transponderWidgetScale') end
+            if write_db.hasKey('transponderWidgetXmin') == 1 then transponderWidgetXmin = write_db.getFloatValue('transponderWidgetXmin') end
+            if write_db.hasKey('transponderWidgetYmin') == 1 then transponderWidgetYmin = write_db.getFloatValue('transponderWidgetYmin') end
+            if write_db.hasKey('transponderWidgetScalemin') == 1 then transponderWidgetScalemin = write_db.getFloatValue('transponderWidgetScalemin') end
 
             if write_db.hasKey('radarInfoWidgetX') == 1 then radarInfoWidgetX = write_db.getFloatValue('radarInfoWidgetX') end
             if write_db.hasKey('radarInfoWidgetY') == 1 then radarInfoWidgetY = write_db.getFloatValue('radarInfoWidgetY') end
             if write_db.hasKey('radarInfoWidgetScale') == 1 then radarInfoWidgetScale = write_db.getFloatValue('radarInfoWidgetScale') end
+            if write_db.hasKey('radarInfoWidgetXmin') == 1 then radarInfoWidgetXmin = write_db.getFloatValue('radarInfoWidgetXmin') end
+            if write_db.hasKey('radarInfoWidgetYmin') == 1 then radarInfoWidgetYmin = write_db.getFloatValue('radarInfoWidgetYmin') end
+            if write_db.hasKey('radarInfoWidgetScalemin') == 1 then radarInfoWidgetScalemin = write_db.getFloatValue('radarInfoWidgetScalemin') end
+
+            if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
 
         elseif action == 'save' then
             write_db.setStringValue('uc-'..validPilotCode,pilotName)
@@ -351,10 +359,18 @@ function globalDB(action)
             write_db.setFloatValue('transponderWidgetX',transponderWidgetX)
             write_db.setFloatValue('transponderWidgetY',transponderWidgetY)
             write_db.setFloatValue('transponderWidgetScale',transponderWidgetScale)
+            write_db.setFloatValue('transponderWidgetXmin',transponderWidgetXmin)
+            write_db.setFloatValue('transponderWidgetYmin',transponderWidgetYmin)
+            write_db.setFloatValue('transponderWidgetScalemin',transponderWidgetScalemin)
 
             write_db.setFloatValue('radarInfoWidgetX',radarInfoWidgetX)
             write_db.setFloatValue('radarInfoWidgetY',radarInfoWidgetY)
             write_db.setFloatValue('radarInfoWidgetScale',radarInfoWidgetScale)
+            write_db.setFloatValue('radarInfoWidgetXmin',radarInfoWidgetXmin)
+            write_db.setFloatValue('radarInfoWidgetYmin',radarInfoWidgetYmin)
+            write_db.setFloatValue('radarInfoWidgetScalemin',radarInfoWidgetScalemin)
+
+            if minimalWidgets then db_1.setIntValue('minimalWidgets',1) else db_1.setIntValue('minimalWidgets',0) end
         end
     end
 end
@@ -419,8 +435,19 @@ function transponderWidget()
         if transponder_1.isActive() == 1 then transponderColor = shieldHPColor transponderStatus = 'Active' end
         local tags = transponder_1.getTags()
 
+        local x,y,s
+        if minimalWidgets then
+            y = transponderWidgetYmin
+            x = transponderWidgetXmin
+            s = transponderWidgetScalemin
+        else
+            y = transponderWidgetY
+            x = transponderWidgetX
+            s = transponderWidgetScale
+        end
+
         tw = [[
-            <svg style="position: absolute; top: ]]..transponderWidgetY..[[vh; left: ]]..transponderWidgetX..[[vw;" viewBox="0 0 286 ]]..tostring(101+#tags*24)..[[" width="]]..transponderWidgetScale..[[vw">
+            <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 ]]..tostring(101+#tags*24)..[[" width="]]..s..[[vw">
                 <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
                 <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 ]]..tostring(81+#tags*24)..[[ 18 ]]..tostring(83+#tags*24)..[["/>
                 <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Transponder Status:</text>
@@ -432,7 +459,7 @@ function transponderWidget()
             local code = 'redacted'
             if showCode then code = tag end
             tw = tw .. [[<line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="]]..tostring(54+(i-1)*27)..[[" x2="22" y2="]]..tostring(80.7+(i-1)*27)..[["/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="]]..tostring(73+(i-1)*27)..[[">]]..code..[[</text>]]
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="]]..tostring(73+(i-1)*27)..[[">]]..code..[[</text>]]
         end    
         tw = tw .. '</svg>'
     end
@@ -629,6 +656,17 @@ function radarWidget()
     local enemyShipNum = radarStats['enemy']['L'] + radarStats['enemy']['M'] + radarStats['enemy']['S'] + radarStats['enemy']['XS']
     local radarRangeString = formatNumber(radarRange,'distance')
 
+    local x, y, s
+    if minimalWidgets then 
+        y = radarInfoWidgetYmin
+        x = radarInfoWidgetXmin
+        s = radarInfoWidgetScalemin
+    else
+        y = radarInfoWidgetY
+        x = radarInfoWidgetX
+        s = radarInfoWidgetScale
+    end
+
     rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.185 * screenHeight) ..'px;left: '.. tostring(.875 * screenWidth) ..[[px;">
     <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Identification Range:&nbsp;</div><div style="float: left;color: rgb(25, 247, 255);">%s&nbsp;</div></div>]],radarRangeString)
   
@@ -640,35 +678,35 @@ function radarWidget()
     <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Attacked By:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%.0f&nbsp;</div><div style="float: left;color: ]]..'white'..[[;">ships</div></div>]],attackedBy)
 
     rw = rw .. [[
-        <svg style="position: absolute; top: ]]..radarInfoWidgetY..[[vh; left: ]]..radarInfoWidgetX..[[vw;" viewBox="0 0 286 245" width="]]..radarInfoWidgetScale..[[vw">
+        <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 245" width="]]..s..[[vw">
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
             <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 225 18 227"/>
-            <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information:</text>
+            <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information</text>
         ]]
     rw = rw .. [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="73">Enemy Ships:</text>
-            <text style="fill: ]]..warning_outline_color..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="157" y="73">]]..enemyShipNum..[[</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="73">Enemy Ships:</text>
+            <text style="fill: ]]..warning_outline_color..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="73">]]..enemyShipNum..[[</text>
 
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="81" x2="22" y2="104"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="100">L:</text>
-            <text style="fill: ]]..warning_outline_color..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="100">]]..radarStats['enemy']['L']..[[</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="100">L:</text>
+            <text style="fill: ]]..warning_outline_color..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="100">]]..radarStats['enemy']['L']..[[</text>
 
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="108" x2="22" y2="131"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="127">M:</text>
-            <text style="fill: ]]..warning_outline_color..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="127">]]..radarStats['enemy']['M']..[[</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="127">M:</text>
+            <text style="fill: ]]..warning_outline_color..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="127">]]..radarStats['enemy']['M']..[[</text>
 
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="135" x2="22" y2="158"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="154">S:</text>
-            <text style="fill: ]]..warning_outline_color..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="154">]]..radarStats['enemy']['S']..[[</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="154">S:</text>
+            <text style="fill: ]]..warning_outline_color..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="154">]]..radarStats['enemy']['S']..[[</text>
 
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="162" x2="22" y2="185"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="181">XS:</text>
-            <text style="fill: ]]..warning_outline_color..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="181">]]..radarStats['enemy']['XS']..[[</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="181">XS:</text>
+            <text style="fill: ]]..warning_outline_color..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="57" y="181">]]..radarStats['enemy']['XS']..[[</text>
 
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="189" x2="22" y2="212"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="208">Friendly Ships:</text>
-            <text style="fill: ]]..ccsHPColor..[[; font-size: 24px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="170" y="208">]]..friendlyShipNum..[[</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="208">Friendly Ships:</text>
+            <text style="fill: ]]..ccsHPColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="150" y="208">]]..friendlyShipNum..[[</text>
 
         ]]
 
@@ -991,6 +1029,9 @@ function warningsWidget()
 end
 
 function generateHTML()
+    if write_db and write_db.hasKey('minimalWidgets') then
+        minimalWidgets = write_db.getIntValue('minimalWidgets') == 1
+    end 
     html = [[ <html> <body style="font-family: Calibri;"> ]]
     if showScreen then
     html = html .. hpWidget()

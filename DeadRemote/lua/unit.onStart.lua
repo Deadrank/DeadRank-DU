@@ -60,7 +60,7 @@ logoSVG = '<svg viewBox="100 0 200 500" width="400" height="500"> 	  <polygon st
 
 -- Ship information Widget --
 shipInfoWidgetX = 76.5
-shipInfoWidgetY = -1
+shipInfoWidgetY = -0.9
 shipInfoWidgetScale = 10
 
 
