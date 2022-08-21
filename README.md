@@ -95,20 +95,22 @@ Additional data is gathered from the radar to help determine engagement actions.
 ![Radar Data](https://user-images.githubusercontent.com/17240745/179417814-99cb9291-6334-43b4-aa09-0d10dfe3355e.png)
 
 The bottom middle information box also includes how many friendly and enemy *dynamic* constructs are currently on radar.
-![image](https://user-images.githubusercontent.com/17240745/179418021-c6132e7f-c5e7-41f9-8457-46a0ad51c013.png)
+![image](https://user-images.githubusercontent.com/17240745/185774152-bbe26a39-79e0-4efa-8420-4730b987e8f9.png)
 
 Finally, the radar provides script overload protection. If there are two many constructs on radar at once, the script will disable the specialized radar functionality (i.e. unique code in the radar widget) and the radar widget will display targets like it would in a vanilla controller.
 
 ### Shield
-If there is a shield on the construct it will be auto-linked when the configuration is run. If enabled (which it is by default), the gunner script will auto-vent the shield as soon as it reaches 0% health. If the sheild is venting and the CCS reaching less than 10%, the script will cancel the rest of the vent in order to try and save the ship from being destroyed by CCS depletion.
+If there is a shield on the construct it will be auto-linked when the configuration is run. If enabled (which it is by default), the gunner script will auto-vent the shield as soon as it reaches 0% health. If the sheild is venting and the CCS reaching less than 10%, the script will cancel the rest of the vent in order to try and save the ship from being destroyed by CCS depletion.<br>
+![Shield/CCS](https://user-images.githubusercontent.com/17240745/185774141-83fc1bc6-3d75-4e0a-92e4-18c50a074ceb.png)
+
 
 The shield will also automatically set resistance levels to match the incoming damage (assuming the resistence timer isn't on a cooldown).
-![Resist data](https://user-images.githubusercontent.com/17240745/179417983-f3f24c88-c03b-464b-b14b-f4f6b5f70712.png)
+![Resist data](https://user-images.githubusercontent.com/17240745/185774123-dc4e5d9a-d149-451b-86cb-e09e27ce05ef.png)
 
 
 ### Transponder
 If there is a transponder on the construct it will be auto-linked when the configuration script is run. If enabled (which it is not by default), the script will automatically generate a time based transponder tag. These auto-generated tags will start with the first three characters of `AGC` to indicate that they are "auto generated codes". These auto-generated codes will rotate every 1000 seconds. If this feature is enabled, the gunner seat will require you to enter a whole number when it first starts up. This number is your unique seed for the auto-code generation. Anyone else using this HUD that enters the same number will always have the same auto-generated code as you and therefor be seen as having matching transponder tags. This allows fleets to have matching transponder tags without the risk of their tag being comprimised even if the enemy gets a hold of their transponder.
-![image](https://user-images.githubusercontent.com/17240745/179420260-ffe2b6f6-9cc0-4874-9896-1489a0863306.png)
+![Transponder](https://user-images.githubusercontent.com/17240745/185774169-098d7bf4-5545-4671-b7b9-ac37320d2883.png)
 Further, the HUD provides the ability to enter manual codes if needed without actually opening the transponder interface directly (see lua commands section).
 
 ## DeadRemote.conf (Remote Controller Script)
