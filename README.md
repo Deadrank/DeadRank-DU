@@ -110,7 +110,7 @@ The shield will also automatically set resistance levels to match the incoming d
 
 ### Transponder
 If there is a transponder on the construct it will be auto-linked when the configuration script is run. If enabled (which it is not by default), the script will automatically generate a time based transponder tag. These auto-generated tags will start with the first three characters of `AGC` to indicate that they are "auto generated codes". These auto-generated codes will rotate every 1000 seconds. If this feature is enabled, the gunner seat will require you to enter a whole number when it first starts up. This number is your unique seed for the auto-code generation. Anyone else using this HUD that enters the same number will always have the same auto-generated code as you and therefor be seen as having matching transponder tags. This allows fleets to have matching transponder tags without the risk of their tag being comprimised even if the enemy gets a hold of their transponder.
-![Transponder](https://user-images.githubusercontent.com/17240745/185774169-098d7bf4-5545-4671-b7b9-ac37320d2883.png)
+![Transponder](https://user-images.githubusercontent.com/17240745/185774367-649fcc29-fe1a-4b8e-bac7-ea495836e151.png)
 Further, the HUD provides the ability to enter manual codes if needed without actually opening the transponder interface directly (see lua commands section).
 
 ## DeadRemote.conf (Remote Controller Script)
