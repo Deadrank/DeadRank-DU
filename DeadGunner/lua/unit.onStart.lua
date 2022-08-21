@@ -11,7 +11,6 @@ showAlerts = false
 -- SETTINGS --
 useDB = true --export use connected DB for config options
 printCombatLog = true --export Print weapon hits/misses to lua
-captainChair = false --export This chair will show combined dmg, but also must be linked to other seats databanks
 dangerWarning = 4 --export
 validatePilot = false --export
 bottomHUDLineColorSZ = 'rgba(125, 150, 160, 1)' --export
@@ -50,11 +49,11 @@ electroMagneticColor = 'rgb(27, 255, 217)' --export
 kineticColor = 'rgb(255, 75, 75)' --export
 thermicColor = 'rgb(255, 234, 41)' --export
 -- Transponder Widget --
-transponderWidgetX = 29 --export
+transponderWidgetX = 40 --export
 transponderWidgetY = 67 --export
 transponderWidgetScale = 11.25 --export
 -- Radar Info Widget --
-radarInfoWidgetX = 40 --export
+radarInfoWidgetX = 29 --export
 radarInfoWidgetY = 67 --export
 radarInfoWidgetScale = 11.25 --export
 -----------------------------------------

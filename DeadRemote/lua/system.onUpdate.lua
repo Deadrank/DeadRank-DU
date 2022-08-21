@@ -241,8 +241,9 @@ end
 -- Choose background color scheme based on PVP --
 bgColor = ''
 lineColor = ''
-if inSZ then bgColor=topHUDFillColorSZ lineColor=topHUDLineColorSZ textColor=textColorSZ 
-else bgColor=topHUDFillColorPVP lineColor=topHUDLineColorPVP textColor=textColorPVP
+fontColor = ''
+if inSZ then bgColor=topHUDFillColorSZ lineColor=topHUDLineColorSZ fontColor=textColorSZ 
+else bgColor=topHUDFillColorPVP lineColor=topHUDLineColorPVP fontColor=textColorPVP
 end
 --------------------------------------------------
 

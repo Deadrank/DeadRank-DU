@@ -235,21 +235,21 @@ function flightWidget()
                 L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
                 stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
 
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Current Accel: ]] .. string.format('%.2f G',accel/9.81) .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Brake Dist: ]] .. formatNumber(brakeDist,'distance') .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Current Accel: ]] .. string.format('%.2f G',accel/9.81) .. [[</text>
+                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Brake Dist: ]] .. formatNumber(brakeDist,'distance') .. [[</text>
                 
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Speed: ]] .. formatNumber(maxSpeed,'speed') .. [[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Accel: ]] .. string.format('%.2f G',maxSpaceThrust/mass/9.81) ..[[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Max Brake: ]] .. string.format('%.2f G',maxBrake/mass/9.81) .. [[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Max Speed: ]] .. formatNumber(maxSpeed,'speed') .. [[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Max Accel: ]] .. string.format('%.2f G',maxSpaceThrust/mass/9.81) ..[[</text>
+                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Max Brake: ]] .. string.format('%.2f G',maxBrake/mass/9.81) .. [[</text>
 
-                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Mass </text>
-                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]]..formatNumber(mass,'mass')..[[</text>
+                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Mass </text>
+                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">]]..formatNumber(mass,'mass')..[[</text>
 
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Gravity </text>
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">]].. string.format('%.2f G',gravity/9.81) ..[[</text>
+                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Gravity </text>
+                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">]].. string.format('%.2f G',gravity/9.81) ..[[</text>
 
-                <text x="]].. tostring(.684 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(-10,]].. tostring(.684 * screenWidth) ..",".. tostring(.028 * screenHeight) ..[[)">]].. mode ..[[</text>
+                <text x="]].. tostring(.684 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(-10,]].. tostring(.684 * screenWidth) ..",".. tostring(.028 * screenHeight) ..[[)">]].. mode ..[[</text>
 
                 
 
@@ -280,7 +280,7 @@ function fuelWidget()
             <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
             <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
             </linearGradient>]],sFuelPercent,sFuelPercent)
-        
+
     fw = fw .. [[
         <path d="
         M ]] .. tostring(.336*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [[ 
@@ -356,7 +356,7 @@ function apStatusWidget()
         L ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [["
         stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bg..[[" />
         
-        <text x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.012 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(10,]].. tostring(.25 * screenWidth) ..",".. tostring(.012 * screenHeight) ..[[)">AutoPilot: ]]..apStatus..[[</text>
+        <text x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.012 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(10,]].. tostring(.25 * screenWidth) ..",".. tostring(.012 * screenHeight) ..[[)">AutoPilot: ]]..apStatus..[[</text>
     ]]
 
     if autopilot_dest and speed > 1000 then
@@ -403,14 +403,14 @@ function positionInfoWidget()
         "
         stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[[" />
         
-        <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.01 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".6vw">Remote Version: ]]..hudVersion..[[</text>
-        <text x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Nearest Planet</text>
-        <text x="]].. tostring(.15 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" >]]..closestPlanetStr..[[</text>
+        <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.01 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".6vw">Remote Version: ]]..hudVersion..[[</text>
+        <text x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Nearest Planet</text>
+        <text x="]].. tostring(.15 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".7vw" >]]..closestPlanetStr..[[</text>
         
-        <text x="]].. tostring(.82 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size="1.42vh" font-weight="bold">Nearest Pipe</text>
-        <text x="]].. tostring(.78 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" >]]..closestPipeStr..[[</text>
+        <text x="]].. tostring(.82 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Nearest Pipe</text>
+        <text x="]].. tostring(.78 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".7vw" >]]..closestPipeStr..[[</text>
 
-        <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".7vw" font-weight="bold">Safe Zone Distance: ]]..SZDStr..[[</text>
+        <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".7vw" font-weight="bold">Safe Zone Distance: ]]..SZDStr..[[</text>
 
         </svg>]]
     return piw
@@ -457,7 +457,7 @@ function helpWidget()
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size="1.42vh" font-weight="bold">
                 OPTION KEY BINDINGS</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+1: Toggle help screen</text>
+                Alt+1: Toggle help screen (Alt+Shift+1 toggles minimal Remote HUD view)</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+2: Toggle Augmented reality view mode (NONE, ALL, PLANETS, CUSTOM) HUD Loads custom waypoints for AR from "autoconf/custom/AR_Waypoints.lua"</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
@@ -612,16 +612,109 @@ function warningsWidget()
     return ww
 end
 
+function minimalShipInfo()
+    local msi = ''
+
+    local bg = bgColor
+    local apStatus = 'inactive'
+    if auto_follow then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'following' end
+    if autopilot then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' end
+    if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' end
+
+    local eta = ''
+    if autopilot_dest and speed > 1000 then
+        local balance = vec3(autopilot_dest - constructPosition):len()/(speed/3.6) --meters/(meter/second) == seconds
+        local seconds = balance % 60 if seconds < 10 then seconds = string.format('0%.0f',seconds) else seconds = string.format('%.0f',seconds) end
+        balance = balance // 60
+        local minutes = balance % 60 if minutes < 10 then minutes = string.format('0%.0f',minutes) else minutes = string.format('%.0f',minutes) end
+        balance = balance // 60
+        local hours = balance % 60
+        eta = string.format(' (ETA %.0f:%s.%s)',hours,minutes,seconds)
+    end
+
+    msi = msi .. [[
+        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Auto Pilot Mode: ]]..apStatus..eta..[[</text>
+        </svg>
+    ]]
+
+    msi = msi .. [[
+        <svg style="position: absolute; top: ]]..shipInfoWidgetY..[[vh; left: ]]..shipInfoWidgetX..[[vw;" viewBox="0 0 286 260" width="]]..shipInfoWidgetScale..[[vw">
+            <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
+            <polygon style="stroke-linejoin: round; fill: ]]..bg..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 258 18 260"/>
+            <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">]]..string.format('%s (%s)',construct.getName(),pilotName)..[[</text>
+        ]]
+    msi = msi .. [[
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="40" y="73">Top Speed:</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 18px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="73" font-family: "monospace";>]]..formatNumber(maxSpeed,'speed')..[[</text>
+
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="81" x2="22" y2="104"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="40" y="100">Brake Dist:</text>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 18px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="100" font-family: "monospace";>]]..formatNumber(brakeDist,'distance')..[[</text>
+
+        ]]
+
+    msi = msi .. '</svg>'
+
+    curFuel = 0
+    local fuelWarning = false
+    local fuelTankWarning = false
+    for i,v in pairs(spacefueltank) do 
+        curFuel = curFuel + v.getItemsVolume()
+        if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
+    end
+    sFuelPercent = curFuel/maxFuel * 100
+    if sFuelPercent < 20 then fuelWarning = true end
+    curFuelStr = string.format('%.2f%%',sFuelPercent)
+
+    msi = msi .. string.format([[
+        <svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;">
+            <linearGradient id="sFuel-vertical" x1="0%%" y1="100%%" x2="0%%" y2="0%%">
+            <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
+            <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
+            </linearGradient>]],sFuelPercent,sFuelPercent)
+
+    msi = msi .. [[
+                <path d="
+                    M ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
+                    L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.185*screenHeight) .. [[
+                    L ]] .. tostring(.848*screenWidth) .. ' ' .. tostring(.185*screenHeight) .. [[
+                    L ]] .. tostring(.848*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
+                    L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [["
+                    stroke="]]..lineColor..[[" stroke-width="1" fill="url(#sFuel-vertical)" />
+                <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.198 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.32vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
+            </svg>
+        ]]
+
+    if fuelTankWarning or fuelWarning or showAlerts then
+        fuelWarningText = 'Fuel level &lt; 20%'
+        if not fuelWarning then fuelWarningText = 'A Fuel tank &lt; 20%%' end
+        warnings['lowFuel'] = 'svgWarning'
+    else
+        warnings['lowFuel'] = nil
+    end
+
+    msi = msi .. '</svg>'
+
+    
+    return msi
+end
+
 function generateScreen()
     html = [[ <html> <body style="font-family: Calibri;"> ]]
+    html = html .. brakeWidget()
     if showScreen then 
-        html = html .. brakeWidget()
-        html = html .. flightWidget()
-        html = html .. fuelWidget()
-        html = html .. apStatusWidget()
-        html = html .. positionInfoWidget()
+        if minimalWidgets then
+            html = html .. minimalShipInfo()
+        else
+            html = html .. flightWidget()
+            html = html .. fuelWidget()
+            html = html .. apStatusWidget()
+            html = html .. positionInfoWidget()
+            html = html .. shipNameWidget()
+        end
         html = html .. engineWidget()
-        html = html .. shipNameWidget()
         if useLogo then
             html = html .. [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
                 </svg>]]
@@ -672,6 +765,7 @@ function globalDB(action)
             if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
             if db_1.hasKey('useLogo') == 1 then useLogo = db_1.getIntValue('useLogo') == 1 end
             if db_1.hasKey('logoSVG') == 1 then logoSVG = db_1.getStringValue('logoSVG') end
+            if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
         elseif action == 'save' then
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
@@ -706,6 +800,7 @@ function globalDB(action)
             db_1.setStringValue('warning_fill_color',warning_fill_color)
             if useLogo then db_1.setIntValue('useLogo',1) else db_1.setIntValue('useLogo',0) end
             db_1.setStringValue('logoSVG',logoSVG)
+            if minimalWidgets then db_1.setIntValue('minimalWidgets',1) else db_1.setIntValue('minimalWidgets',0) end
         end
     end
 end
