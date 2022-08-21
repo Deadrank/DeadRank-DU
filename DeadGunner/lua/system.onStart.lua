@@ -370,14 +370,35 @@ function weaponsWidget()
         local offset = 1
         for i,w in pairs(weapon) do
             local textColor = neutralFontColor
-            local ammoColor = ccsHPColor
+            local ammoColor = neutralFontColor
             local probColor = warning_outline_color
             if w.isOutOfAmmo() == 1 then ammoColor = warning_outline_color end
 
             local probs = w.getHitProbability()
             if probs > .7 then probColor = ccsHPColor elseif probs > .5 then probColor = 'yellow' end
             
-            local weaponStr = string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring((0.66 - 0.015*i) * screenHeight) ..'px;left: '.. tostring(0.02* screenWidth) ..'px;"><div style="float: left;color: %s;">%s |&nbsp;</div><div style="float: left;color:%s;"> %.2f%% </div><div style="float: left;color: %s;"> | %s |&nbsp;</div><div style="float: left;color: %s;"> Ammo Count: %s </div></div>',textColor,w.getName(),probColor,probs*100,textColor,wStatus[w.getStatus()],ammoColor,w.getAmmoCount())
+            local weaponName = w.getName():lower()
+
+            local matches = {}
+            for w in weaponName:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+            local prefix = matches[1]:sub(1,1) .. matches[2]:sub(1,1)
+            local wtype = ''
+            if string.find(weaponName,'cannon') then wType = 'Cannon'
+            elseif string.find(weaponName,'railgun') then wType = 'Railgun'
+            elseif string.find(weaponName,'missile') then wType = 'Missile'
+            elseif string.find(weaponName,'laser') then wType = 'Laser'
+            end
+            weaponName = prefix .. wType
+
+            local ammoType = system.getItem(w.getAmmo())
+            ammoType = tostring(ammoType['name']):lower()
+            ammoTypeColor = neutralFontColor
+            if string.find(ammoType,'antimatter') then ammoTypeColor = antiMatterColor ammoType = 'Antimatter'
+            elseif string.find(ammoType,'electromagnetic') then ammoTypeColor = electroMagneticColor ammoType = 'ElectroMagnetic'
+            elseif string.find(ammoType,'kinetic') then ammoTypeColor = kineticColor ammoType = 'Kinetic'
+            elseif string.find(ammoType,'thermic') then ammoTypeColor = thermicColor ammoType = 'Thermic'
+            end
+            local weaponStr = string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring((0.66 - 0.015*i) * screenHeight) ..'px;left: '.. tostring(0.02* screenWidth) ..'px;"><div style="float: left;color: %s;">%s |&nbsp;</div><div style="float: left;color:%s;"> %.2f%% </div><div style="float: left;color: %s;"> | %s |&nbsp;</div><div style="float: left;color: %s;"> '..ammoType..'&nbsp;</div><div style="float: left;color: %s;">(%s) </div></div>',fontColor,weaponName,probColor,probs*100,textColor,wStatus[w.getStatus()],ammoTypeColor,ammoColor,w.getAmmoCount())
             wtext = wtext .. weaponStr
             offset = i
         end
