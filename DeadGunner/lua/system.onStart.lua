@@ -1013,13 +1013,15 @@ function warningsWidget()
     warningColor['venting'] = shieldHPColor
 
     local count = 0
+    local y = .06
+    if minimalWidgets then y = .14 end
     for k,v in pairs(warnings) do
         if v ~= nil then
             ww = ww .. string.format([[
-                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.65 * screenWidth) ..[[" y="]].. tostring(.06 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
+                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.65 * screenWidth) ..[[" y="]].. tostring(y * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
                     ]]..warningSymbols[v]..[[
                 </svg>
-                <text x="]].. tostring(.677 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
+                <text x="]].. tostring(.677 * screenWidth) ..[[" y="]].. tostring((y+.02) * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
                 ]])
             count = count + 1
         end
