@@ -16,7 +16,7 @@ The gunner seat will control and/or read data from:
  - Weapons (manual link)
  - Radar (manual link)
  - Transponder (auto link if present)
- - Databank (manually linked, optional)
+ - Databank (auto link if present, optional) (links to all databanks on the construct, but only writes to one)
  - Shield (manually linked, optional)
 
 Any items listed above as manual link, must be linked *before* running  the autoconfiguration
@@ -35,9 +35,6 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `hide codes`: Changes visual display of transponder tags on the HUD to "redacted". This is useful if you are streaming and do not want your tags displayed on-stream
  - `show codes`: Changes the visual display of transponder codes back to their actual values
  - `delcode <transponder tag>`: Removes the transponder tag specified from your transponder
- - `addships`: Adds all ships currently on your radar to a "friendly" ship list so that they will be filtered out of certain radar views even if they do not have matching transponder tags (if a databank is linked, will also store the construct IDs in the databank for future use) *NOTE: this feature is currently not working, will remove this note when fixed*
- - `addshipid <construct id> [owner/name]`: Adds an individual ship to the "friendly" ship list. The ship is tagged will be tagged with the specified owners name (optional).
- - `delshipid <construct id>`: Removes the specified construct ID from the "friendly" ship list
  - `<3 digit target number>`: Enter the 3 digit number of your desired target to set it as your "primary"  (can be used with radar widget filter for quicker targeting).
  - `0`: Entering "0" will clear the current active primary target
  - `agc <any whole number>`: Changes the code seed value of the automatically generated transponder codes (if enabled)
@@ -45,9 +42,13 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `hide <core size>`: Filters out the selected core size from the radar widget (core sizes need to be in uppercase)
  - `print db`: Prints out all key value pairs of string values in the databank (if connected)
  - `clear db`: Clears all key value pairs stored in the databank
+ - `coreid`: Prints your ships core ID
+ - `clear damage`: Clears damage from the current chair against the current target
+ - `clear all damage`: Clears all damage from the current chair against all targets
 
 ### Lua Parameters
  - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters (Default = enabled)
+ - `minimalWidgets`:  Whether widget locations should use the minimalist settings or not (Default = disabled, overriddent by remote if attached to same DB)
  - `printCombatLog`: Print out weapon hits and misses (including damage dealt) in the lua channel. Useful so so that you do not have to switch between the combat log and lua channel for commands. (Default = enabled)
  - `dangerWarning`: The number of ships that need to start attacking you before a warning is displayed on screen (Default = 4)
  - `validatePilot`: If enabled, will ensure that the player using the seat matches the ID entered into the lua code. To enable this, first ensure that you know your playerID, then edit the lua inside of "unit start" and replace the following with your player ID (Default = disabled):<br>
@@ -68,6 +69,10 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `neutralLineColor`: HUD Color customizations (Default = 'lightgrey')
  - `neutralFontColor`: HUD Color customizations (Default = 'darkgrey')
  - `warning_size`: Size of warning indicators in the upper right
+ - `radarBuffer`: Small buffer between safe and PvP zone on when to alert for new radar contacts
+ - WidgetX,Y and Scale: Widgets have an X, Y and Scale option which allows you to move them around on your screen and resize them.
+ - Widget Related Colors: some widgets have color options for changing the feel/look of the HUD
+ 
 
 ### Weapons
 Weapons are controllable from 3rd persion view using the weapon widgets. With the widget, you can start firing, stop firing and reload the weapons. I the lower left of the screen the HUD displays the hit chance of each weapon linked.
