@@ -675,6 +675,10 @@ function minimalShipInfo()
             <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
             </linearGradient>]],sFuelPercent,sFuelPercent)
 
+
+    if Nav.axisCommandManager:getMasterMode() == controlMasterModeId.travel then mode = 'Throttle ' .. tostring(Nav.axisCommandManager:getThrottleCommand(0) * 100) .. '%' modeBG = fuelTextColor
+    else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
+    end
     msi = msi .. [[
                 <path d="
                     M ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
@@ -684,6 +688,7 @@ function minimalShipInfo()
                     L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [["
                     stroke="]]..lineColor..[[" stroke-width="1" fill="url(#sFuel-vertical)" />
                 <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.198 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.32vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
+                <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.2115 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>
             </svg>
         ]]
 
@@ -697,7 +702,6 @@ function minimalShipInfo()
 
     msi = msi .. '</svg>'
 
-    
     return msi
 end
 
