@@ -110,33 +110,75 @@ function WeaponWidgetCreate()
     end
 end
 
-function coCheck()
-    local cont = coroutine.status(co)
-    if cont ~= "dead" then 
-        local value, done = coroutine.resume(co)
-        if done then 
-            system.print("Done") 
+function updateRadarOld()
+    local decode = json.decode
+    while true do
+        local i = 0
+        local getData = radar_1.getWidgetData()
+        -- local worksInEnvironment = getData:find('worksInEnvironment":false')
+        for S in getData:gmatch('({"constructId":".-%b{}.-})') do
+            i = i + 1
+            local construct = decode(S)
+            if i > 50 then
+                i = 0
+                coroutine.yield()
+            end
         end
-    elseif cont == "dead" then
-        co = coroutine.create(updateRadar)
-        local value, done = coroutine.resume(co)
+        coroutine.yield()
     end
 end
 
 function updateRadar(filter)
     local data = radar_1.getWidgetData()
+
     local radarList = radar_1.getConstructIds()
     local constructList = {}
-    if #radarList > max_radar_load then radarOverload = true else radarOverload = false end
-    if radarOverload then
-        for n,id in pairs(radarList) do
-            local threatLevel = radar_1.getThreatRateFrom(id)
+    if #radarList > max_radar_load then radarOverload = true end
+    radarContactNumber = #radarList
+
+    local enemyLShips = 0
+    local friendlyLShips = 0
+    
+    local shipsBySize = {}
+    shipsBySize['XS'] = {}
+    shipsBySize['S'] = {}
+    shipsBySize['M'] = {}
+    shipsBySize['L'] = {}
+
+    identifiedBy = 0
+    attackedBy = 0
+    local tempRadarStats = {
+        ['enemy'] = {
+            ['L'] = 0,
+            ['M'] = 0,
+            ['S'] = 0,
+            ['XS'] = 0
+        },
+        ['friendly'] = {
+            ['L'] = 0,
+            ['M'] = 0,
+            ['S'] = 0,
+            ['XS'] = 0
+        }
+    }
+    
+    --for n,id in pairs(radarList) do
+    local n = 0
+    for id in data:gmatch('{"constructId":"([%d%.]*)"') do
+        --local id = S.match([[{"constructId":"([%d%.]*)"]])
+        --local id = construct.constructId
+        local identified = radar_1.isConstructIdentified(id) == 1--construct.isIdentified--
+        local shipType = radar_1.getConstructKind(id)
+
+        if  (radarOverload and shipType == 5 or identified) or (not radarOverload) then
+            local shipSize = radar_1.getConstructCoreSize(id)--construct.size--
+            local nameOrig = radar_1.getConstructName(id) --construct.name--
+            local threatLevel = radar_1.getThreatRateFrom(id)--construct.targetThreatState--
             if threatLevel == 2 then identifiedBy = identifiedBy + 1
             elseif threatLevel == 5 then attackedBy = attackedBy + 1
             end
             local tMatch = radar_1.hasMatchingTransponder(id) == 1
             local abandonded = radar_1.isConstructAbandoned(id) == 1
-            local nameOrig = radar_1.getConstructName(id)
             local name = nameOrig--:gsub('%[',''):gsub('%]','')
             nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%[')
             local uniqueCode = string.sub(tostring(id),-3)
@@ -153,154 +195,84 @@ function updateRadar(filter)
             elseif abandonded then
                 uniqueName = string.format('[CORED] %s',name)
             end
-            if n >= max_radar_load then break end
-        
-            local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
-            for str in rawData do
-                local replacedData = str:gsub(nameOrig,uniqueName)
-                if identified then
-                    table.insert(constructList,1,replacedData)
-                elseif radarSort == 'Size' then
-                    table.insert(shipsBySize[shipSize],replacedData)
-                else
-                    table.insert(constructList,replacedData)
+
+            local shipIDMatch = false
+            if useShipID then for k,v in pairs(friendlySIDs) do if id == k then shipIDMatch = true end end end
+            local friendly = tMatch or shipIDMatch
+            
+            if shipType == 5 then
+                if friendly then tempRadarStats['friendly'][shipSize] = tempRadarStats['friendly'][shipSize] + 1
+                else tempRadarStats['enemy'][shipSize] = tempRadarStats['enemy'][shipSize] + 1
                 end
             end
+
+            if contains(filterSize,shipSize) then
+                if filter == 'enemy' and not friendly then
+                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                    for str in rawData do
+                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        if identified then
+                            table.insert(constructList,1,replacedData)
+                        elseif radarSort == 'Size' then
+                            table.insert(shipsBySize[shipSize],replacedData)
+                        else
+                            table.insert(constructList,replacedData)
+                        end
+                    end
+                elseif filter == 'identified' and identified then
+                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                    for str in rawData do
+                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        if radarSort == 'Size' then
+                            table.insert(shipsBySize[shipSize],replacedData)
+                        else
+                            table.insert(constructList,replacedData)
+                        end
+                    end
+                elseif filter == 'friendly' and friendly then
+                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                    for str in rawData do
+                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        if identified then
+                            table.insert(constructList,1,replacedData)
+                        elseif radarSort == 'Size' then
+                            table.insert(shipsBySize[shipSize],replacedData)
+                        else
+                            table.insert(constructList,replacedData)
+                        end
+                    end
+                elseif filter == 'primary' and tostring(primary) == uniqueCode then
+                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                    for str in rawData do
+                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        if identified then
+                            table.insert(constructList,1,replacedData)
+                        elseif radarSort == 'Size' then
+                            table.insert(shipsBySize[shipSize],replacedData)
+                        else
+                            table.insert(constructList,replacedData)
+                        end
+                    end
+                elseif radarFilter == 'All' then
+                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                    for str in rawData do
+                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        if identified then
+                            table.insert(constructList,1,replacedData)
+                        elseif radarSort == 'Size' then
+                            table.insert(shipsBySize[shipSize],replacedData)
+                        else
+                            table.insert(constructList,replacedData)
+                        end
+                    end
+                end
+            end
+            if n % 25 == 0 then coroutine.yield() end
         end
-        data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
-        data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
-        radarWidgetData = data
-        return data
+        n = n + 1
     end
 
-    local enemyLShips = 0
-    local friendlyLShips = 0
-    
-    local shipsBySize = {}
-    shipsBySize['XS'] = {}
-    shipsBySize['S'] = {}
-    shipsBySize['M'] = {}
-    shipsBySize['L'] = {}
-
-    identifiedBy = 0
-    attackedBy = 0
-    radarStats = {
-        ['enemy'] = {
-            ['L'] = 0,
-            ['M'] = 0,
-            ['S'] = 0,
-            ['XS'] = 0
-        },
-        ['friendly'] = {
-            ['L'] = 0,
-            ['M'] = 0,
-            ['S'] = 0,
-            ['XS'] = 0
-        }
-    }
-    
-    for _,id in pairs(radarList) do
-        local threatLevel = radar_1.getThreatRateFrom(id)
-        if threatLevel == 2 then identifiedBy = identifiedBy + 1
-        elseif threatLevel == 5 then attackedBy = attackedBy + 1
-        end
-        local tMatch = radar_1.hasMatchingTransponder(id) == 1
-        local abandonded = radar_1.isConstructAbandoned(id) == 1
-        local nameOrig = radar_1.getConstructName(id)
-        local name = nameOrig--:gsub('%[',''):gsub('%]','')
-        nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%[')
-        local uniqueCode = string.sub(tostring(id),-3)
-        local uniqueName = string.format('[%s] %s',uniqueCode,name)
-        if tMatch then 
-            local owner = radar_1.getConstructOwnerEntity(id)
-            if owner['isOrganization'] then
-                owner = system.getOrganization(owner['id'])
-                uniqueName = string.format('[%s] %s',owner['tag'],name)
-            else
-                owner = system.getPlayerName(owner['id'])
-                uniqueName = string.format('[%s] %s',owner,name)
-            end
-        elseif abandonded then
-            uniqueName = string.format('[CORED] %s',name)
-        end
-
-        local shipIDMatch = false
-        if useShipID then for k,v in pairs(friendlySIDs) do if id == k then shipIDMatch = true end end end
-        local friendly = tMatch or shipIDMatch
-        local shipSize = radar_1.getConstructCoreSize(id)
-        
-        local identified = radar_1.isConstructIdentified(id) == 1
-
-        local shipType = radar_1.getConstructKind(id)
-        if shipType == 5 then
-            if friendly then radarStats['friendly'][shipSize] = radarStats['friendly'][shipSize] + 1
-            else radarStats['enemy'][shipSize] = radarStats['enemy'][shipSize] + 1
-            end
-        end
-
-        if contains(filterSize,shipSize) then
-            if filter == 'enemy' and not friendly then
-                local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
-                for str in rawData do
-                    local replacedData = str:gsub(nameOrig,uniqueName)
-                    if identified then
-                        table.insert(constructList,1,replacedData)
-                    elseif radarSort == 'Size' then
-                        table.insert(shipsBySize[shipSize],replacedData)
-                    else
-                        table.insert(constructList,replacedData)
-                    end
-                end
-            elseif filter == 'identified' and identified then
-                local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
-                for str in rawData do
-                    local replacedData = str:gsub(nameOrig,uniqueName)
-                    if radarSort == 'Size' then
-                        table.insert(shipsBySize[shipSize],replacedData)
-                    else
-                        table.insert(constructList,replacedData)
-                    end
-                end
-            elseif filter == 'friendly' and friendly then
-                local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
-                for str in rawData do
-                    local replacedData = str:gsub(nameOrig,uniqueName)
-                    if identified then
-                        table.insert(constructList,1,replacedData)
-                    elseif radarSort == 'Size' then
-                        table.insert(shipsBySize[shipSize],replacedData)
-                    else
-                        table.insert(constructList,replacedData)
-                    end
-                end
-            elseif filter == 'primary' and tostring(primary) == uniqueCode then
-                local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
-                for str in rawData do
-                    local replacedData = str:gsub(nameOrig,uniqueName)
-                    if identified then
-                        table.insert(constructList,1,replacedData)
-                    elseif radarSort == 'Size' then
-                        table.insert(shipsBySize[shipSize],replacedData)
-                    else
-                        table.insert(constructList,replacedData)
-                    end
-                end
-            elseif radarFilter == 'All' then
-                local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
-                for str in rawData do
-                    local replacedData = str:gsub(nameOrig,uniqueName)
-                    if identified then
-                        table.insert(constructList,1,replacedData)
-                    elseif radarSort == 'Size' then
-                        table.insert(shipsBySize[shipSize],replacedData)
-                    else
-                        table.insert(constructList,replacedData)
-                    end
-                end
-            end
-        end
-    end
-
+    coroutine.yield()
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
     data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
     if radarSort == 'Size' then
@@ -309,16 +281,17 @@ function updateRadar(filter)
         for _,ship in pairs(shipsBySize['M']) do table.insert(constructList,ship) end
         for _,ship in pairs(shipsBySize['L']) do table.insert(constructList,ship) end
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
-    elseif not radarOverload then
+    else
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
     end
 
+    radarStats = tempRadarStats
     radarWidgetData = data
     return data
 end
 
 function RadarWidgetCreate()
-    local _data = updateRadar(radarFilter)
+    local _data = radar_1.getWidgetData()--updateRadar(radarFilter)
     local _panel = system.createWidgetPanel("RADAR")
     local _widget = system.createWidget(_panel, "radar")
     radarDataID = system.createData(_data)
@@ -744,7 +717,7 @@ function radarWidget()
         <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 245" width="]]..s..[[vw">
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
             <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 225 18 227"/>
-            <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information</text>
+            <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information (]]..tostring(radarContactNumber)..[[)</text>
         ]]
     rw = rw .. [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
@@ -1110,5 +1083,3 @@ function generateHTML()
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
 end
-
-co = coroutine.create(coCheck)

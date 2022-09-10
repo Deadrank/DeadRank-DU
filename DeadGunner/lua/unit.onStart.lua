@@ -28,7 +28,7 @@ L_Shield_HP = 11500000 --export
 M_Shield_HP = 8625000 --export
 S_Shield_HP = 8625000 --export
 XS_Shield_HP = 500000 --export
-max_radar_load = 250 --export
+max_radar_load = 400 --export
 maxWeaponsPerWidget = 3 --export How many weapons in each default weapon widget
 radarBuffer = 0.00001
 warning_size = 0.75 --export How large the warning indicators should be
@@ -100,6 +100,8 @@ dmgTick = 0
 --------
 
 --- Radar Initial Values ---
+cr = nil
+constructListData = {}
 radarWidgetData = nil
 radarOverload = false
 radarDataID = nil
@@ -141,6 +143,7 @@ identifiedBy = 0
 attackedBy = 0
 warpScan = {}
 unknownRadar = {}
+radarContactNumber = 0
 ------------------------------
 
 --- Screen Resolution/keys ---

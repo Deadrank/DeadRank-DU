@@ -19,10 +19,17 @@ end
 --    local _data = updateRadar(radarFilter)
 --    system.updateData(radarDataID, _data)
 --end
-if radar_1 and radarWidgetData then
-    coCheck()
+
+if radar_1 and cr == nil then
+    cr = coroutine.create(updateRadar)
     --data = radar_1.getWidgetData()
-    system.updateData(radarDataID, radarWidgetData)
+elseif cr ~= nil then
+    if coroutine.status(cr) ~= "dead" and coroutine.status(cr) == "suspended" then
+        coroutine.resume(cr,radarFilter)
+    elseif coroutine.status(cr) == "dead" then
+        cr = nil
+        system.updateData(radarDataID, radarWidgetData)
+    end
 end
 
 -- Shield Updates --
