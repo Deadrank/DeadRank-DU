@@ -15,9 +15,14 @@ if not inSZ then
     fontColor = textColorPVP
 end
 
-if radarStart and radar_1 then
-    local _data = updateRadar(radarFilter)
-    system.updateData(radarDataID, _data)
+--if radarStart and radar_1 then
+--    local _data = updateRadar(radarFilter)
+--    system.updateData(radarDataID, _data)
+--end
+if radar_1 and radarWidgetData then
+    coCheck()
+    --data = radar_1.getWidgetData()
+    system.updateData(radarDataID, radarWidgetData)
 end
 
 -- Shield Updates --

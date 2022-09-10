@@ -110,12 +110,72 @@ function WeaponWidgetCreate()
     end
 end
 
+function coCheck()
+    local cont = coroutine.status(co)
+    if cont ~= "dead" then 
+        local value, done = coroutine.resume(co)
+        if done then 
+            system.print("Done") 
+        end
+    elseif cont == "dead" then
+        co = coroutine.create(updateRadar)
+        local value, done = coroutine.resume(co)
+    end
+end
+
 function updateRadar(filter)
     local data = radar_1.getWidgetData()
     local radarList = radar_1.getConstructIds()
+    local constructList = {}
+    if #radarList > max_radar_load then radarOverload = true else radarOverload = false end
+    if radarOverload then
+        for n,id in pairs(radarList) do
+            local threatLevel = radar_1.getThreatRateFrom(id)
+            if threatLevel == 2 then identifiedBy = identifiedBy + 1
+            elseif threatLevel == 5 then attackedBy = attackedBy + 1
+            end
+            local tMatch = radar_1.hasMatchingTransponder(id) == 1
+            local abandonded = radar_1.isConstructAbandoned(id) == 1
+            local nameOrig = radar_1.getConstructName(id)
+            local name = nameOrig--:gsub('%[',''):gsub('%]','')
+            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%[')
+            local uniqueCode = string.sub(tostring(id),-3)
+            local uniqueName = string.format('[%s] %s',uniqueCode,name)
+            if tMatch then 
+                local owner = radar_1.getConstructOwnerEntity(id)
+                if owner['isOrganization'] then
+                    owner = system.getOrganization(owner['id'])
+                    uniqueName = string.format('[%s] %s',owner['tag'],name)
+                else
+                    owner = system.getPlayerName(owner['id'])
+                    uniqueName = string.format('[%s] %s',owner,name)
+                end
+            elseif abandonded then
+                uniqueName = string.format('[CORED] %s',name)
+            end
+            if n >= max_radar_load then break end
+        
+            local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+            for str in rawData do
+                local replacedData = str:gsub(nameOrig,uniqueName)
+                if identified then
+                    table.insert(constructList,1,replacedData)
+                elseif radarSort == 'Size' then
+                    table.insert(shipsBySize[shipSize],replacedData)
+                else
+                    table.insert(constructList,replacedData)
+                end
+            end
+        end
+        data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
+        data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
+        radarWidgetData = data
+        return data
+    end
+
     local enemyLShips = 0
     local friendlyLShips = 0
-    local constructList = {}
+    
     local shipsBySize = {}
     shipsBySize['XS'] = {}
     shipsBySize['S'] = {}
@@ -138,8 +198,7 @@ function updateRadar(filter)
             ['XS'] = 0
         }
     }
-    if #radarList > max_radar_load then radarOverload = true return data end
-    radarOverload = false
+    
     for _,id in pairs(radarList) do
         local threatLevel = radar_1.getThreatRateFrom(id)
         if threatLevel == 2 then identifiedBy = identifiedBy + 1
@@ -169,9 +228,10 @@ function updateRadar(filter)
         if useShipID then for k,v in pairs(friendlySIDs) do if id == k then shipIDMatch = true end end end
         local friendly = tMatch or shipIDMatch
         local shipSize = radar_1.getConstructCoreSize(id)
-        local shipType = radar_1.getConstructKind(id)
+        
         local identified = radar_1.isConstructIdentified(id) == 1
 
+        local shipType = radar_1.getConstructKind(id)
         if shipType == 5 then
             if friendly then radarStats['friendly'][shipSize] = radarStats['friendly'][shipSize] + 1
             else radarStats['enemy'][shipSize] = radarStats['enemy'][shipSize] + 1
@@ -240,6 +300,7 @@ function updateRadar(filter)
             end
         end
     end
+
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
     data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
     if radarSort == 'Size' then
@@ -248,9 +309,11 @@ function updateRadar(filter)
         for _,ship in pairs(shipsBySize['M']) do table.insert(constructList,ship) end
         for _,ship in pairs(shipsBySize['L']) do table.insert(constructList,ship) end
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
-    else
+    elseif not radarOverload then
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
     end
+
+    radarWidgetData = data
     return data
 end
 
@@ -1047,3 +1110,5 @@ function generateHTML()
     html = html .. [[ </body> </html> ]]
     system.setScreen(html)
 end
+
+co = coroutine.create(coCheck)

@@ -9,7 +9,7 @@ chairID = tostring(player.getSeatId())
 showAlerts = false
 
 -- SETTINGS --
-useDB = true --export use connected DB for config options
+useDB = false --export use connected DB for config options
 minimalWidgets = false --export
 printCombatLog = true --export Print weapon hits/misses to lua
 dangerWarning = 4 --export
@@ -100,6 +100,7 @@ dmgTick = 0
 --------
 
 --- Radar Initial Values ---
+radarWidgetData = nil
 radarOverload = false
 radarDataID = nil
 radarStart = false
