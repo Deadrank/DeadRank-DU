@@ -15,9 +15,32 @@ if not inSZ then
     fontColor = textColorPVP
 end
 
-if radarStart and radar_1 then
-    local _data = updateRadar(radarFilter)
-    system.updateData(radarDataID, _data)
+--if radarStart and radar_1 then
+--    local _data = updateRadar(radarFilter)
+--    system.updateData(radarDataID, _data)
+--end
+
+if radar_1 and cr == nil then
+    cr = coroutine.create(updateRadar)
+    --data = radar_1.getWidgetData()
+elseif cr ~= nil then
+    if coroutine.status(cr) ~= "dead" and coroutine.status(cr) == "suspended" then
+        coroutine.resume(cr,radarFilter)
+    elseif coroutine.status(cr) == "dead" then
+        cr = nil
+        system.updateData(radarDataID, radarWidgetData)
+        if not cr_time then
+            cr_time = system.getArkTime()
+        else
+            cr_delta = system.getArkTime() - cr_time
+            cr_time = system.getArkTime()
+            if (cr_delta > 1 and radarOverload) or showAlerts then
+                warnings['radar_delta'] = 'svgCritical'
+            else
+                warnings['radar_delta'] = nil
+            end
+        end
+    end
 end
 
 -- Shield Updates --
