@@ -110,30 +110,12 @@ function WeaponWidgetCreate()
     end
 end
 
-function updateRadarOld()
-    local decode = json.decode
-    while true do
-        local i = 0
-        local getData = radar_1.getWidgetData()
-        -- local worksInEnvironment = getData:find('worksInEnvironment":false')
-        for S in getData:gmatch('({"constructId":".-%b{}.-})') do
-            i = i + 1
-            local construct = decode(S)
-            if i > 50 then
-                i = 0
-                coroutine.yield()
-            end
-        end
-        coroutine.yield()
-    end
-end
-
 function updateRadar(filter)
     local data = radar_1.getWidgetData()
 
     local radarList = radar_1.getConstructIds()
     local constructList = {}
-    if #radarList > max_radar_load then radarOverload = true end
+    if #radarList > max_radar_load then radarOverload = true else radarOverload = false end
     radarContactNumber = #radarList
 
     local enemyLShips = 0
@@ -165,8 +147,6 @@ function updateRadar(filter)
     --for n,id in pairs(radarList) do
     local n = 0
     for id in data:gmatch('{"constructId":"([%d%.]*)"') do
-        --local id = S.match([[{"constructId":"([%d%.]*)"]])
-        --local id = construct.constructId
         local identified = radar_1.isConstructIdentified(id) == 1--construct.isIdentified--
         local shipType = radar_1.getConstructKind(id)
 
@@ -180,7 +160,7 @@ function updateRadar(filter)
             local tMatch = radar_1.hasMatchingTransponder(id) == 1
             local abandonded = radar_1.isConstructAbandoned(id) == 1
             local name = nameOrig--:gsub('%[',''):gsub('%]','')
-            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%[')
+            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)')
             local uniqueCode = string.sub(tostring(id),-3)
             local uniqueName = string.format('[%s] %s',uniqueCode,name)
             if tMatch then 
@@ -1039,6 +1019,7 @@ function warningsWidget()
     warningText['friendly'] = 'Target is Friendly'
     warningText['noRadar'] = 'No Radar Linked'
     warningText['venting'] = 'Shield Venting'
+    warningText['radar_delta'] = string.format('Radar Delay %.2fs',cr_delta)
 
     local warningColor = {}
     warningColor['attackedBy'] = 'red'
@@ -1047,6 +1028,7 @@ function warningsWidget()
     warningColor['friendly'] = 'green'
     warningColor['noRadar'] = 'red'
     warningColor['venting'] = shieldHPColor
+    warningColor['radar_delta'] = 'orange'
 
     local count = 0
     local y = .06

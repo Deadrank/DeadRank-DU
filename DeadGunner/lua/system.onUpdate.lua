@@ -29,6 +29,17 @@ elseif cr ~= nil then
     elseif coroutine.status(cr) == "dead" then
         cr = nil
         system.updateData(radarDataID, radarWidgetData)
+        if not cr_time then
+            cr_time = system.getArkTime()
+        else
+            cr_delta = system.getArkTime() - cr_time
+            cr_time = system.getArkTime()
+            if (cr_delta > 1 and radarOverload) or showAlerts then
+                warnings['radar_delta'] = 'svgCritical'
+            else
+                warnings['radar_delta'] = nil
+            end
+        end
     end
 end
 
