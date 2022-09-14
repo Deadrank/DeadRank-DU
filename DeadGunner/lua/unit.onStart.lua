@@ -10,6 +10,7 @@ showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
+showCode = true --export True=plain text transponder codes, False=redacted codes
 minimalWidgets = false --export
 printCombatLog = true --export Print weapon hits/misses to lua
 dangerWarning = 4 --export
@@ -136,11 +137,13 @@ radarStats = {
         ['XS'] = 0
     }
 }
-lastDistance = {}
-lastDistanceTime = 0
-speedCompare = 'Stable'
+lastDistance = 0
+lastUpdateTime = 0
+speedCompare = 'Not Identified'
 accelCompare = 'No Accel'
-lastSpeed = {}
+lastSpeed = 0
+speedCompare = 0
+gapCompare = 0
 identifiedBy = 0
 attackedBy = 0
 warpScan = {}
@@ -184,7 +187,6 @@ transponderStatus = false
 tCode = nil
 cOverlap = false
 cOverlapTick = 0
-showCode = true
 -----------------
 
 bootTimer = 0

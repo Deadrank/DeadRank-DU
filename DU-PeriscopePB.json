@@ -108,7 +108,7 @@
     },
     "handlers": [
         {
-            "code": "unit.hide() system.print('-- Peri board shown --')\nshowPeri = true\nlocal periscope = [[\n<style>\nimg {\nposition: fixed;\nwidth: 10vw; \nmax-height: 100%; \nbox-sizing: border-box;\nbottom: 48vh;\nleft: 17vw;\nborder-radius: 8px;\nborder: 2px solid white;\nanimation:blinking 0.5s 1;\n}\n\n                    @keyframes blinking{\n                    0%{   width: 0vw;  }\n                    100%{  width: 10vw;   }\n                    }\n\n</style>\n<img src=\"gunner_target.liveview\">]]\n\nsystem.setScreen(periscope)\nsystem.showScreen(1)",
+            "code": "unit.hide() system.print('-- Peri board shown --')\nshowPeri = true\nlocal periscope = [[\n<style>\nimg {\nposition: fixed;\nwidth: 10vw; \nmax-height: 100%; \nbox-sizing: border-box;\nbottom: 44vh;\nbottom: 44vh;\nborder-radius: 8px;\nborder: 2px solid white;\nanimation:blinking 0.5s 1;\n}\n\n                    @keyframes blinking{\n                    0%{   width: 0vw;  }\n                    100%{  width: 10vw;   }\n                    }\n\n</style>\n<img src=\"gunner_target.liveview\">]]\n\nsystem.setScreen(periscope)\nsystem.showScreen(1)",
             "filter": {
                 "args": [],
                 "signature": "onStart()",
@@ -117,7 +117,7 @@
             "key": "0"
         },
         {
-            "code": "if showPeri then\n    local periscope = [[\n    <style>\n    img {\n    position: fixed;\n    width: 30vw; \n    max-height: 100%; \n    box-sizing: border-box;\n    bottom: 48vh;\n    left: 17vw;\n    border-radius: 8px;\n    border: 2px solid white;\n    border-radius: 8px;\n    animation:blinking 0.5s 1;\n    }\n\n                        @keyframes blinking{\n                        0%{   width: 10vw;  }\n                        100%{  width: 30vw;   }\n                        }\n\n    </style>\n    <img src=\"gunner_target.liveview\">]]\n\n    system.setScreen(periscope)\nend",
+            "code": "if showPeri then\n    local periscope = [[\n    <style>\n    img {\n    position: fixed;\n    width: 30vw; \n    max-height: 100%; \n    box-sizing: border-box;\n    bottom: 44vh;\n    bottom: 44vh;\n    border-radius: 8px;\n    border: 2px solid white;\n    border-radius: 8px;\n    animation:blinking 0.5s 1;\n    }\n\n                        @keyframes blinking{\n                        0%{   width: 10vw;  }\n                        100%{  width: 30vw;   }\n                        }\n\n    </style>\n    <img src=\"gunner_target.liveview\">]]\n\n    system.setScreen(periscope)\nend",
             "filter": {
                 "args": [
                     {
@@ -130,7 +130,7 @@
             "key": "1"
         },
         {
-            "code": "if showPeri then\n    local periscope = [[\n    <style>\n    img {\n    position: fixed;\n    width: 10vw; \n    max-height: 100%; \n    box-sizing: border-box;\n    bottom: 48vh;\n    left: 17vw;\n    border-radius: 8px;\n    border: 2px solid white;\n    border-radius: 8px;\n    animation:blinking 0.5s 1;\n    }\n\n                        @keyframes blinking{\n                        0%{   width: 30vw;  }\n                        100%{  width: 10vw;   }\n                        }\n\n    </style>\n    <img src=\"gunner_target.liveview\">]]\n\n    system.setScreen(periscope)\nend",
+            "code": "if showPeri then\n    local periscope = [[\n    <style>\n    img {\n    position: fixed;\n    width: 10vw; \n    max-height: 100%; \n    box-sizing: border-box;\n    bottom: 44vh;\n    bottom: 44vh;\n    border-radius: 8px;\n    border: 2px solid white;\n    border-radius: 8px;\n    animation:blinking 0.5s 1;\n    }\n\n                        @keyframes blinking{\n                        0%{   width: 30vw;  }\n                        100%{  width: 10vw;   }\n                        }\n\n    </style>\n    <img src=\"gunner_target.liveview\">]]\n\n    system.setScreen(periscope)\nend",
             "filter": {
                 "args": [
                     {
@@ -143,7 +143,7 @@
             "key": "2"
         },
         {
-            "code": "if text == 'scope' then\n    if showPeri then\n        showPeri = false\n        system.setScreen('')\n    else\n        showPeri = true\n        local periscope = [[\n        <style>\n        img {\n        position: fixed;\n        width: 10vw; \n        max-height: 100%; \n        box-sizing: border-box;\n        bottom: 48vh;\n        left: 17vw;\n        border-radius: 8px;\n        border: 2px solid white;\n        border-radius: 8px;\n        animation:blinking 0.5s 1;\n        }\n\n                            @keyframes blinking{\n                            0%{   width: 0vw;  }\n                            100%{  width: 10vw;   }\n                            }\n\n        </style>\n        <img src=\"gunner_target.liveview\">]]\n\n        system.setScreen(periscope)\n    end\nend",
+            "code": "if text == 'scope' then\n    if showPeri then\n        showPeri = false\n        system.setScreen('')\n    else\n        showPeri = true\n        local periscope = [[\n        <style>\n        img {\n        position: fixed;\n        width: 10vw; \n        max-height: 100%; \n        box-sizing: border-box;\n        bottom: 44vh;\n        bottom: 44vh;\n        border-radius: 8px;\n        border: 2px solid white;\n        border-radius: 8px;\n        animation:blinking 0.5s 1;\n        }\n\n                            @keyframes blinking{\n                            0%{   width: 0vw;  }\n                            100%{  width: 10vw;   }\n                            }\n\n        </style>\n        <img src=\"gunner_target.liveview\">]]\n\n        system.setScreen(periscope)\n    end\nend",
             "filter": {
                 "args": [
                     {
