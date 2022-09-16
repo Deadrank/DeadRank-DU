@@ -1,11 +1,11 @@
-name: DeadRemote v3.1.5
+name: DeadRemote v3.2.0
 
 slots:
     core:
         class: CoreUnit
     db:
         class: DataBank
-        select: manual
+        select: all
     antigrav:
         class: AntiGravityGeneratorUnit
     warpdrive:

@@ -2,7 +2,7 @@ cPos = vec3(construct.getWorldPosition())
 local inWS = false
 if warpScan then
     for k,v in pairs(warpScan) do if id == k then inWS = true break end end
-    if not inSZ and SZD*0.000005 > radarBuffer and contains(filterSize,shipSize) then
+    if not inSZ and SZD*0.000005 > radarBuffer then
         system.stopSound()
         system.playSound('targetleft.mp3')
         if inWS then
