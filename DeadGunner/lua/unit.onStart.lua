@@ -12,6 +12,7 @@ showAlerts = false
 useDB = true --export use connected DB for config options
 showCode = true --export True=plain text transponder codes, False=redacted codes
 minimalWidgets = false --export
+targetIndicators = true --export Show warnings when target is speeding up or slowing down
 printCombatLog = true --export Print weapon hits/misses to lua
 dangerWarning = 4 --export
 validatePilot = false --export

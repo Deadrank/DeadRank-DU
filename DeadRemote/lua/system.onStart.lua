@@ -593,16 +593,21 @@ function warningsWidget()
 
     local warningColor = {}
     warningColor['lowFuel'] = 'red'
-    warningColor['brakes'] = 'orange'
+
+    if math.floor(system.getArkTime()*5) % 2 == 0 then
+        warningColor['brakes'] = 'orange'
+    else
+        warningColor['brakes'] = 'yellow'
+    end
 
     local count = 0
     for k,v in pairs(warnings) do
         if v ~= nil then
             ww = ww .. [[
-                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.24 * screenWidth) ..[[" y="]].. tostring(.06 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
+                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.24 * screenWidth) ..[[" y="]].. tostring(.20 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
                     ]]..warningSymbols[v]..[[
                 </svg>
-                <text x="]].. tostring(.267 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
+                <text x="]].. tostring(.267 * screenWidth) ..[[" y="]].. tostring(.22 * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
                 ]]
             count = count + 1
         end
