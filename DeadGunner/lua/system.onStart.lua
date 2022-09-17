@@ -181,7 +181,7 @@ function updateRadar(filter)
             if useShipID then for k,v in pairs(friendlySIDs) do if id == k then shipIDMatch = true end end end
             local friendly = tMatch or shipIDMatch
             
-            if shipType == 5 then
+            if shipType == 5 and not abandonded then
                 if friendly then tempRadarStats['friendly'][shipSize] = tempRadarStats['friendly'][shipSize] + 1
                 else tempRadarStats['enemy'][shipSize] = tempRadarStats['enemy'][shipSize] + 1
                 end

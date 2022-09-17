@@ -193,6 +193,7 @@ Nav:setEngineTorqueCommand('torque', angularAcceleration, keepCollinearity, 'air
 local brakeAcceleration = vec3()
 if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= brakeDist + AP_Brake_Buffer then
     brakeAcceleration = -maxBrake * constructVelocityDir
+    brakeInput = 1
 elseif autopilot and autopilot_dest ~= nil and not brakesOn then
     brakeAcceleration = vec3()
     brakeInput = 0
