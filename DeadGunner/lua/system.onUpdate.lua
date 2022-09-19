@@ -76,9 +76,5 @@ if shield_1 then
 
     local coreHP = 0
     if core_1 then coreHP = (core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress() end
-    if shield_1.isActive() == 0 and shield_1.isVenting() == 1 and not rD and coreHP < 0.15 then
-        shield_1.stopVenting()
-        shield_1.activate()
-    end
 end
 -- End Shield Updates --
