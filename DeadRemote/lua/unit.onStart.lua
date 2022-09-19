@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.3.0'
+hudVersion = 'v3.4.0'
 minimalWidgets = false --export
 validatePilot = false --export
 useDB = true --export
@@ -41,7 +41,7 @@ Direction_Indicator_Color = 'rgba(200, 225, 235, 1)' --export
 Prograde_Indicator_Size = 7.5 --export
 Prograde_Indicator_Color = 'rgb(60, 255, 60)' --export
 AP_Brake_Buffer = 5000 --export
-AP_Max_Rotation_Factor = 20 --export
+AP_Max_Rotation_Factor = 10 --export
 AR_Mode = 'NONE' --export
 AR_Range = 3 --export
 AR_Size = 15 --export

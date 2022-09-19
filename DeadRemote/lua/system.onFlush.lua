@@ -98,18 +98,29 @@ local targetYaw = 0
 local targetPitch = 0
 local yawChange = 0
 local pitchChange = 0
-local totalAngularChange = nil
+--local totalAngularChange = nil
 if autopilot_dest then
-    destVec = vec3(autopilot_dest - constructPosition)
-    currentYaw = -math.deg(signedRotationAngle(constructUp, constructVelocity, constructForward))
-    currentPitch = math.deg(signedRotationAngle(constructRight, constructVelocity, constructForward))
+    destVec = vec3(autopilot_dest - constructPosition):normalize()
+    local dirYaw = -math.deg(signedRotationAngle(constructUp:normalize(), destVec:normalize(), constructForward:normalize()))
+    local dirPitch = math.deg(signedRotationAngle(constructRight:normalize(), destVec:normalize(), constructForward:normalize()))
 
-    targetYaw = -math.deg(signedRotationAngle(constructUp, destVec, constructForward))
-    local targetPitch = math.deg(signedRotationAngle(constructRight, destVec, constructForward))
+    local speedYaw = -math.deg(signedRotationAngle(constructUp:normalize(), destVec:normalize(), constructVelocity))
+    local speedPitch = math.deg(signedRotationAngle(constructRight:normalize(), destVec:normalize(), constructVelocity))
 
-    yawChange = targetYaw-currentYaw
-    pitchChange = targetPitch-currentPitch
-    totalAngularChange = math.abs(yawChange) + math.abs(pitchChange)
+    local yawDiff = -math.deg(signedRotationAngle(constructUp:normalize(), constructVelocity:normalize(), constructForward:normalize()))
+    local pitchDiff = math.deg(signedRotationAngle(constructRight:normalize(), constructVelocity:normalize(), constructForward:normalize()))
+
+    if speed < 40 then
+        yawChange = dirYaw
+        pitchChange = dirPitch
+    else
+        yawChange = speedYaw
+        pitchChange = speedPitch
+
+        if math.abs(yawDiff) > 30 then yawChange = dirYaw end
+        if math.abs(pitchDiff) > 30 then pitchChange = dirPitch end
+    end
+    --totalAngularChange = math.abs(yawChange) + math.abs(pitchChange)
     --system.print(string.format('%.2f | %.2f',pitchChange,yawChange))
 end
 
