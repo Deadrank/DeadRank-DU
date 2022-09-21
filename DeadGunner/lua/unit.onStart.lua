@@ -11,6 +11,7 @@ showAlerts = false
 -- SETTINGS --
 useDB = true --export use connected DB for config options
 showCode = true --export True=plain text transponder codes, False=redacted codes
+szAlerts = false --export
 minimalWidgets = false --export
 hideAbandonedCores = true --export
 targetIndicators = true --export Show warnings when target is speeding up or slowing down
