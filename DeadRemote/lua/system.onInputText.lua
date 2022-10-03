@@ -138,3 +138,21 @@ if string.starts(text,'::pos{') then
     system.print('-- Autopilot destination set --')
     system.print(matches[1])
 end
+if string.starts(text,'distance') then
+    system.print('-- Distances to AR Points --')
+    local distTable = {}
+    local nameTable = {}
+    local posTable = {}
+    for name,pos in pairs(AR_Generate) do
+        local pDist = vec3(pos - constructPosition):len()
+        table.insert(distTable,pDist)
+        nameTable[tostring(pDist)] = name
+        posTable[tostring(pDist)] = string.format('::pos{0,0,%.1f,%.1f,%.1f}',pos['x'],pos['y'],pos['z'])
+    end
+    table.sort(distTable,function(a, b) return a > b end)
+    for _,dist in ipairs(distTable) do
+        system.print(string.format('%s -> %s',nameTable[tostring(dist)],formatNumber(dist,'distance')))
+        system.print('   ' .. posTable[tostring(dist)])
+    end
+    system.print('----------------------------')
+end
