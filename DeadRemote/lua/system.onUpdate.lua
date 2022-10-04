@@ -163,7 +163,7 @@ elseif AR_Mode == 'PLANETS' then
 end
 planetAR = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
 for name,pos in pairs(AR_Generate) do
-    if not (name:find('Moon') or name:find('Haven') or name:find('Sanctuary')) or not AR_Exclude_Moons then
+    if not (name:find('Moon') or name:find('Haven') or name:find('Sanctuary') or name:find('Asteroid')) or not AR_Exclude_Moons then
         local pDist = vec3(pos - constructPosition):len()
         if pDist*0.000005 < 500  or planets[name] == nil then 
             local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
