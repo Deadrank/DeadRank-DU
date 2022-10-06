@@ -285,6 +285,8 @@ end
 function globalDB(action)
     if write_db ~= nil then
         if action == 'get' then
+            if write_db.hasKey('homeBaseLocation') == 1 then homeBaseLocation = write_db.getStringValue('homeBaseLocation') end
+            if write_db.hasKey('homeBaseDistance') == 1 then homeBaseDistance = write_db.getIntValue('homeBaseDistance') end
             if write_db.hasKey('printCombatLog') == 1 then printCombatLog = write_db.getIntValue('printCombatLog') == 1 end
             if write_db.hasKey('dangerWarning') == 1 then dangerWarning = write_db.getIntValue('dangerWarning') end
             if write_db.hasKey('validatePilot') == 1 then validatePilot = write_db.getIntValue('validatePilot') == 1 end
@@ -339,6 +341,9 @@ function globalDB(action)
             if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
 
         elseif action == 'save' then
+            if homeBaseLocation then write_db.setStringValue('homeBaseLocation',homeBaseLocation) end
+            write_db.setIntValue('homeBaseDistance',homeBaseDistance)
+
             write_db.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then write_db.setIntValue('printCombatLog',1) else write_db.setIntValue('printCombatLog',0) end
             write_db.setIntValue('dangerWarning',dangerWarning)

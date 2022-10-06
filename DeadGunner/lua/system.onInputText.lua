@@ -201,3 +201,45 @@ if text:lower() == 'print damage' then
         end
     end
 end
+if string.starts(text,'/G') then
+    if write_db ~= nil then
+        local matches = {}
+        for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+        local found = false
+        if #matches > 2 then
+            for _,key in pairs(write_db.getKeyList()) do
+                if matches[2] == key then
+                    found = true
+                    write_db.setStringValue(key,matches[3])
+                    write_db.setIntValue(key,tonumber(matches[3]))
+                end
+            end
+            if found then
+                system.print(string.format('Set "%s" to "%s"',matches[2],matches[3]))
+            else
+                system.print('-- INVALID VARIABLE NAME --')
+            end
+        else
+            system.print('-- INVALID COMMAND FORMAT --')
+        end
+    else
+        system.print('-- NO DATABANK --')
+    end
+end
+if string.starts(text,'?') then
+    if write_db ~= nil then
+        local matches = {}
+        for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+        if #matches > 1 then
+            system.print('-- DB READOUT START --')
+            for _,key in pairs(write_db.getKeyList()) do
+                if string.find(key,matches[2]) ~= nil then
+                    system.print(string.format('%s = %s',key,write_db.getStringValue(key)))
+                end
+            end
+            system.print('-- DB READOUT END --')
+        end
+    else
+        system.print('-- NO DB ATTACHED --')
+    end
+end

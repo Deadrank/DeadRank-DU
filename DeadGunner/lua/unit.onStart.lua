@@ -16,6 +16,8 @@ minimalWidgets = false --export
 hideAbandonedCores = true --export
 targetIndicators = true --export Show warnings when target is speeding up or slowing down
 printCombatLog = true --export Print weapon hits/misses to lua
+homeBaseLocation = '' --export Location of home base (to turn off shield)
+homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
 dangerWarning = 4 --export
 validatePilot = false --export
 bottomHUDLineColorSZ = 'rgba(125, 150, 160, 1)' --export
@@ -101,6 +103,10 @@ end
 
 -- Shield Initialize --
 dmgTick = 0
+homeBaseVec = nil
+if homeBaseLocation ~= '' then
+    homeBaseVec = vec3(convertWaypoint(homeBaseLocation))
+end
 --------
 
 --- Radar Initial Values ---

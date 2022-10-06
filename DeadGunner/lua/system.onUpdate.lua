@@ -15,14 +15,8 @@ if not inSZ then
     fontColor = textColorPVP
 end
 
---if radarStart and radar_1 then
---    local _data = updateRadar(radarFilter)
---    system.updateData(radarDataID, _data)
---end
-
 if radar_1 and cr == nil then
     cr = coroutine.create(updateRadar)
-    --data = radar_1.getWidgetData()
 elseif cr ~= nil then
     if coroutine.status(cr) ~= "dead" and coroutine.status(cr) == "suspended" then
         coroutine.resume(cr,radarFilter)
@@ -44,6 +38,7 @@ elseif cr ~= nil then
 end
 
 -- Shield Updates --
+local cPos = vec3(construct.getWorldPosition())
 if shield_1 then
     local srp = shield_1.getResistancesPool()
     local csr = shield_1.getResistances()
@@ -70,8 +65,16 @@ if shield_1 then
     local hp = shield_1.getShieldHitpoints()
     if shield_1.isVenting() == 0 and hp == 0 and autoVent then
         shield_1.startVenting()
-    elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 then 
-        shield_1.activate()
+    elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 or vec3(homeBaseVec - cPos):len() < homeBaseDistance*1000 then
+        if homeBaseVec then
+            if vec3(homeBaseVec - cPos):len() >= homeBaseDistance*1000 then
+                shield_1.activate()
+            else
+                shield_1.deactivate()
+            end
+        else
+            shield_1.activate()
+        end
     end
 
     local coreHP = 0
