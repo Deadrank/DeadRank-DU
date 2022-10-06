@@ -507,6 +507,9 @@ function hpWidget()
             CCSPercent = 100*(core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress()
         end
     end
+    if CCSPercent < 25 and write_db then
+        write_db.clearValue('homeBaseLocation')
+    end
     if (shield_1 and shieldPercent < 15) or showAlerts then
         hw = hw .. string.format([[
         <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: red;">
