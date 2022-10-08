@@ -74,37 +74,17 @@ if auto_follow then
         targetID = db_1.getIntValue('targetID')
         if followID == nil or targetID == followID then
             followID = targetID
-            targetSpeed = db_1.getFloatValue('targetSpeed')
+            targetSpeed = db_1.getFloatValue('targetSpeed') + followSpeedMod
             targetDist = db_1.getFloatValue('targetDistance')
-            local followBrakeDist = 0
-            if math.abs(speed/3.6 - targetSpeed) > 5 then
-                followBrakeDist,followBrakeTime = Kinematic.computeDistanceAndTime(speed/3.6,targetSpeed,mass,0,0,maxBrake)
-            end
             if db_1.hasKey('followDistance') == 1 then followDistance = db_1.getFloatValue('followDistance') else followDistance = defautlFollowDistance end
-            followDistance = followDistance + followBrakeDist
-            if followDistance > targetDist and followDistance - followDistance*.1 < targetDist then 
-                -- Set cruise speed to targets speed
-                brakeInput = 0
-                Nav.axisCommandManager:resetCommand(axisCommandId.longitudinal)
-                if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byTargetSpeed) then
-                    Nav.control.cancelCurrentControlMasterMode()
-                end
-                Nav.axisCommandManager:setTargetSpeedCommand(axisCommandId.longitudinal,targetSpeed)
-            elseif followDistance < targetDist then
-                -- Full throttle
-                brakeInput = 0
-                if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byTargetSpeed) then
-                    Nav.control.cancelCurrentControlMasterMode()
-                end
-                Nav.axisCommandManager:setTargetSpeedCommand(axisCommandId.longitudinal,targetSpeed + followMaxSpeedGain)
-            elseif followDistance - followDistance*.1 > targetDist then
-                -- Full brake
-                brakeInput = 1
-                if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byThrottle) then
-                    Nav.control.cancelCurrentControlMasterMode()
-                end
-                Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
+
+            -- Set cruise speed to targets speed
+            brakeInput = 0
+            Nav.axisCommandManager:resetCommand(axisCommandId.longitudinal)
+            if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byTargetSpeed) then
+                Nav.control.cancelCurrentControlMasterMode()
             end
+            Nav.axisCommandManager:setTargetSpeedCommand(axisCommandId.longitudinal,targetSpeed)
         elseif followID ~= targetID then
             if (Nav.axisCommandManager:getAxisCommandType(0) ~= axisCommandType.byThrottle) then
                 Nav.control.cancelCurrentControlMasterMode()
@@ -113,26 +93,13 @@ if auto_follow then
             system.print('-- Auto follow cancelled due to target change --')
             followID = nil
             auto_follow = false
-            db_1.clearValue('followDistance')
-            db_1.clearValue('targetDistance')
-            db_1.clearValue('targetSpeed')
-            db_1.clearValue('targetID')
         end
     else
         auto_follow = false
         system.print('-- No target found for following --')
     end
 end
-if db_1 then 
-    if auto_follow then
-        db_1.setIntValue('following',1)
-        db_1.setIntValue('followingID',followID)
-    else
-        followID = nil
-        db_1.setIntValue('following',0)
-        db_1.setIntValue('followingID',0)
-    end
-end
+
 ---------------------------
 
 -- Generate on screen planets for Augmented Reality view --

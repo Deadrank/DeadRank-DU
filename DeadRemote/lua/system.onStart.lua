@@ -740,6 +740,7 @@ end
 function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
+            if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
             if db_1.hasKey('showRemotePanel') == 1 then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
             if db_1.hasKey('showDockingPanel') == 1 then showDockingPanel = db_1.getIntValue('showDockingPanel') == 1 end
             if db_1.hasKey('showFuelPanel') == 1 then showFuelPanel = db_1.getIntValue('showFuelPanel') == 1 end
@@ -779,6 +780,7 @@ function globalDB(action)
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
             if showFuelPanel then db_1.setIntValue('showFuelPanel',1) else db_1.setIntValue('showFuelPanel',0) end
             if showHelper then db_1.setIntValue('showHelper',1) else db_1.setIntValue('showHelper',0) end
+            if validatePilot then db_1.setIntValue('validatePilot',1) else db_1.setIntValue('validatePilot',0) end
             db_1.setIntValue('defaultHoverHeight',defaultHoverHeight)
             db_1.setIntValue('defautlFollowDistance',defautlFollowDistance)
             db_1.setStringValue('topHUDLineColorSZ',topHUDLineColorSZ)

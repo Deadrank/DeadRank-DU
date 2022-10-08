@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.4.2'
+hudVersion = 'v3.5.0'
 minimalWidgets = false --export
 validatePilot = false --export
 useDB = true --export
@@ -72,7 +72,16 @@ if db_1 ~= nil and useDB then
     globalDB('get')
 end
 
+if db_1 ~= nil then
+    for _,key in pairs(db_1.getKeyList()) do
+        if db_1.getStringValue(key) ~= nil and db_1.getStringValue(key) ~= '' and string.starts(key,'uc-') then 
+            userCode[string.sub(key,4)] = db_1.getStringValue(key)
+        end
+    end
+end
+
 followID = nil
+followSpeedMod = 0
 AR_Custom_Points = {}
 AR_Custom = false
 AR_Temp = false
@@ -114,7 +123,7 @@ yawInput = 0
 brakeInput = 0
 
 Nav = Navigator.new(system, core, unit)
-Nav.axisCommandManager:setupCustomTargetSpeedRanges(axisCommandId.longitudinal, {1000, 5000, 10000, 20000, 30000})
+Nav.axisCommandManager:setupCustomTargetSpeedRanges(axisCommandId.longitudinal, {1000, 5000, 10000, 20000, 30000, 40000, 50000})
 Nav.axisCommandManager:setTargetGroundAltitude(0)
 
 -- Parenting widget

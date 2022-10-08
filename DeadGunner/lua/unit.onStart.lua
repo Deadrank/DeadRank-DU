@@ -110,6 +110,8 @@ end
 --------
 
 --- Radar Initial Values ---
+auto_follow = false
+followID = nil
 cr = nil
 cr_time = nil
 cr_delta = nil

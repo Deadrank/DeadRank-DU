@@ -15,6 +15,7 @@ if not inSZ then
     fontColor = textColorPVP
 end
 
+-- Radar Updates --
 if radar_1 and cr == nil then
     cr = coroutine.create(updateRadar)
 elseif cr ~= nil then
@@ -36,6 +37,7 @@ elseif cr ~= nil then
         end
     end
 end
+---- End Radar Updates ----
 
 -- Shield Updates --
 local cPos = vec3(construct.getWorldPosition())
@@ -81,3 +83,24 @@ if shield_1 then
     if core_1 then coreHP = (core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress() end
 end
 -- End Shield Updates --
+
+-- AutoFollow Updates --
+local target = tostring(radar_1.getTargetId())
+if auto_follow then
+    if not followID then followID = target end
+    if followID then
+        local identified = radar_1.isConstructIdentified(followID) == 1
+        if identified then
+            local tSpeed = radar_1.getConstructSpeed(followID) * 3.6
+            local tDist = radar_1.getConstructDistance(followID)
+            write_db.setIntValue('targetID',tonumber(followID))
+            write_db.setFloatValue('targetSpeed',tSpeed)
+            write_db.setFloatValue('targetDistance',tDist)
+        else
+            write_db.clearValue('targetID')
+            write_db.clearValue('targetSpeed')
+            write_db.clearValue('targetDistance')
+        end
+    end
+end
+-- End autofollow --

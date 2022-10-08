@@ -1,4 +1,4 @@
-name: DeadGunner v3.4.6
+name: DeadGunner v3.5.0
 pvp: true
 
 slots:
@@ -63,6 +63,10 @@ handlers:
     onInputText(text):
       lua: |
 {{system.onInputText.lua}}
+    onActionStart:
+      args: ['option5']
+      lua: |
+{{system.onActionStart.opt5.lua}}
     onActionStart:
       args: ['option7']
       lua: |

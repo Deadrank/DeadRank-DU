@@ -341,9 +341,6 @@ function globalDB(action)
             if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
 
         elseif action == 'save' then
-            if homeBaseLocation then write_db.setStringValue('homeBaseLocation',homeBaseLocation) end
-            write_db.setIntValue('homeBaseDistance',homeBaseDistance)
-
             write_db.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then write_db.setIntValue('printCombatLog',1) else write_db.setIntValue('printCombatLog',0) end
             write_db.setIntValue('dangerWarning',dangerWarning)
@@ -397,6 +394,9 @@ function globalDB(action)
             write_db.setFloatValue('radarInfoWidgetScalemin',radarInfoWidgetScalemin)
 
             if minimalWidgets then db_1.setIntValue('minimalWidgets',1) else db_1.setIntValue('minimalWidgets',0) end
+            if homeBaseLocation then write_db.setStringValue('homeBaseLocation',homeBaseLocation) end
+            write_db.setIntValue('homeBaseDistance',homeBaseDistance)
+
         end
     end
 end
