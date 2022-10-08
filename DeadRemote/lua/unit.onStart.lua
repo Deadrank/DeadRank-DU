@@ -14,7 +14,8 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.5.0'
+hudVersion = 'v3.5.1'
+caerusOption = false --export
 minimalWidgets = false --export
 validatePilot = false --export
 useDB = true --export
@@ -72,6 +73,12 @@ if db_1 ~= nil and useDB then
     globalDB('get')
 end
 
+if caerusOption then
+    shipInfoWidgetX = 53
+    shipInfoWidgetY = 80
+    shipInfoWidgetScale = 12
+end
+
 if db_1 ~= nil then
     for _,key in pairs(db_1.getKeyList()) do
         if db_1.getStringValue(key) ~= nil and db_1.getStringValue(key) ~= '' and string.starts(key,'uc-') then 
@@ -115,6 +122,7 @@ pipes = {}
 SZ = vec3(13771471, 7435803, -128971)
 inSZ = true
 enabledEngineTags = {}
+milEng = false
 ------------------------------------
 
 pitchInput = 0

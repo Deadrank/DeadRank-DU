@@ -587,6 +587,9 @@ end
 
 function warningsWidget()
     local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    if caerusOption then
+        ww = '<svg width="100%" height="100%" style="position: absolute;left:20%;top:59%;font-family: Calibri;">'
+    end
     local warningText = {}
     warningText['lowFuel'] = fuelWarningText
     warningText['brakes'] = 'Brakes Locked'
@@ -638,8 +641,11 @@ function minimalShipInfo()
 
     msi = msi .. [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Auto Pilot Mode: ]]..apStatus..eta..[[</text>
-        </svg>
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Auto Pilot Mode: ]]..apStatus..eta..[[</text>]]
+    if caerusOption then
+        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.92 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>]]
+    end
+    msi = msi .. [[</svg>
     ]]
 
     msi = msi .. [[
@@ -691,9 +697,13 @@ function minimalShipInfo()
                     L ]] .. tostring(.848*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
                     L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [["
                     stroke="]]..lineColor..[[" stroke-width="1" fill="url(#sFuel-vertical)" />
-                <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.198 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.32vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
-                <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.2115 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>
-            </svg>
+                <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.198 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.32vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>]]
+    if caerusOption then
+        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.90 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
+    else
+        msi = msi .. [[<text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.2115 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
+    end    
+    msi = msi .. [[</svg>
         ]]
 
     if fuelTankWarning or fuelWarning or showAlerts then
@@ -740,6 +750,7 @@ end
 function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
+            if db_1.hasKey('caerusOption') == 1 then caerusOption = db_1.getIntValue('caerusOption') == 1 end
             if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
             if db_1.hasKey('showRemotePanel') == 1 then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
             if db_1.hasKey('showDockingPanel') == 1 then showDockingPanel = db_1.getIntValue('showDockingPanel') == 1 end
@@ -776,6 +787,7 @@ function globalDB(action)
             if db_1.hasKey('logoSVG') == 1 then logoSVG = db_1.getStringValue('logoSVG') end
             if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
         elseif action == 'save' then
+            if caerusOption then db_1.setIntValue('caerusOption',1) else db_1.setIntValue('caerusOption',0) end
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
             if showFuelPanel then db_1.setIntValue('showFuelPanel',1) else db_1.setIntValue('showFuelPanel',0) end

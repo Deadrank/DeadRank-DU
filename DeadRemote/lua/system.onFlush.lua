@@ -124,6 +124,10 @@ if autopilot_dest then
     --system.print(string.format('%.2f | %.2f',pitchChange,yawChange))
 end
 
+if caerusOption then
+    if not milEng then Nav:setEngineCommand('MilEng',vec3.zero,vec3.zero) end
+end
+
 if autopilot and autopilot_dest ~= nil and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
     yawPID:inject(yawChange)
     local apYawInput = yawPID:get()
