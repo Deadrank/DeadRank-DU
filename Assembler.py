@@ -9,7 +9,8 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 parser = argparse.ArgumentParser(description='Assemble LUA files into .conf structure')
 parser.add_argument('source',type=str,nargs=1,choices=[
     'DeadGunner',
-    'DeadRemote'
+    'DeadRemote',
+    'DeadXS'
     ],
     help='Source Folder to pull LUA files from (i.e. DeadGunner, DeadRemote)')
 parser.add_argument('--copy',action='store_true', 
@@ -25,7 +26,8 @@ path = os.path.join(cwd,src)
 # Mapping of Folders to .conf files
 confMap = {
     'DeadGunner':'DeadGunner.conf',
-    'DeadRemote':'DeadRemote.conf'
+    'DeadRemote':'DeadRemote.conf',
+    'DeadXS':'DeadXS.conf'
 }
 
 # Setup and pull lua files

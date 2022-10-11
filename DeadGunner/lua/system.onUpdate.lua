@@ -23,7 +23,7 @@ elseif cr ~= nil then
         coroutine.resume(cr,radarFilter)
     elseif coroutine.status(cr) == "dead" then
         cr = nil
-        system.updateData(radarDataID, radarWidgetData)
+        system.updateData(radarDataID,radarWidgetData)
         if not cr_time then
             cr_time = system.getArkTime()
         else
