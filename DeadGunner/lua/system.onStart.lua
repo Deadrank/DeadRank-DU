@@ -429,8 +429,13 @@ function weaponsWidget()
             elseif string.find(weaponName,'railgun') then wType = 'Railgun'
             elseif string.find(weaponName,'missile') then wType = 'Missile'
             elseif string.find(weaponName,'laser') then wType = 'Laser'
+            elseif string.find(weaponName,'stasis') then wType = 'Stasis'
             end
-            weaponName = prefix .. wType
+            if wType == 'Stasis' then
+                weaponName = wType
+            else
+                weaponName = prefix .. wType
+            end
 
             local ammoType = system.getItem(w.getAmmo())
             ammoType = tostring(ammoType['name']):lower()
