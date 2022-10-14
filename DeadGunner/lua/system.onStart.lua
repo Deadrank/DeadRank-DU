@@ -255,7 +255,7 @@ function updateRadar(filter)
 
     coroutine.yield()
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
-    --data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
+    data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
     if radarSort == 'Size' then
         for _,ship in pairs(shipsBySize['XS']) do table.insert(constructList,ship) end
         for _,ship in pairs(shipsBySize['S']) do table.insert(constructList,ship) end
