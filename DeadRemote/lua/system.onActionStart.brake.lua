@@ -1,7 +1,12 @@
 
-if brakeInput > 0 then
-    brakeInput = 0
-    brakesOn = false
+if toggleBrakes then
+    if brakeInput > 0 then
+        brakeInput = 0
+        brakesOn = false
+    else
+        brakeInput = brakeInput + 1
+        brakesOn = true
+    end
 else
     brakeInput = brakeInput + 1
     brakesOn = true

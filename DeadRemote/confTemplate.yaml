@@ -1,4 +1,4 @@
-name: DeadRemote v3.5.3
+name: DeadRemote v3.5.4
 
 slots:
     core:
@@ -98,6 +98,10 @@ handlers:
       args: ['brake']
       lua: |
 {{system.onActionStart.brake.lua}}
+    onActionStop:
+      args: ['brake']
+      lua: |
+{{system.onActionStop.brake.lua}}
     onActionStart:
       args: ['yawleft']
       lua: |

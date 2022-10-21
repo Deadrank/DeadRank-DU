@@ -14,11 +14,12 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.5.3'
+hudVersion = 'v3.5.4'
 caerusOption = false --export
 minimalWidgets = false --export
 validatePilot = false --export
 useDB = true --export
+toggleBrakes = true --export
 showRemotePanel = false --export
 showDockingPanel = false --export
 showFuelPanel = false --export
@@ -129,6 +130,7 @@ pitchInput = 0
 rollInput = 0
 yawInput = 0
 brakeInput = 0
+spaceBar = false
 
 Nav = Navigator.new(system, core, unit)
 Nav.axisCommandManager:setupCustomTargetSpeedRanges(axisCommandId.longitudinal, {1000, 5000, 10000, 20000, 30000, 40000, 50000})

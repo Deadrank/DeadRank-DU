@@ -750,6 +750,7 @@ end
 function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
+            if db_1.hasKey('toggleBrakes') == 1 then toggleBrakes = db_1.getIntValue('toggleBrakes') == 1 end
             if db_1.hasKey('caerusOption') == 1 then caerusOption = db_1.getIntValue('caerusOption') == 1 end
             if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
             if db_1.hasKey('showRemotePanel') == 1 then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
@@ -787,6 +788,7 @@ function globalDB(action)
             if db_1.hasKey('logoSVG') == 1 then logoSVG = db_1.getStringValue('logoSVG') end
             if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
         elseif action == 'save' then
+            if toggleBrakes then db_1.setIntValue('toggleBrakes',1) else db_1.setIntValue('toggleBrakes',0) end
             if caerusOption then db_1.setIntValue('caerusOption',1) else db_1.setIntValue('caerusOption',0) end
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
             if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
