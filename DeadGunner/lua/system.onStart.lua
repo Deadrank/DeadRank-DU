@@ -340,6 +340,13 @@ function globalDB(action)
 
             if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
 
+            for _,key in pairs(write_db.getKeyList()) do
+                if string.starts(key,'sc-') then
+                    local id = string.sub(key,4)
+                    friendlySIDs[tonumber(id)] = write_db.getStringValue(string.format('sc-%s',id))
+                end
+            end
+
         elseif action == 'save' then
             write_db.setStringValue('uc-'..validPilotCode,pilotName)
             if printCombatLog then write_db.setIntValue('printCombatLog',1) else write_db.setIntValue('printCombatLog',0) end
@@ -948,12 +955,29 @@ function identifiedWidget()
                 ]]
             end
 
+            local owner = ''
+            if radar_1.hasMatchingTransponder(id) == 1 then
+                owner = radar_1.getConstructOwnerEntity(id)
+                if owner['isOrganization'] then
+                    owner = system.getOrganization(owner['id'])
+                    owner = owner['tag']
+                else
+                    owner = system.getPlayerName(owner['id'])
+                end
+            elseif friendlySIDs[id] then
+                owner = friendlySIDs[id]
+            end
+            if owner ~= '' then 
+                owner = [[<text style="fill: white; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="5">]]..string.format('Owned by: %s (%s)',owner,id)..[[</text>]]
+            end
+
             y = 11.25
             x = 10
             s = 11.25
             if minimalWidgets then x = 49.5 y = -0.9 s = 10 end
             iw = iw .. [[
-                <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 240" width="]]..s..[[vw">
+                <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
+                    ]]..owner..[[
                     <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
                     <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
                     <polygon style="stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 225 18 227"/>

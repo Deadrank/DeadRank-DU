@@ -95,6 +95,7 @@ end
 if not found then system.print('-- No usable DB found --') end
 ------------------------
 
+friendlySIDs = {}
 userCode = {}
 userCode[validPilotCode] = pilotName
 if useDB and write_db ~= nil then
@@ -125,7 +126,6 @@ table.insert(filterSize,'L')
 table.insert(filterSize,'M')
 table.insert(filterSize,'S')
 table.insert(filterSize,'XS')
-friendlySIDs = {}
 useShipID = true
 radarFilter = 'All'
 radarSort = 'Distance'

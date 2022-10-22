@@ -27,35 +27,53 @@ if string.starts(text:lower(),'delcode') then
     system.print('--Transponder Code Removed--')
 end
 
+if string.starts(text:lower(),'printcore') then
+    local targetID = radar_1.getTargetId()
+    if targetID ~= 0 then
+        system.print(targetID)
+    end
+end
 if string.starts(text:lower(),'addships') then
     local matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
-    for _,ship in ipairs(erDisplay) do
-        friendlySIDs[ship.id] = 'Auto Add'
-        write_db.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
-        system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',ship.name,ship.id))
-    end
-    for _,ship in ipairs(frDisplay) do
-        friendlySIDs[ship.id] = 'Auto Add'
-        write_db.setStringValue(string.format('sc-%s',ship.id),'Auto Add')
-        system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',ship.name,ship.id))
-    end
-end
-if string.starts(text:lower(),'addshipid') then
-    local matches = {}
-    for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
-    if #matches == 3 then
-        friendlySIDs[tonumber(matches[2])] = matches[3]
-        write_db.setStringValue(string.format('sc-%s',matches[2]),matches[3])
-        system.print(string.format('-- ShipID %s (%s) added to friendly list --',matches[2],matches[3]))
-    elseif #matches == 2 then
-        friendlySIDs[tonumber(matches[2])] = radar_1.getConstructName(matches[2])
-        write_db.setStringValue(string.format('sc-%s',matches[2]),'nil')
-        system.print(string.format('-- ShipID %s (%s) added to friendly list --',matches[2],radar_1.getConstructName(matches[2])))
+    if #matches > 1 then
+        id = matches[2]
+        if radar_1.hasMatchingTransponder(id) == 1 then
+            local owner = radar_1.getConstructOwnerEntity(id)
+            if owner['isOrganization'] then
+                owner = system.getOrganization(owner['id'])
+                owner = owner['tag']
+            else
+                owner = system.getPlayerName(owner['id'])
+            end
+            friendlySIDs[id] = owner
+            write_db.setStringValue(string.format('sc-%s',id),owner)
+            system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',radar_1.getConstructName(id),id))
+        else
+            friendlySIDs[id] = 'Auto Add'
+            write_db.setStringValue(string.format('sc-%s',id),'Auto Add')
+            system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',radar_1.getConstructName(id),id))
+        end
     else
-        system.print('-- Invalid command "addFreindlyID <shipID> <pilotname>" --')
+        for _,id in ipairs(radar_1.getConstructIds()) do
+            if radar_1.hasMatchingTransponder(id) == 1 then
+                local owner = radar_1.getConstructOwnerEntity(id)
+                if owner['isOrganization'] then
+                    owner = system.getOrganization(owner['id'])
+                    owner = owner['tag']
+                else
+                    owner = system.getPlayerName(owner['id'])
+                end
+                friendlySIDs[id] = owner
+                write_db.setStringValue(string.format('sc-%s',id),owner)
+                system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',radar_1.getConstructName(id),id))
+            else
+                friendlySIDs[id] = 'Auto Add'
+                write_db.setStringValue(string.format('sc-%s',id),'Auto Add')
+                system.print(string.format('-- Added to friendly list (Name: %s | ID: %s)',radar_1.getConstructName(id),id))
+            end
+        end
     end
-    system.print('-- Construct ID added to Friendly list --') 
 end
 if string.starts(text:lower(),'delshipid') then
     local matches = {}
