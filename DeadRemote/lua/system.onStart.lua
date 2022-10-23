@@ -137,14 +137,24 @@ end
 
 function closestPipe()
     pipes = {}
+    local i = 0
     for name,center in pairs(planets) do
-            pipes[string.format('%s - %s',closestPlanetName,name)] = {}
-            table.insert(pipes[string.format('%s - %s',closestPlanetName,name)],planets[closestPlanetName])
-            table.insert(pipes[string.format('%s - %s',closestPlanetName,name)],center)
+        for name2,center2 in pairs(planets) do
+            if name ~= name2 and pipes[string.format('%s - %s',name2,name)] == nil then
+                pipes[string.format('%s - %s',name,name2)] = {}
+                table.insert(pipes[string.format('%s - %s',name,name2)],center)
+                table.insert(pipes[string.format('%s - %s',name,name2)],center2)
+                if i % 50 == 0 then
+                    coroutine.yield()
+                end
+                i = i + 1
+            end
+        end
     end
     local cPipe = 'None'
     local cDist = 9999999999
     local cLoc = vec3(construct.getWorldPosition())
+    i = 0
     for pName,vecs in pairs(pipes) do
         local tempDist,tempType = pipeDist(vecs[1],vecs[2],cLoc,false)
         if tempDist ~= nil then
@@ -153,7 +163,13 @@ function closestPipe()
                 cPipe = pName
             end
         end
+        if i % 50 == 0 then
+            coroutine.yield()
+        end
+        i = i + 1
     end
+    closestPipeName = cPipe
+    closestPipeDistance = cDist
     return cPipe,cDist
 end
 

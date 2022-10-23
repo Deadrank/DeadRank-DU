@@ -9,11 +9,22 @@ elseif seated == 0 and player.isFrozen() == 1 then
 end
 ----------------------------------
 
--- Closest Planet/Pipe info --
+
+
+-- Planet Location Updates --
 closestPlanetName,closestPlanetDist = closestPlanet()
-closestPipeName,closestPipeDistance = closestPipe()
+if cr == nil then
+    cr = coroutine.create(closestPipe)
+elseif cr ~= nil then
+    if coroutine.status(cr) == "suspended" then
+        coroutine.resume(cr)
+    elseif coroutine.status(cr) == "dead" then
+        cr = nil
+    end
+end
 closestPipeStr = string.format('%s (%s)',closestPipeName,formatNumber(closestPipeDistance,'distance'))
 closestPlanetStr = string.format('%s (%s)',closestPlanetName,formatNumber(closestPlanetDist,'distance'))
+---- End Planet Updates ----
 
 -- Disable AutoPilot if to close to planet --
 if closestPlanetDist < 40000 and autopilot then 

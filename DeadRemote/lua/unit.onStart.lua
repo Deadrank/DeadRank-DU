@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.5.4'
+hudVersion = 'v3.5.5'
 caerusOption = false --export
 minimalWidgets = false --export
 validatePilot = false --export
@@ -88,6 +88,7 @@ if db_1 ~= nil then
     end
 end
 
+cr = nil
 followID = nil
 followSpeedMod = 0
 AR_Custom_Points = {}
