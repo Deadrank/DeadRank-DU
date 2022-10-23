@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.5.5'
+hudVersion = 'v3.5.6'
 caerusOption = false --export
 minimalWidgets = false --export
 validatePilot = false --export
