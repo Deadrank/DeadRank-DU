@@ -99,19 +99,18 @@ if type(tonumber(text)) == 'number' and (#text == 3 or text == '0') and codeSeed
     end
 end
 
-if string.starts(text:lower(),'agc') or codeSeed == nil then
+if string.starts(text,'agc') then
     local matches = {}
-    for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+    for w in text:gmatch('([^ ]+) ?') do table.insert(matches,w) end
     if (#matches ~= 2 or not tonumber(matches[2])) and codeSeed ~= nil then
         system.print('-- Invalid start command --')
     else
         local t = nil
         if #matches == 2 then t = tonumber(matches[2]) elseif #matches == 1 then t = tonumber(matches[1]) end
         if codeSeed == nil then
-            system.print('-- Booting up --')
+            system.print('-- Transponder started --')
             codeSeed = t
-            system.showScreen(1)
-            unit.setTimer('booting',1)
+            unit.setTimer('code',0.25)
         else
             codeSeed = t
             system.print('-- Code seed changed --')

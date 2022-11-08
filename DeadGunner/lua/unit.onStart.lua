@@ -198,6 +198,17 @@ transponderStatus = false
 tCode = nil
 cOverlap = false
 cOverlapTick = 0
+codeSeed = nil
+rollTimer = 120 --Roll code timer in seconds
+if pcall(require,'autoconf/custom/transponder') then 
+    codeSeed = tonumber(require('autoconf/custom/transponder'))
+end
+if codeSeed == nil then
+    system.print('--ENTER ACTIVATION CODE--')
+    system.print('"agc <number>"')
+else
+    unit.setTimer('code',0.25)
+end
 -----------------
 
 bootTimer = 0
