@@ -225,9 +225,15 @@ return {
 ```
 Any number of beacons can be added to this list. Ensure that each entry (except the last one) ends in a `,` (comma).
 
+### transponder.lua
+This file can be used to house the initial seed for generating random transponder codes. If the file is present and properly formatted, the gunner chair will pick up the code stored in the file and use it to generate the random codes. If you have the same code seed as another ship, your "random" codes will always be matching. The codes change every 2 minutes by default and have an overlap time of 5 seconds (to help prevent lag issues).<br>
+```return 123456```
 
-## DU-PeriscopePB.json (Periscope script for board)
+## PB-Periscope.json (Periscope script for board)
 This script is simply copied an pasted to the desired programming board. No linking necessary.
+
+## PB-Transponder.json (Transponder script for board)
+This script can suppliment the transponder code in the gunner seat (i.e. if you are running a non-PvP ship). The code works the same as that mentioned above for AGC, just link the transponder to the board and paste the config in it.
 
 ### Audio Files for Radar contact are put at the location below (contact.mp3, targetleft.mp3):
 ..\Documents\NQ\DualUniverse\audio
