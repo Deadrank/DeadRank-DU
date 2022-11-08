@@ -1,0 +1,165 @@
+{
+    "slots": {
+        "0": {
+            "name": "transponder_1",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "1": {
+            "name": "slot2",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "2": {
+            "name": "slot3",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "3": {
+            "name": "slot4",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "4": {
+            "name": "slot5",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "5": {
+            "name": "slot6",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "6": {
+            "name": "slot7",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "7": {
+            "name": "slot8",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "8": {
+            "name": "slot9",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "9": {
+            "name": "slot10",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-1": {
+            "name": "unit",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-2": {
+            "name": "system",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        },
+        "-3": {
+            "name": "library",
+            "type": {
+                "events": [],
+                "methods": []
+            }
+        }
+    },
+    "handlers": [
+        {
+            "code": "tags = {}\n\ncodeSeed = nil\nif pcall(require,'autoconf/custom/transponder') then \n    codeSeed = tonumber(require('autoconf/custom/transponder'))\nend\n\ntransponder_1.deactivate()\ncOverlap = false\ncOverlapTick = 0\n\nrollTimer = 120 --Roll code timer in seconds\n\ndebug = false --export\nunit.hideWidget()\nif codeSeed == nil then\n    system.print('--ENTER ACTIVATION CODE--')\n    system.print('\"agc <number>\"')\nelse\n    unit.setTimer('code',0.25)\nend",
+            "filter": {
+                "args": [],
+                "signature": "onStart()",
+                "slotKey": "-1"
+            },
+            "key": "0"
+        },
+        {
+            "code": "if transponder_1 ~= nil then\n    local keep = {}\n    if codeSeed ~= nil then\n        for i,v in ipairs(tags) do\n            if not string.starts(v,'AGC') then\n                table.insert(keep,v)\n            end\n        end\n        transponder_1.setTags(keep)\n        transponder_1.deactivate()\n    end\nend",
+            "filter": {
+                "args": [],
+                "signature": "onStop()",
+                "slotKey": "-1"
+            },
+            "key": "1"
+        },
+        {
+            "code": "if transponder_1 ~= nil then\n    tags = transponder_1.getTags()\n    if transponder_1.isActive() ~= 1 then transponder_1.activate() end\n    \nend\n\nlocal a = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'\nmath.randomseed(tonumber(string.format('%.0f',codeSeed + system.getArkTime()/rollTimer)))\nlocal genCode = 'AGC'\nfor i = 1,5 do\n    local c = math.random(1,string.len(a))\n    genCode = genCode .. string.sub(a,c,c)\nend\n\nif cOverlapTick > 5 then unit.stopTimer('overlap') end\n\nlocal cApplied = contains(tags,genCode)\nif genCode ~= tCode or not cApplied then\n\n    if cOverlapTick == 0 or cOverlapTick > 3 then \n        local r = {}\n        for i,v in ipairs(tags) do\n            if string.starts(v,'AGC') then\n                table.insert(r,i)\n            end\n        end\n        for _,i in ipairs(r) do table.remove(tags,i) end\n\n        if cOverlapTick == 0 and tCode ~= nil then\n            cOverlapTick = 1\n            unit.setTimer('overlap',2)\n            if debug then system.print('New code generated: ' .. genCode) end\n        end\n        if cOverlapTick >= 3 or tCode == nil then\n            unit.stopTimer('overlap')\n            if tCode ~= nil and debug then system.print('Removed old code: ' .. tCode) elseif debug then system.print('New code generated: ' .. genCode) end\n            tCode = genCode\n            cOverlapTick = 0\n            local r = {}\n            for i,v in ipairs(tags) do\n                if string.starts(v,'AGC') then\n                    table.insert(r,i)\n                end\n            end\n            for _,i in ipairs(r) do table.remove(tags,i) end\n            table.insert(tags,genCode)\n            transponder_1.setTags(tags)\n        else\n            table.insert(tags,genCode)\n            table.insert(tags,tCode)\n            transponder_1.setTags(tags)\n        end\n    end\nend",
+            "filter": {
+                "args": [
+                    {
+                        "value": "code"
+                    }
+                ],
+                "signature": "onTimer(code)",
+                "slotKey": "-1"
+            },
+            "key": "2"
+        },
+        {
+            "code": "cOverlapTick = cOverlapTick + 1",
+            "filter": {
+                "args": [
+                    {
+                        "value": "overlap"
+                    }
+                ],
+                "signature": "onTimer(overlap)",
+                "slotKey": "-1"
+            },
+            "key": "2"
+        },
+        {
+            "code": "function string.starts(String,Start)\n    return string.sub(String,1,string.len(Start))==Start\n end\n \n function contains(tablelist, val)\n     for i=1,#tablelist do\n        if tablelist[i] == val then \n           return true\n        end\n     end\n     return false\n  end",
+            "filter": {
+                "args": [],
+                "signature": "onStart()",
+                "slotKey": "-2"
+            },
+            "key": "3"
+        },
+        {
+            "code": "if string.starts(text,'agc') then\n    local matches = {}\n    for w in text:gmatch('([^ ]+) ?') do table.insert(matches,w) end\n    if (#matches ~= 2 or not tonumber(matches[2])) and codeSeed ~= nil then\n        system.print('-- Invalid start command --')\n    else\n        local t = nil\n        if #matches == 2 then t = tonumber(matches[2]) elseif #matches == 1 then t = tonumber(matches[1]) end\n        if codeSeed == nil then\n            system.print('-- Transponder started --')\n            codeSeed = t\n            unit.setTimer('code',0.25)\n        else\n            codeSeed = t\n            system.print('-- Code seed changed --')\n        end\n    end\nend",
+            "filter": {
+                "args": [
+                    {
+                        "variable": "*"
+                    }
+                ],
+                "signature": "inputText(text)",
+                "slotKey": "-2"
+            },
+            "key": "4"
+        }
+    ],
+    "methods": [],
+    "events": []
+}
