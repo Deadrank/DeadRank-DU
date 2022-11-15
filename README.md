@@ -15,81 +15,73 @@ Simply right-click on the links below and select "Save Link As..." to download t
 The gunner seat will control and/or read data from:
  - Weapons (manual link)
  - Radar (manual link)
- - Transponder (auto link if present)
  - Databank (auto link if present, optional) (links to all databanks on the construct, but only writes to one)
- - Shield (manually linked, optional)
 
 Any items listed above as manual link, must be linked *before* running  the autoconfiguration
 
 ### Hotkeys
- - Alt+7: Changes radar filtering mode. Toggles through the following options:
+ - `Alt`+`shift`+`2`: Changes the gunner seat AR Mode. Toggles through the following:
+   - 'All' = Shows all gunner related AR points
+   - 'FLEET' = Shows only fleet related AR points
+   - 'ABANDONDED' = Shows only abandoned cores
+ - `Alt`+`7`: Changes radar filtering mode. Toggles through the following options:
    - 'All' = Default mode that shows everything 
    - 'enemy' = Show only ships that do not have matching transponder tags or have a matching friendly ship ID
    - 'identified' = show only ships you have identified
    - 'friendly' = show only ships that have matching transponder tags or have a matching friendly ship ID
    - 'primary' = show ONLY your primary target in radar widget (see lua commands for how to choose a "primary" target)
- - Alt+8: Start/Stop shield vent manually
+ - `Alt`+`8`: Start/Stop shield vent manually
 
 ### Lua Commands
+#### Transponder
  - `code <transponder tag>`: Adds the transponder tag specified to your transponder (auto-toggles the transponder off and then on to ensure it is active as well)
- - `hide codes`: Changes visual display of transponder tags on the HUD to "redacted". This is useful if you are streaming and do not want your tags displayed on-stream
- - `show codes`: Changes the visual display of transponder codes back to their actual values
  - `delcode <transponder tag>`: Removes the transponder tag specified from your transponder
+ - `show codes`: Displays the active transponder codes in the transponder widget on-screen for 5 seconds
+ - `agc <any whole number>`: Changes the code seed value of the automatically generated transponder codes (if enabled)
+
+#### Targeting
  - `<3 digit target number>`: Enter the 3 digit number of your desired target to set it as your "primary"  (can be used with radar widget filter for quicker targeting).
  - `0`: Entering "0" will clear the current active primary target
- - `agc <any whole number>`: Changes the code seed value of the automatically generated transponder codes (if enabled)
+ - `setFC`: Will set the currently highlighted ship as the fleet FC for AR (REQUIRES matching transponder code)
+ - `setSL`: Will set the currently highlighted ship as the squad leader for AR (REQUIRES matching transponder code)
  - `show <core size>`: Makes the selected core size visible again in the radar widget (core sizes need to be uppercase)
  - `hide <core size>`: Filters out the selected core size from the radar widget (core sizes need to be in uppercase)
+ - `clear abnd`: Clears the closest abandanded construct AR marker
+
+#### Other
  - `print db`: Prints out all key value pairs of string values in the databank (if connected)
  - `clear db`: Clears all key value pairs stored in the databank
  - `coreid`: Prints your ships core ID
  - `clear damage`: Clears damage from the current chair against the current target
  - `clear all damage`: Clears all damage from the current chair against all targets
 
-### Lua Parameters
- - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters (Default = enabled)
- - `minimalWidgets`:  Whether widget locations should use the minimalist settings or not (Default = disabled, overriddent by remote if attached to same DB)
- - `printCombatLog`: Print out weapon hits and misses (including damage dealt) in the lua channel. Useful so so that you do not have to switch between the combat log and lua channel for commands. (Default = enabled)
- - `dangerWarning`: The number of ships that need to start attacking you before a warning is displayed on screen (Default = 4)
+### Key Lua Parameters
+ - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters. If you want to change parameter values, you need to ensure this is unchecked (Default = enabled)
  - `validatePilot`: If enabled, will ensure that the player using the seat matches the ID entered into the lua code. To enable this, first ensure that you know your playerID, then edit the lua inside of "unit start" and replace the following with your player ID (Default = disabled):<br>
 ![image](https://user-images.githubusercontent.com/17240745/179420665-07efca53-1c95-441f-b40d-0a7231b8823c.png)<br>
- - `generateAutoCode`: Whether or not to enable the auto-code generation feature of the transponder (Default = disabled)
  - `autoVent`: Whether or not to automatically start venting when shield is destroyed (Default = enabled)
- - `L_Shield_HP`: Mapped value for Large Constructs shield (used in target shield health estimate) (Default = 11500000)
- - `M_Shield_HP`: Mapped value for Medium Constructs shield (used in target shield health estimate) (Default = 8625000)
- - `S_Shield_HP`: Mapped value for Small Constructs shield (used in target shield health estimate) (Default = 8625000)
- - `XS_Shield_HP`: Mapped value for Small Constructs shield (used in target shield health estimate) (Default = 500000)
- - `max_radar_load`: Radar limit before disabling radar widget customization (to prevent overload) (Default = 250)
- - `bottomHUDLineColorSZ`: HUD Color customizations (Default = 'white')
- - `bottomHUDFillColorSZ`: HUD Color customizations (Default = 'rgba(29, 63, 255, 0.75)')
- - `textColorSZ`: HUD Color customizations (Default = 'white')
- - `bottomHUDLineColorPVP`: HUD Color customizations (Default ='lightgrey')
- - `bottomHUDFillColorPVP`: HUD Color customizations (Default ='rgba(255, 0, 0, 0.75)')
- - `textColorPVP`: HUD Color customizations (Default = 'black')
- - `neutralLineColor`: HUD Color customizations (Default = 'lightgrey')
- - `neutralFontColor`: HUD Color customizations (Default = 'darkgrey')
- - `warning_size`: Size of warning indicators in the upper right
- - `radarBuffer`: Small buffer between safe and PvP zone on when to alert for new radar contacts
- - WidgetX,Y and Scale: Widgets have an X, Y and Scale option which allows you to move them around on your screen and resize them.
- - Widget Related Colors: some widgets have color options for changing the feel/look of the HUD
+ - `toggleBrakes`: If enabled, brakes will be toggled on and off by the brake key. If this is disabled, the brake key will only feather the brakes. They can still be locked in this mode by using `ctrl`+`space`
+ - `homeBaseLocation`: Location of home base. If a position tag is present, the HUD will turn off your shield when you get close (default=emtpy)
+ - `homeBaseDistance`: Distance in km from home base to turn off shield (default=5)
  
 
 ### Weapons
-Weapons are controllable from 3rd persion view using the weapon widgets. With the widget, you can start firing, stop firing and reload the weapons. I the lower left of the screen the HUD displays the hit chance of each weapon linked.
-![Weapon Data](https://user-images.githubusercontent.com/17240745/179405092-d4cbd4c2-3a78-4096-b091-def94a05f87a.png)
+Weapons are controllable from 3rd persion view using the weapon widgets. With the widget, you can start firing, stop firing and reload the weapons. I the lower left of the screen the HUD displays the hit chance of each weapon linked.<br>
+![Weapon Data](https://user-images.githubusercontent.com/17240745/202014932-a74d8b79-b4bd-45ff-9753-da28c5a9cac8.png)
 
 ### Radar
 The radar widget has various filter modes for easier identification and targeting. The different modes are described in the hotkey section under Alt+7. On top of the filtering, the radar widget also displays a unique identifyer (last 3 digits of the `construct id`). If the target has matching transponder tags, the unique identifer is instead replaced with the owner of the construct (player name for player owned constructs or Organization tag for org owned constructs). Additionally, the radar widget also puts any identified constructs at the top of the list regardless of their distance from your position.
 
 Target data of currently selected construct appears in the center of the screen. This data will display whether the construct is identified or not. I the selected construct is friendly, a warning will also appear.
-Unidentified friendly: ![Unidentified Freindly](https://user-images.githubusercontent.com/17240745/179416594-b1db7e8a-3a5f-4cc4-bee6-ce1b6d8a0d57.png)
-Identified enemy: ![Identified Enemy](https://user-images.githubusercontent.com/17240745/179416995-7d2dbd94-750b-4c26-b88a-8b4f346abede.png)
-If the selected target is abandoned (i.e. cored) a warning will pop up indicating that it is cored)
-![image](https://user-images.githubusercontent.com/17240745/179420317-8fdc84a3-2a64-482a-856e-2efb97bd07d0.png)
+Unidentified friendly:<br>
+![Friendly](https://user-images.githubusercontent.com/17240745/202023287-a206ce41-fdc9-4197-a08b-354fc28c00de.png)
+<br>
+If the selected target is abandoned (i.e. cored) a warning will pop up indicating that it is cored)<br>
+![image](https://user-images.githubusercontent.com/17240745/202024098-a2e9e93b-50a9-4a8f-a6b4-36d4385e3fca.png)
 
 
-Any identified ships (when not selected) will have ship card with info appear on the left side of the screen above the weapon information. The identification cards display various information about the identified targets. An example can be seen below:
-![Identification Cards](https://user-images.githubusercontent.com/17240745/179417323-9d605353-8755-4ed3-9cb2-3ca1ab00b642.png)
+Any identified ships (when not selected) will have ship card with info appear on the left side of the screen above the weapon information. The identification cards display various information about the identified targets. An example can be seen below:<br>
+![IDCard](https://user-images.githubusercontent.com/17240745/202023528-570f331e-f770-4eda-894b-34d042f35a35.png)
 
 Additional data is gathered from the radar to help determine engagement actions. In the upper left corner, you will be able to see your radars identification range, how many ships have you identified and how many ships are actively shooting at you. Example seen below:
 ![Radar Data](https://user-images.githubusercontent.com/17240745/179417814-99cb9291-6334-43b4-aa09-0d10dfe3355e.png)
@@ -109,26 +101,27 @@ The shield will also automatically set resistance levels to match the incoming d
 
 
 ### Transponder
-If there is a transponder on the construct it will be auto-linked when the configuration script is run. If enabled (which it is not by default), the script will automatically generate a time based transponder tag. These auto-generated tags will start with the first three characters of `AGC` to indicate that they are "auto generated codes". These auto-generated codes will rotate every 1000 seconds. If this feature is enabled, the gunner seat will require you to enter a whole number when it first starts up. This number is your unique seed for the auto-code generation. Anyone else using this HUD that enters the same number will always have the same auto-generated code as you and therefor be seen as having matching transponder tags. This allows fleets to have matching transponder tags without the risk of their tag being comprimised even if the enemy gets a hold of their transponder.
+If there is a transponder on the construct it will be auto-linked when the configuration script is run. If enabled (which it is not by default), the script will automatically generate a time based transponder tag. These auto-generated tags will start with the first three characters of `AGC` to indicate that they are "auto generated codes". These auto-generated codes will rotate every 1000 seconds. If this feature is enabled, the gunner seat will require you to enter a whole number when it first starts up. This number is your unique seed for the auto-code generation. Anyone else using this HUD that enters the same number will always have the same auto-generated code as you and therefor be seen as having matching transponder tags. This allows fleets to have matching transponder tags without the risk of their tag being comprimised even if the enemy gets a hold of their transponder.<br>
 ![Transponder](https://user-images.githubusercontent.com/17240745/185774367-649fcc29-fe1a-4b8e-bac7-ea495836e151.png)
+<br>
 Further, the HUD provides the ability to enter manual codes if needed without actually opening the transponder interface directly (see lua commands section).
 
 ## DeadRemote.conf (Remote Controller Script)
 
 ### Hotkeys
- - Alt+1: Overlays the screen with quick help tips
- - Alt+2: Rotates through various Augmented Reality (AR) modes including:
+ - `Alt`+`1`: Overlays the screen with quick help tips
+ - `Alt`+`2`: Rotates through various Augmented Reality (AR) modes including:
    - ALL: Shows all AR points available (within range)
    - PLANETS: ONLY show planets (moons are excluded by default, but can be enabled in lua parameters)
    - TEMPORARY: Only show temporary points (ones entered using the `addwaypoint` lua command
    - FROM_FILE: Only show AR points that were read from the `AR_Waypoints.lua` file (more info in the *Additional Files* section)
    - NONE: No AR points shown (excludes auto-pilot destination)
- - Alt+3: Clears all engine tag filtering so that the throttle controls all engines again
- - Alt+Shift+3: Rotates through a list of predefined engine tags to control. List includes (`military`,`maneuver` and `freight`)
- - Alt+4: Starts auto-pilot towards the current auto-pilot destination *Auto-pilot feature is currently a work in progress, use with caution and only for in space travel`
- - Alt+5: Enables "auto follow" mode. This mode attempts to match the speed of the selected construct and maintain optimal weapon distance. *This feature does not steer the ship, but only controls throttle operations*
- - Alt+6: Sets current waypoint destination and auto-pilot destination to the center of the nearest safe zone (does not automatically engage auto-pilot however)
- - Alt+9: Toggles engine control mode between throttle and cruise
+ - `Alt`+`3`: Clears all engine tag filtering so that the throttle controls all engines again
+ - `Alt`+`Shift`+`3`: Rotates through a list of predefined engine tags to control. List includes (`military`,`maneuver` and `freight`)
+ - `Alt`+`4`: Starts auto-pilot towards the current auto-pilot destination *Auto-pilot feature is currently a work in progress, use with caution and only for in space travel`
+ - `Alt`+`5`: Enables "auto follow" mode. This mode attempts to match the speed of the selected construct and maintain optimal weapon distance. *This feature does not steer the ship, but only controls throttle operations*
+ - `Alt`+`6`: Sets current waypoint destination and auto-pilot destination to the center of the nearest safe zone (does not automatically engage auto-pilot however)
+ - `Alt`+`9`: Toggles engine control mode between throttle and cruise
 
 ### Lua Commands
  - `disable <engine tag>`: Removes the entered engine tag from the currently controlled engine tag list
@@ -138,40 +131,6 @@ Further, the HUD provides the ability to enter manual codes if needed without ac
  - `addWaypoint <::pos{}> [name]`: Adds the entered postion to the temporary AR point list. Optionally include the name to display on that waypoint. If no name is entered, then the tag is labeled with "Temp_0"
  - `delWaypoint <name>`: Removes the selected waypoint from the temprary AR point list
  - `<::pos{auto-pilot destination}>`: Enter a position tag by itself to set the auto-pilot destination. The auto-pilot destination also adds a permenant AR point that is shown on the screen.
-
-### Lua Parameters
- - `validatePilot`: If enabled, will ensure that the player using the seat matches the ID entered into the lua code. To enable this, first ensure that you know your playerID, then edit the lua inside of "unit start" and replace the following with your player ID (Default = disabled):<br>
- - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters (Default = enabled)
- - `showRemotePanel`: Show default remote controller widget (Default = disabled)
- - `showDockingPanel`: Show default docking widget (Default = disabled)
- - `showFuelPanel`: Show default fuel widget (Default = disabled)
- - `showHelper`: Always show default helper widget (Default = disabled)
- - `showShieldWidget`: Show default shield widget (Default = disabled)
- - `defaultHoverHeight`: Set default hover engine height (Default = 42)
- - `defautlFollowDistance`: Set default auto-follow distance (overridden when gunner chair has weapons) (Default = 40)
- - `topHUDLineColorSZ`: HUD Color customizations (Default = 'white')
- - `topHUDFillColorSZ`: HUD Color customizations (Default = 'rgba(29, 63, 255, 0.75)')
- - `textColorSZ`: HUD Color customizations (Default = 'white')
- - `topHUDLineColorPVP`: HUD Color customizations (Default = 'lightgrey')
- - `topHUDFillColorPVP`: HUD Color customizations (Default = 'rgba(255, 0, 0, 0.75)')
- - `textColorPVP`: HUD Color customizations (Default = 'black')
- - `fuelTextColor`: HUD Color customizations (Default = 'white')
- - `Direction_Indicator_Size`: HUD Color customizations (Default = 5)
- - `Direction_Indicator_Color`: HUD Color customizations (Default = 'white')
- - `Prograde_Indicator_Size`: HUD Color customizations (Default = 7.5)
- - `Prograde_Indicator_Color`: HUD Color customizations (Default = 'rgb(60, 255, 60)')
- - `AP_Brake_Buffer`: Sets distance from autopilot destination to stop in km (Default = 5000)
- - `AP_Max_Rotation_Factor`: Sets autopilot turn factor (Default = 20)
- - `AR_Mode`: Sets the intial AR mode when entering the remote (Default = 'NONE')
- - `AR_Range`: Sets side of screen offsite for AR points (Default = 3)
- - `AR_Size`: Sets AR Point max size (Default = 15)
- - `AR_Fill`: HUD Color customizations (Default = 'rgb(29, 63, 255)')
- - `AR_Outline`: HUD Color customizations (Default = 'white')
- - `AR_Opacity`: HUD Color customizations (Default = '0.5')
- - `AR_Exclude_Moons`: Exlude moons from AR point sets (Default = enabled)
- - `EngineTagColor`: HUD Color customizations (Default = 'rgb(60, 255, 60)')
- - `initialResistWait` Sets the amount of time in seconds after initial damage before setting resistences (Default = 15)
- - `autoVent`: Enables the auto vent functionality of the shield if linked (Default = enabled)
 
 ### Features
 #### Travel Indicators
