@@ -4,6 +4,119 @@ if bootTimer >= 2 then
     generateHTML()
 end
 
+local constructPosition = vec3(construct.getWorldPosition())
+
+-- Generate on screen combat points for Augmented Reality view --
+AR_Generate = {}
+if AR_Mode == 'ALL' then
+    if write_db then
+        for _,key in pairs(write_db.getKeyList()) do
+            if string.starts(key,'abnd-') and not string.starts(key,'abnd-name-') then
+                abndPos = write_db.getStringValue(key)
+                AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = convertWaypoint(abndPos)
+            end
+        end
+    end
+    if FC then
+        if radar_1.hasMatchingTransponder(FC) == 1 then
+            local temp = radar_1.getConstructWorldPos(FC)
+            fc_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
+            AR_Generate['Fleet Commander'] = convertWaypoint(fc_pos)
+        elseif fc_pos then
+            AR_Generate['Fleet Commander [LAST KNOWN]'] = convertWaypoint(fc_pos)
+        end
+    end
+    if SL then
+        if radar_1.hasMatchingTransponder(SL) == 1 then
+            local temp = radar_1.getConstructWorldPos(SL)
+            sl_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
+            AR_Generate['Squad Leader'] = convertWaypoint(sl_pos)
+        elseif sl_pos then
+            AR_Generate['Squad Leader [LAST KNOWN]'] = convertWaypoint(sl_pos)
+        end
+    end
+elseif AR_Mode == 'FLEET' then
+    if FC then
+        if radar_1.hasMatchingTransponder(FC) == 1 then
+            local temp = radar_1.getConstructWorldPos(FC)
+            fc_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
+            AR_Generate['Fleet Commander'] = convertWaypoint(fc_pos)
+        elseif fc_pos then
+            AR_Generate['Fleet Commander [LAST KNOWN]'] = convertWaypoint(fc_pos)
+        end
+    end
+    if SL then
+        if radar_1.hasMatchingTransponder(SL) == 1 then
+            local temp = radar_1.getConstructWorldPos(SL)
+            sl_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
+            AR_Generate['Squad Leader'] = convertWaypoint(sl_pos)
+        elseif sl_pos then
+            AR_Generate['Squad Leader [LAST KNOWN]'] = convertWaypoint(sl_pos)
+        end
+    end
+elseif AR_Mode == 'ABANDONDED' then
+    if write_db then
+        for _,key in pairs(write_db.getKeyList()) do
+            if string.starts(key,'abnd-') and not string.starts(key,'abnd-name-') then
+                abndPos = write_db.getStringValue(key)
+                AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = convertWaypoint(abndPos)
+            end
+        end
+    end
+end
+ARSVG = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+for name,pos in pairs(AR_Generate) do
+    local pDist = vec3(pos - constructPosition):len()
+    if pDist*0.000005 < abandonedCoreDist or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') then 
+        local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
+        if pInfo[3] ~= 0 then
+            if pInfo[1] < .01 then pInfo[1] = .01 end
+            if pInfo[2] < .01 then pInfo[2] = .01 end
+            local fill = AR_Fill
+            if string.starts(name,'[CORED]') then fill = 'rgb(144,144,144)'
+            elseif string.starts(name,'Fleet Commander') then fill = 'rgb(186,85,211)'
+            elseif string.starts(name,'Squad Leader') then fill = 'rgb(30, 144, 255)'
+            end
+            local translate = '(0,0)'
+            local depth = AR_Size * 1/(0.02*pDist*0.000005)
+            local pDistStr = ''
+            if pDist < 1000 then pDistStr = string.format('%.2fm',pDist)
+            elseif pDist < 100000 then pDistStr = string.format('%.2fkm',pDist/1000)
+            else pDistStr = string.format('%.2fsu',pDist*0.000005)
+            end
+            if depth > AR_Size then depth = tostring(AR_Size) elseif depth < 1 then depth = '1' else depth = tostring(depth) end
+            if pInfo[1] < 1 and pInfo[2] < 1 then
+                translate = string.format('(%.2f,%.2f)',screenWidth*pInfo[1],screenHeight*pInfo[2])
+            elseif pInfo[1] > 1 and pInfo[1] < AR_Range and pInfo[2] < 1 then
+                translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight*pInfo[2])
+            elseif pInfo[2] > 1 and pInfo[2] < AR_Range and pInfo[1] < 1 then
+                translate = string.format('(%.2f,%.2f)',screenWidth*pInfo[1],screenHeight)
+            else
+                translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
+            end
+            if string.starts(name,'Squad Leader') or string.starts(name,'Fleet Commander') then
+                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                        <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:]]..AR_Outline..[[;stroke-width:1;opacity:0.75;" />
+                        <line x1="0" y1="0" x2="]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
+                        <line x1="]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
+                        <text x="]]..tostring(depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                        </g>]]
+            else
+                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                        <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                        </g>]]
+            end
+        end
+    end
+end
+ARSVG = ARSVG .. '</svg>'
+-----------------------------------------------------------
+
+
+-- SZ Boundary --
 inSZ = construct.isInPvPZone() == 0
 SZD = construct.getDistanceToSafeZone()
 bgColor = bottomHUDFillColorSZ 
@@ -14,6 +127,7 @@ if not inSZ then
     bgColor = bottomHUDFillColorPVP
     fontColor = textColorPVP
 end
+---------------------
 
 -- Radar Updates --
 if radar_1 and cr == nil then
@@ -38,51 +152,6 @@ elseif cr ~= nil then
     end
 end
 ---- End Radar Updates ----
-
--- Shield Updates --
-local cPos = vec3(construct.getWorldPosition())
-if shield_1 then
-    local srp = shield_1.getResistancesPool()
-    local csr = shield_1.getResistances()
-    local rcd = shield_1.getResistancesCooldown()
-    if shield_1.getStressRatioRaw()[1] == 0 and shield_1.getStressRatioRaw()[2] == 0 and shield_1.getStressRatioRaw()[3] == 0 and shield_1.getStressRatioRaw()[4] == 0 then
-        dmgTick = 0
-        srp = srp / 4
-        if (csr[1] == srp and csr[2] == srp and csr[3] == srp and csr[4] == srp) or rcd ~= 0 then
-            --No change
-        else
-            shield_1.setResistances(srp,srp,srp,srp)
-        end
-    elseif math.abs(arkTime - dmgTick) >= initialResistWait then
-        local srr = shield_1.getStressRatioRaw()
-        if (csr[1] == (srp*srr[1]) and csr[2] == (srp*srr[2]) and csr[3] == (srp*srr[3]) and csr[4] == (srp*srr[4])) or rcd ~= 0 then -- If ratio hasn't change, or timer is not up, don't waste the resistance change timer.
-            --No change
-        else
-            shield_1.setResistances(srp*srr[1],srp*srr[2],srp*srr[3],srp*srr[4])
-        end
-    elseif dmgTick == 0 then
-        dmgTick = arkTime
-    end
-
-    local hp = shield_1.getShieldHitpoints()
-    if shield_1.isVenting() == 0 and hp == 0 and autoVent then
-        shield_1.startVenting()
-    elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 or vec3(homeBaseVec - cPos):len() < homeBaseDistance*1000 then
-        if homeBaseVec then
-            if vec3(homeBaseVec - cPos):len() >= homeBaseDistance*1000 then
-                shield_1.activate()
-            else
-                shield_1.deactivate()
-            end
-        else
-            shield_1.activate()
-        end
-    end
-
-    local coreHP = 0
-    if core_1 then coreHP = (core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress() end
-end
--- End Shield Updates --
 
 -- AutoFollow Updates --
 local target = tostring(radar_1.getTargetId())

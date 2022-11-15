@@ -10,14 +10,12 @@ showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
-showCode = true --export True=plain text transponder codes, False=redacted codes
 szAlerts = false --export
 minimalWidgets = false --export
 hideAbandonedCores = true --export
 targetIndicators = true --export Show warnings when target is speeding up or slowing down
 printCombatLog = true --export Print weapon hits/misses to lua
-homeBaseLocation = '' --export Location of home base (to turn off shield)
-homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
+abandonedCoreDist = 10 --export Distance in AR to show abandoned cores in SU
 dangerWarning = 4 --export
 validatePilot = false --export
 bottomHUDLineColorSZ = 'rgba(125, 150, 160, 1)' --export
@@ -28,8 +26,6 @@ bottomHUDFillColorPVP = 'rgba(255, 0, 0, 0.75)' --export
 textColorPVP = 'black' --export
 neutralLineColor = 'lightgrey' --export
 neutralFontColor = 'white' --export
-generateAutoCode = false --export
-autoVent = true --export Autovent shield at 0 hp
 L_Shield_HP = 11500000 --export
 M_Shield_HP = 8625000 --export
 S_Shield_HP = 8625000 --export
@@ -41,29 +37,13 @@ warning_size = 0.75 --export How large the warning indicators should be
 warning_outline_color = 'rgb(255, 60, 60)' --export
 warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
 
--- HP (Shield/CCS) widget --
-hpWidgetX = 33 --export
-hpWidgetY = 88 --export
-hpWidgetScale = 17 --export
-shieldHPColor = 'rgb(25, 247, 255)' --export
-ccsHPColor = 'rgb(60, 255, 60)' --export
--- Resist Widget --
-resistWidgetX = 45 --export
-resistWidgetY = 82 --export
-resistWidgetScale = 8.5 --export
 antiMatterColor = 'rgb(56, 255, 56)' --export
 electroMagneticColor = 'rgb(27, 255, 217)' --export
 kineticColor = 'rgb(255, 75, 75)' --export
 thermicColor = 'rgb(255, 234, 41)' --export
--- Transponder Widget --
-transponderWidgetX = 40 --export
-transponderWidgetY = 67 --export
-transponderWidgetScale = 11.25 --export
 
-transponderWidgetXmin = 58.5 --export
-transponderWidgetYmin = -0.9 --export
-transponderWidgetScalemin = 10 --export
 -- Radar Info Widget --
+friendlyTextColor = 'rgb(60, 255, 60)' --export
 radarInfoWidgetX = 29 --export
 radarInfoWidgetY = 67 --export
 radarInfoWidgetScale = 11.25 --export
@@ -101,14 +81,6 @@ userCode[validPilotCode] = pilotName
 if useDB and write_db ~= nil then
     globalDB('get')
 end
-
--- Shield Initialize --
-dmgTick = 0
-homeBaseVec = nil
-if homeBaseLocation ~= '' then
-    homeBaseVec = vec3(convertWaypoint(homeBaseLocation))
-end
---------
 
 --- Radar Initial Values ---
 auto_follow = false
@@ -191,26 +163,6 @@ dmgTracker = {}
 primary = nil
 --------------
 
--- Transponder --
-codeSeed = nil
-tags = {}
-transponderStatus = false
-tCode = nil
-cOverlap = false
-cOverlapTick = 0
-codeSeed = nil
-rollTimer = 120 --Roll code timer in seconds
-if pcall(require,'autoconf/custom/transponder') then 
-    codeSeed = tonumber(require('autoconf/custom/transponder'))
-end
-if codeSeed == nil then
-    system.print('--ENTER ACTIVATION CODE--')
-    system.print('"agc <number>"')
-else
-    unit.setTimer('code',0.25)
-end
------------------
-
 bootTimer = 0
 if validatePilot then
     local validPilot = false
@@ -222,6 +174,19 @@ if validatePilot then
         unit.exit()
     end
 end
+
+-- AR Initialization --
+AR_Mode = 'ALL'
+AR_Range = 3
+AR_Size = 8
+AR_Fill = 'rgb(29, 63, 255)'
+AR_Outline = 'rgba(125, 150, 160, 1)'
+AR_Opacity = '0.5'
+FC = nil
+fc_pos = nil
+SL = nil
+sl_pos = nil
+----------------------
 
 warnings = {}
 warningSymbols = {}
@@ -311,43 +276,9 @@ else
 end
 
 instructionHTML = ''
-if generateAutoCode then
-    system.print('-- ENTER ACTIVATION CODE --')
-    local textColor = 'white'
-    instructionHTML = [[
-    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="50vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
-                Gunner Chair Startup Instructions</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                1) Press "enter" key and go to lua chat channel</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                2) Enter the number you would like to use as your unique transponder seed</text>
-            <text x="]].. tostring(.265 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                (or 0 if you do not want auto generated codes)</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                3) After entering the code, the seat will start</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
-                Notes:</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                 - The code entered will create an auto-generated transponder code that changes every ~15 minutes.</text>
-            <text x="]].. tostring(.27 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                Anyone using this HUD and entering the same startup code will have matching transponders</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                 - Manually link a data bank to the seat to enable shared functions between the DeadGunner HUD and the DeadRemote HUD</text>
-            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
-                 - Make sure to run the seat config AFTER linking all radar and weapons to the seat</text>
-            </rect>
-            </svg>]]
-else
-    unit.setTimer('booting',1)
-    codeSeed = 0
-end
 
+unit.setTimer('booting',1)
 
-html = [[<html> <body style="font-family: Calibri;">]]
-html = html .. instructionHTML .. [[</body></html>]]
-system.setScreen(html)
 system.showScreen(1)
 
 showScreen = true

@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v3.5.6'
+hudVersion = 'v4.0.0'
 caerusOption = false --export
 minimalWidgets = false --export
 validatePilot = false --export
@@ -25,6 +25,9 @@ showDockingPanel = false --export
 showFuelPanel = false --export
 showHelper = false --export
 showShieldWidget = false --export
+autoVent = true --export Autovent shield at 0 hp
+homeBaseLocation = '' --export Location of home base (to turn off shield)
+homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
 defaultHoverHeight = 42 --export
 defautlFollowDistance = 40 --export
 followMaxSpeedGain = 4000 --export
@@ -60,6 +63,30 @@ warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
 useLogo = false --export Enable the logo to be shown on the HUD. Must use the logo variable in unit.onStart and logo must be in SVG format.
 logoSVG = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0" y="0" viewBox="0 0 1024 612" xml:space="preserve" enable-background="new 0 0 1024 612"> 	<defs> 		<filter id="glow"> 			<feGaussianBlur result="coloredBlur" stdDeviation="10"/> 		</filter> 	</defs> 	<style> 		.blue{ 			fill: rgb(255, 65, 65) 		} 		.animationBlur{ 			filter:url(#glow) 		} 		.animationBlur, .animationSolid{ 			fill:rgb(255, 65, 65); 			stroke:rgb(255, 65, 65); 			stroke-width:14; 			stroke-miterlimit:18.6667; 			stroke-dasharray:4000; 		} 	</style> 	 	<path class="animationBlur" d="M313.3 138.1c26.4-2.1 50.1 9.8 64.6 29.1 11.2 14.9 32.4 17.8 47.2 6.3 2.5-2 22.5-17.6 25-19.6 14.2-11.1 16.7-31.6 5.9-46-34-45.1-89.9-72.7-152-67.3-82.9 7.3-149.2 75.1-155 158-6.9 99.9 72.1 183.2 170.5 183.2 43.4-1.8 73.5-14.2 103.8-35.1 43.5-30.1 87.6-77.7 171.6-137.5-28.3 5.8-66.6 20-107.7 34.6-57.1 20.2-119.5 41-167.8 40.1-41.4 0-74.9-34.5-73-76.4 1.7-36.3 30.8-66.5 66.9-69.4z"/> 	<path class="animationSolid" d="M313.3 138.1c26.4-2.1 50.1 9.8 64.6 29.1 11.2 14.9 32.4 17.8 47.2 6.3 2.5-2 22.5-17.6 25-19.6 14.2-11.1 16.7-31.6 5.9-46-34-45.1-89.9-72.7-152-67.3-82.9 7.3-149.2 75.1-155 158-6.9 99.9 72.1 183.2 170.5 183.2 43.4-1.8 73.5-14.2 103.8-35.1 43.5-30.1 87.6-77.7 171.6-137.5-28.3 5.8-66.6 20-107.7 34.6-57.1 20.2-119.5 41-167.8 40.1-41.4 0-74.9-34.5-73-76.4 1.7-36.3 30.8-66.5 66.9-69.4z"/> 	<path class="animationBlur" d="M707 283.9c-26.4 2.1-50.1-9.8-64.6-29.1-11.2-14.9-32.5-17.8-47.2-6.3-2.5 2-22.5 17.6-25 19.5-14.2 11.1-16.7 31.6-5.9 46 34 45.1 89.9 72.7 152 67.3 82.9-7.3 149.1-75 154.9-158 7-99.8-72-183.1-170.5-183.1-43.3 1.8-73.4 14.2-103.8 35.1-43.5 30.1-87.6 77.7-171.6 137.5 28.3-5.8 66.6-20 107.7-34.6 57.1-20.2 119.5-41 167.8-40.1 41.5 0 74.9 34.5 73 76.4-1.6 36.3-30.7 66.5-66.8 69.4z"/> 	<path class="animationSolid" d="M707 283.9c-26.4 2.1-50.1-9.8-64.6-29.1-11.2-14.9-32.5-17.8-47.2-6.3-2.5 2-22.5 17.6-25 19.5-14.2 11.1-16.7 31.6-5.9 46 34 45.1 89.9 72.7 152 67.3 82.9-7.3 149.1-75 154.9-158 7-99.8-72-183.1-170.5-183.1-43.3 1.8-73.4 14.2-103.8 35.1-43.5 30.1-87.6 77.7-171.6 137.5 28.3-5.8 66.6-20 107.7-34.6 57.1-20.2 119.5-41 167.8-40.1 41.5 0 74.9 34.5 73 76.4-1.6 36.3-30.7 66.5-66.8 69.4z"/> 	<g id="g3848"> 		<path id="path83" class="blue" d="M149.6 500.4h13.7v-68.5h-13.7v68.5z"/> 		<path id="path85" class="blue" d="M212.2 500.4h13.7v-47.5l41.1 47.5h13.7v-68.5H267v47.5l-41.1-47.5h-13.7v68.5z"/> 		<path id="path87" class="blue" d="M329.5 500.4h13.7V473h41.1v-13.7h-41.1v-13.7H398v-13.7h-68.5v68.5z"/> 		<path id="path89" class="blue" d="M446.8 500.4h13.7v-68.5h-13.7v68.5z"/> 		<path id="path91" class="blue" d="M509.3 500.4H523v-47.5l41.1 47.5h13.7v-68.5h-13.7v47.5L523 431.9h-13.7v68.5z"/> 		<path id="path93" class="blue" d="M626.7 500.4h13.7v-68.5h-13.7v68.5z"/> 		<path id="path95" class="blue" d="M689.2 431.9v13.7h27.4v54.8h13.7v-54.8h27.4v-13.7h-68.5z"/> 		<path id="path97" class="blue" d="M806.5 431.9v10.3c0 5.7 2.8 10.4 6.1 13.1l21.3 17.7v27.4h13.7V473l21.3-17.7c3.3-2.7 6.1-7.5 6.1-13.1v-10.3h-13.7v10.3c0 .9-.4 2-1.2 2.6L840.7 461l-19.4-16.2c-.8-.6-1.2-1.6-1.2-2.6v-10.3h-13.6z"/> 	</g> 	<g id="g3838"><path id="path60" class="blue" d="M206.4 534.3h-44.5c-8.2 0-14.8 6.7-14.8 14.8v29.7c0 8.2 6.7 14.8 14.8 14.8h44.5v-9.7h-44.5c-2.8 0-5.2-2.4-5.2-5.2V549c0-2.8 2.4-5.2 5.2-5.2h44.5v-9.5z"/> 		<path id="path62" class="blue" d="M218.3 578.9c0 8.2 6.7 14.8 14.8 14.8h29.7c8.2 0 14.8-6.7 14.8-14.8v-29.7c0-8.2-6.7-14.8-14.8-14.8h-29.7c-8.2 0-14.8 6.7-14.8 14.8v29.7zm14.9 5.2c-2.8 0-5.2-2.4-5.2-5.2v-29.7c0-2.8 2.4-5.2 5.2-5.2h29.7c2.8 0 5.2 2.4 5.2 5.2v29.7c0 2.8-2.4 5.2-5.2 5.2h-29.7z"/> 		<path id="path64" class="blue" d="M289.7 593.7h9.7v-24.9h20.3l17.5 24.9h11.9l-17.5-24.9h2.7c8.2 0 14.8-6.7 14.8-14.8v-4.8c0-8.2-6.7-14.8-14.8-14.8h-44.5v59.3zm9.6-34.5V544h34.9c2.8 0 5.2 2.4 5.2 5.2v4.8c0 2.8-2.4 5.2-5.2 5.2h-34.9z"/> 		<path id="path66" class="blue" d="M361 593.7h9.7v-24.9h34.9c8.2 0 14.8-6.7 14.8-14.8v-4.8c0-8.2-6.7-14.8-14.8-14.8H361v59.3zm9.7-34.5V544h34.9c2.8 0 5.2 2.4 5.2 5.2v4.8c0 2.8-2.4 5.2-5.2 5.2h-34.9z"/> 		<path id="path68" class="blue" d="M432.4 578.9c0 8.2 6.7 14.8 14.8 14.8h29.7c8.2 0 14.8-6.7 14.8-14.8v-29.7c0-8.2-6.7-14.8-14.8-14.8h-29.7c-8.2 0-14.8 6.7-14.8 14.8v29.7zm14.8 5.2c-2.8 0-5.2-2.4-5.2-5.2v-29.7c0-2.8 2.4-5.2 5.2-5.2h29.7c2.8 0 5.2 2.4 5.2 5.2v29.7c0 2.8-2.4 5.2-5.2 5.2h-29.7z"/> 		<path id="path70" class="blue" d="M503.7 593.7h9.7v-24.9h20.3l17.5 24.9h11.9l-17.5-24.9h2.7c8.2 0 14.8-6.7 14.8-14.8v-4.8c0-8.2-6.7-14.8-14.8-14.8h-44.5v59.3zm9.7-34.5V544h34.9c2.8 0 5.2 2.4 5.2 5.2v4.8c0 2.8-2.4 5.2-5.2 5.2h-34.9z"/> 		<path id="path72" class="blue" d="M575.1 593.7h9.7v-24.9h40.1v24.9h9.7v-44.5c0-8.2-6.7-14.8-14.8-14.8h-29.7c-8.2 0-14.8 6.7-14.8 14.8l-.2 44.5zm9.6-34.5v-10c0-2.8 2.4-5.2 5.2-5.2h29.7c2.8 0 5.2 2.4 5.2 5.2v10h-40.1z"/> 		<path id="path74" class="blue" d="M646.4 534.3v9.7h24.9v49.7h9.7V544h24.9v-9.7h-59.5z"/> 		<path id="path76" class="blue" d="M718.9 593.7h9.7v-59.4h-9.7v59.4z"/><path id="path78" class="blue" d="M741.6 578.9c0 8.2 6.7 14.8 14.8 14.8h29.7c8.2 0 14.8-6.7 14.8-14.8v-29.7c0-8.2-6.7-14.8-14.8-14.8h-29.7c-8.2 0-14.8 6.7-14.8 14.8v29.7zm14.8 5.2c-2.8 0-5.2-2.4-5.2-5.2v-29.7c0-2.8 2.4-5.2 5.2-5.2h29.7c2.8 0 5.2 2.4 5.2 5.2v29.7c0 2.8-2.4 5.2-5.2 5.2h-29.7z"/> 		<path id="path80" class="blue" d="M812.9 593.7h9.7v-44.6l40.1 44.6h9.7v-59.4h-9.7V579l-40.1-44.6h-9.7v59.3z"/> 	</g> </svg>' --export SVG Logo that will be placed in the top left of the HUD (automatically scaled)
 
+-- HP (Shield/CCS) widget --
+hpWidgetX = 33 --export
+hpWidgetY = 88 --export
+hpWidgetScale = 17 --export
+shieldHPColor = 'rgb(25, 247, 255)' --export
+ccsHPColor = 'rgb(60, 255, 60)' --export
+-- Resist Widget --
+resistWidgetX = 45 --export
+resistWidgetY = 82 --export
+resistWidgetScale = 8.5 --export
+antiMatterColor = 'rgb(56, 255, 56)' --export
+electroMagneticColor = 'rgb(27, 255, 217)' --export
+kineticColor = 'rgb(255, 75, 75)' --export
+thermicColor = 'rgb(255, 234, 41)' --export
+
+-- Transponder Widget --
+transponderWidgetX = 40 --export
+transponderWidgetY = 67 --export
+transponderWidgetScale = 11.25 --export
+
+transponderWidgetXmin = 58.5 --export
+transponderWidgetYmin = -0.9 --export
+transponderWidgetScalemin = 10 --export
+
 -- Ship information Widget --
 shipInfoWidgetX = 76.5
 shipInfoWidgetY = -0.9
@@ -88,6 +115,31 @@ if db_1 ~= nil then
     end
 end
 
+-- Transponder --
+showCode = false
+codeTimer = 5
+codeCount = 0
+codeSeed = nil
+tags = {}
+transponderStatus = false
+tCode = nil
+cOverlap = false
+cOverlapTick = 0
+codeSeed = nil
+rollTimer = 120 --Roll code timer in seconds
+if pcall(require,'autoconf/custom/transponder') then 
+    codeSeed = tonumber(require('autoconf/custom/transponder'))
+end
+if codeSeed == nil then
+    system.print('--ENTER ACTIVATION CODE--')
+    system.print('"agc <number>"')
+else
+    unit.setTimer('code',0.25)
+end
+-----------------
+
+---- Initialization ---
+constructPosition = vec3(construct.getWorldPosition())
 cr = nil
 followID = nil
 followSpeedMod = 0
@@ -126,6 +178,14 @@ inSZ = true
 enabledEngineTags = {}
 milEng = false
 ------------------------------------
+
+-- Shield Initialize --
+dmgTick = 0
+homeBaseVec = nil
+if homeBaseLocation ~= '' then
+    homeBaseVec = vec3(convertWaypoint(homeBaseLocation))
+end
+--------
 
 pitchInput = 0
 rollInput = 0
@@ -218,6 +278,39 @@ if validatePilot then
     end
 end
 ----------------------------
+
+if generateAutoCode then
+    system.print('-- ENTER ACTIVATION CODE --')
+    local textColor = 'white'
+    instructionHTML = [[
+        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+            <rect x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="50vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
+                Gunner Chair Startup Instructions</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                1) Press "enter" key and go to lua chat channel</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                2) Enter the number you would like to use as your unique transponder seed</text>
+            <text x="]].. tostring(.265 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                (or 0 if you do not want auto generated codes)</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                3) After entering the code, the seat will start</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size=".8vw" font-weight="bold">
+                Notes:</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                 - The code entered will create an auto-generated transponder code that changes every ~15 minutes.</text>
+            <text x="]].. tostring(.27 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                Anyone using this HUD and entering the same startup code will have matching transponders</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                 - Manually link a data bank to the seat to enable shared functions between the DeadGunner HUD and the DeadRemote HUD</text>
+            <text x="]].. tostring(.255 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..textColor..[[" font-size=".8vw">
+                 - Make sure to run the seat config AFTER linking all radar and weapons to the seat</text>
+            </rect>
+            </svg>]]
+            html = [[<html> <body style="font-family: Calibri;">]]
+    html = html .. instructionHTML .. [[</body></html>]]
+    system.setScreen(html)
+end
 
 showScreen = true
 fuelWarningText = ''
@@ -317,4 +410,6 @@ warningSymbols['svgBrakes'] = [[
                 </svg>
             ]]
 
+
+unit.setTimer('screen',0.025)
 system.showScreen(1)

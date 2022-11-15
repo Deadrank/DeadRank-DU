@@ -1,7 +1,6 @@
 if transponder_1 ~= nil then
     tags = transponder_1.getTags()
     if transponder_1.isActive() ~= 1 then transponder_1.activate() end
-    
 end
 
 local a = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'

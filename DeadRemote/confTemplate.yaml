@@ -1,4 +1,4 @@
-name: DeadRemote v3.6.0
+name: DeadRemote v4.0.0
 
 slots:
     core:
@@ -26,16 +26,35 @@ slots:
         select: manual
     shield:
         class: ShieldGeneratorUnit
-        select: manual
+        select: all
+    transponder:
+        class: TransponderUnit
+        select: all
 
 handlers:
   unit:
+    onTimer:
+      args: ['code']
+      lua: |
+{{unit.onTimer.code.lua}}
+    onTimer:
+      args: ['overlap']
+      lua: |
+{{unit.onTimer.overlap.lua}}
     onStart:
       lua: |
 {{unit.onStart.lua}}
     onStop:
       lua: |
 {{unit.onStop.lua}}
+    onTimer:
+      args: ['screen']
+      lua: |
+{{unit.onTimer.screen.lua}}
+    onTimer:
+      args: ['showCode']
+      lua: |
+{{unit.onTimer.showCode.lua}}
   system:
     onStart:
       lua: |

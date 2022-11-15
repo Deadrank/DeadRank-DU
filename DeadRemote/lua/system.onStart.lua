@@ -457,9 +457,9 @@ function shipNameWidget()
     snw = snw .. [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
+            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.042 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Code: ]]..tostring(construct.getId())..[[</text>
         </svg>
     ]]
-
     return snw
 end
 
@@ -609,9 +609,13 @@ function warningsWidget()
     local warningText = {}
     warningText['lowFuel'] = fuelWarningText
     warningText['brakes'] = 'Brakes Locked'
+    warningText['venting'] = 'Shield Venting'
 
     local warningColor = {}
     warningColor['lowFuel'] = 'red'
+    warningColor['cored'] = 'orange'
+    warningColor['friendly'] = 'green'
+    warningColor['venting'] = shieldHPColor
 
     if math.floor(system.getArkTime()*5) % 2 == 0 then
         warningColor['brakes'] = 'orange'
@@ -633,6 +637,250 @@ function warningsWidget()
     end
     ww = ww .. '</svg>'
     return ww
+end
+
+function hpWidget()
+    local hw = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    --Shield/CCS Widget
+    shieldPercent = 0
+    if shield_1 then
+        shieldPercent = shield_1.getShieldHitpoints()/shield_1.getMaxShieldHitpoints()*100
+    end
+    CCSPercent = 0
+    if core_1 then
+        if core_1.getMaxCoreStress() then
+            CCSPercent = 100*(core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress()
+        end
+    end
+    if CCSPercent < 25 and CCSPercent > 5 and db_1 then
+        db_1.clearValue('homeBaseLocation')
+        if transponder_1 then transponder_1.setTags({}) end
+    elseif CCSPercent == 0 and shieldPercent < 5 then
+        db_1.clearValue('homeBaseLocation')
+        if transponder_1 then transponder_1.setTags({}) end
+    end
+    if (shield_1 and shieldPercent < 15) or showAlerts then
+        hw = hw .. string.format([[
+        <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: red;">
+            ]]..warningSymbols['svgCritical']..[[
+        </svg>
+        <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.64 * screenHeight) ..[[" style="fill: red" font-size="3.42vh" font-weight="bold">SHIELD CRITICAL</text>
+        ]])
+    elseif (shield_1 and shieldPercent < 30) or showAlerts then
+        hw = hw .. string.format([[
+        <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: orange;">
+            ]]..warningSymbols['svgWarning']..[[
+        </svg>
+        <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.64 * screenHeight) ..[[" style="fill: orange" font-size="3.42vh" font-weight="bold">SHIELD LOW</text>
+        ]])
+    end
+    hw = hw .. '</svg>'
+    hw = hw .. [[
+        <svg style="position: absolute; top: ]]..hpWidgetY..[[vh; left: ]]..hpWidgetX..[[vw;" viewBox="0 0 355 97" width="]]..tostring(hpWidgetScale)..[[vw">
+            <polyline style="fill-opacity: 0; stroke-linejoin: round; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" points="2 78.902 250 78.902 276 50" bx:origin="0.564202 0.377551"/>
+            <polyline style="stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" points="225 85.853 253.049 85.853 271 67.902" bx:origin="-1.23913 -1.086291"/>
+            <rect x="26.397" y="158.28" width="59" height="9" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000076, 0, 1, -24.396999, -79.380203)" bx:origin="2.813559 -3.390291"/>
+            <rect x="4.921" y="123.131" width="11" height="7" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000076, 0, 1, -2.921, -35.229931)" bx:origin="15.090909 -5.644607"/>
+            <rect x="4.921" y="123.111" width="11" height="6.999" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000106, 0, 1, 13.079, -35.20953)" bx:origin="13.636364 -5.645962"/>
+            <rect x="4.921" y="123.111" width="11" height="6.999" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000106, 0, 1, 29.078999, -35.20953)" bx:origin="12.181818 -5.645719"/>
+            <rect x="4.921" y="123.111" width="11" height="6.999" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000106, 0, 1, 45.078999, -35.20953)" bx:origin="10.727273 -5.645477"/>
+            ]]
+    local placement = 0
+    for i = 4, CCSPercent, 4 do 
+        hw = hw .. [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..ccsHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="56" x2="]]..tostring(5+placement)..[["   y2="72" bx:origin="0 0.096154"/>]]  placement = placement + 10
+    end
+            
+    hw = hw .. [[
+            <line style="stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="5" y1="25.706" x2="5" y2="39.508" bx:origin="0 1.607143"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="14.859" y1="31.621" x2="14.859" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="24.718" y1="31.684" x2="24.718" y2="39.571" bx:origin="0 2.0545"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="34.576" y1="31.684" x2="34.576" y2="39.571" bx:origin="0 2.0545"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="44.435" y1="31.621" x2="44.435" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="54.294" y1="31.621" x2="54.294" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="64.153" y1="31.621" x2="64.153" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="74.012" y1="31.621" x2="74.012" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="83.871" y1="31.621" x2="83.871" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="93.729" y1="31.621" x2="93.729" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="103.588" y1="31.684" x2="103.588" y2="39.571" bx:origin="0 2.0545"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="113.447" y1="31.684" x2="113.447" y2="39.571" bx:origin="0 2.0545"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="123.306" y1="31.621" x2="123.306" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="133.165" y1="31.621" x2="133.165" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="143.023" y1="31.621" x2="143.023" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="152.882" y1="31.621" x2="152.882" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="162.741" y1="31.621" x2="162.741" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="172.6" y1="31.621" x2="172.6" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="182.459" y1="31.684" x2="182.459" y2="39.571" bx:origin="0 2.0545"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="192.318" y1="31.684" x2="192.318" y2="39.571" bx:origin="0 2.0545"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="202.176" y1="31.621" x2="202.176" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="212.035" y1="31.621" x2="212.035" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="221.894" y1="31.621" x2="221.894" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="231.753" y1="31.621" x2="231.753" y2="39.508" bx:origin="0 2.0625"/>
+            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="245" y1="25.706" x2="245" y2="39.508" bx:origin="0 1.535714"/>
+            <text style="fill: ]]..shieldHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="15" y="28.824" bx:origin="-2.698544 2.296589">Shield:</text>
+            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 6.70451px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, -12.273296, 5.679566)" x="16" y="89.114" bx:origin="3.495402 -4.692753">Incoming Damage</text>
+            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 73.924286, 48.558426)" x="16" y="89.114" dx="-83.506" dy="-39.079" bx:origin="35.484825 -7.519482">A</text>
+            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 98.152718, 71.789642)" x="16" y="89.114" dx="-91.857" dy="-65.038" bx:origin="38.374239 -7.519481">E</text>
+            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 106.659058, 48.558426)" x="16" y="89.114" dx="-83.506" dy="-39.079" bx:origin="33.936403 -7.519482">T</text>
+            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 121.659058, 48.558426)" x="16" y="89.114" dx="-83.506" dy="-39.079" bx:origin="27.291514 -7.519482">K</text>
+            <text style="fill: ]]..shieldHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="53.45" y="28.824" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',shieldPercent)..[[%</text>
+            <text style="fill: ]]..ccsHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="153" y="28.824" bx:origin="-2.698544 2.296589">CCS:</text>
+            <text style="fill: ]]..ccsHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="182.576" y="28.824" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',CCSPercent)..[[%</text>
+            
+            ]]
+            if shield_1 then
+                local ventCD = shield_1.getVentingCooldown()
+                if ventCD > 0 then
+                    hw = hw .. [[
+                        <text style="fill: ]]..warning_outline_color..[[; font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="66" y="91.01" bx:origin="-2.698544 2.296589">Vent Cooldown: </text>
+                        <text style="fill: ]]..warning_outline_color..[[; font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="151" y="91.01" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',ventCD)..[[s</text>
+                    ]]
+                end
+            end
+    local placement = 0
+    for i = 4, shieldPercent, 4 do 
+        hw = hw .. [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..shieldHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="42" x2="]]..tostring(5+placement)..[["   y2="55" bx:origin="0 0.096154"/>]]  placement = placement + 10
+    end
+
+    hw = hw .. '</svg>'
+
+    return hw
+end
+
+function resistWidget()
+    local rw = ''
+
+    local stress = shield_1.getStressRatioRaw()
+    local amS = stress[1]
+    local emS = stress[2]
+    local knS = stress[3]
+    local thS = stress[4]
+
+    local srp = shield_1.getResistancesPool()
+    local csr = shield_1.getResistances()
+    local amR = csr[1]/srp
+    local emR = csr[2]/srp
+    local knR = csr[3]/srp
+    local thR = csr[4]/srp
+
+    local resistTimer = shield_1.getResistancesCooldown()
+    local resistTimerPer = 1 - resistTimer/shield_1.getResistancesMaxCooldown()
+    local resistTimerColor = shieldHPColor
+    if resistTimer > 0 then resistTimerColor = warning_outline_color end 
+
+    if shield_1.isVenting() == 0 then
+        warnings['venting'] = nil
+    else 
+        warnings['venting'] = 'svgCritical'
+    end
+
+    rw = [[
+        <svg style="position: absolute; top: ]]..resistWidgetY..[[vh; left: ]]..resistWidgetX..[[vw;" viewBox="0 0 143 127" width="]]..resistWidgetScale..[[vw">
+            <defs>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-am">
+                    <stop offset="]]..tostring(amS*100)..[[%" style="stop-color: ]]..antiMatterColor..[[; stop-opacity: 1"/>
+                    <stop offset="]]..tostring(amS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-th">
+                    <stop offset="]]..tostring(thS*100)..[[%" style="stop-color: ]]..thermicColor..[[; stop-opacity: 1"/>
+                    <stop offset="]]..tostring(thS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-em">
+                    <stop offset="]]..tostring(emS*100)..[[%" style="stop-color: ]]..electroMagneticColor..[[; stop-opacity: 1"/>
+                    <stop offset="]]..tostring(emS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-kn">
+                    <stop offset="]]..tostring(knS*100)..[[%" style="stop-color: ]]..kineticColor..[[; stop-opacity: 1"/>
+                    <stop offset="]]..tostring(knS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-am">
+                    <stop offset="]]..tostring(amR*100)..[[%" style="stop-color: ]]..antiMatterColor..[["/>
+                    <stop offset="]]..tostring(amR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-em">
+                    <stop offset="]]..tostring(emR*100)..[[%" style="stop-color: ]]..electroMagneticColor..[["/>
+                    <stop offset="]]..tostring(emR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-th">
+                    <stop offset="]]..tostring(thR*100)..[[%" style="stop-color: ]]..thermicColor..[["/>
+                    <stop offset="]]..tostring(thR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
+                </linearGradient>
+                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-kn">
+                    <stop offset="]]..tostring(knR*100)..[[%" style="stop-color: ]]..kineticColor..[[;"/>
+                    <stop offset="]]..tostring(knR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
+                </linearGradient>
+                <linearGradient x1="0%" y1="50%" x2="100%" y2="50%" id="resist-timer-horizontal" gradientUnits="userSpaceOnUse">
+                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
+                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..warning_outline_color..[[;"/>  
+                </linearGradient>
+                <linearGradient x1="50%" y1="0%" x2="50%" y2="80%" id="resist-timer-vertical" gradientUnits="userSpaceOnUse">
+                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
+                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..warning_outline_color..[[;"/>  
+                </linearGradient>
+            </defs>
+            <ellipse style="fill: none; stroke: ]]..neutralLineColor..[[;" cx="73" cy="61" rx="8" ry="8"/>
+            <ellipse style="fill: ]]..neutralLineColor..[[; stroke: ]]..neutralLineColor..[[;" cx="73" cy="61" rx="2" ry="2"/>
+            <polyline style="fill: none; stroke-linejoin: bevel; stroke-linecap: round; stroke: ]]..neutralLineColor..[[;" points="53 30 35 61 53 93"/>
+            <polyline style="fill: none; stroke-linejoin: bevel; stroke-linecap: round; stroke: ]]..neutralLineColor..[[;" points="92 30 110 61 92 93"/>
+            <polyline style="fill: none; stroke-linecap: round; stroke-linejoin: bevel; stroke: ]]..neutralLineColor..[[;" points="90 35 105 61 90 89"/>
+            <polyline style="fill: none; stroke-linecap: round; stroke-linejoin: bevel; stroke: ]]..neutralLineColor..[[;" points="55 35 40 61 55 89"/>
+            <line style="fill: none; stroke-width: 0.5px; stroke: url(#resist-timer-horizontal);" x1="17" y1="61" x2="128" y2="61"/>
+            <line style="fill: none; stroke-width: 0.5px; stroke: url(#resist-timer-vertical);" x1="72.888" y1="-9.275" x2="72.888" y2="101.725" transform="matrix(1, 0, 0, 1, 0.112056, 14.27536)"/>
+            <text style="fill: ]]..antiMatterColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="55.182" y="51.282">AM</text>
+            <text style="fill: ]]..electroMagneticColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="78" y="51.282">EM</text>
+            <text style="fill: ]]..thermicColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="78" y="77.282">TH</text>
+            <text style="fill: ]]..kineticColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="55" y="77.282">KN</text>
+            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-am);" d="M 15 59 C 45.52 58.894 71.021 34.344 71 3" transform="matrix(-1, 0, 0, -1, 86.000015, 62)"/>
+            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-th);" d="M 75 119 C 105.52 118.894 131.021 94.344 131 63"/>
+            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-em);" d="M 75 59 C 105.52 58.894 131.021 34.344 131 3" transform="matrix(0, -1, 1, 0, 72.000008, 134.000008)"/>
+            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-kn);" d="M 15 119 C 45.52 118.894 71.021 94.344 71 63" transform="matrix(0, 1, -1, 0, 134.000008, 47.999992)"/>
+            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-am); stroke-width: 5px;" d="M 25 56 C 48.435 55.92 68.016 37.068 68 13" transform="matrix(-1, 0, 0, -1, 93.000015, 69)"/>
+            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-em); stroke-width: 5px;" d="M 78 56 C 101.435 55.919 121.016 37.068 121 13" transform="matrix(0, -1, 1, 0, 65.000004, 134.000004)"/>
+            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-th); stroke-width: 5px;" d="M 78 109 C 101.435 108.919 121.016 90.068 121 66"/>
+            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-kn); stroke-width: 5px;" d="M 24 109 C 47.435 108.919 67.016 90.068 67 66" transform="matrix(0, 1, -1, 0, 133.000008, 41.999992)"/>
+            </svg>
+    ]]
+    return rw
+end
+
+function transponderWidget()
+    local tw = ''
+    if transponder_1 ~= nil then
+        local transponderColor = warning_outline_color
+        local transponderStatus = 'offline'
+        if transponder_1.isActive() == 1 then transponderColor = shieldHPColor transponderStatus = 'Active' end
+        local tags = transponder_1.getTags()
+
+        local x,y,s
+        if minimalWidgets then
+            y = transponderWidgetYmin
+            x = transponderWidgetXmin
+            s = transponderWidgetScalemin
+        else
+            y = transponderWidgetY
+            x = transponderWidgetX
+            s = transponderWidgetScale
+        end
+
+        tw = [[
+            <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 ]]..tostring(101+#tags*24)..[[" width="]]..s..[[vw">
+                <rect x="6%" y="12%" width="87%" height="79%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
+                <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
+                <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 ]]..tostring(81+#tags*24)..[[ 18 ]]..tostring(83+#tags*24)..[["/>
+                <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Transponder Status:</text>
+                <text style="fill: ]]..transponderColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="190" y="35">]]..transponderStatus..[[</text>
+            ]]
+
+
+        for i,tag in pairs(tags) do
+            local code = 'redacted'
+            if codeCount > 0 then code = tag end
+            tw = tw .. [[<line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="]]..tostring(54+(i-1)*27)..[[" x2="22" y2="]]..tostring(80.7+(i-1)*27)..[["/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="]]..tostring(73+(i-1)*27)..[[">]]..code..[[</text>]]
+        end
+        tw = tw .. '</svg>'
+    end
+
+    return tw
 end
 
 function minimalShipInfo()
@@ -736,6 +984,9 @@ function minimalShipInfo()
 end
 
 function generateScreen()
+    if db_1 and db_1.hasKey('minimalWidgets') then
+        minimalWidgets = db_1.getIntValue('minimalWidgets') == 1
+    end 
     html = [[ <html> <body style="font-family: Calibri;"> ]]
     html = html .. brakeWidget()
     if showScreen then 
@@ -748,6 +999,9 @@ function generateScreen()
             html = html .. positionInfoWidget()
             html = html .. shipNameWidget()
         end
+        if transponder_1 then html = html .. transponderWidget() end
+        html = html .. hpWidget()
+        if shield_1 then html = html .. resistWidget() end
         html = html .. engineWidget()
         if useLogo then
             html = html .. [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
@@ -766,6 +1020,7 @@ end
 function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
+            if db_1.hasKey('generateAutoCode') == 1 then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
             if db_1.hasKey('toggleBrakes') == 1 then toggleBrakes = db_1.getIntValue('toggleBrakes') == 1 end
             if db_1.hasKey('caerusOption') == 1 then caerusOption = db_1.getIntValue('caerusOption') == 1 end
             if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
@@ -803,7 +1058,34 @@ function globalDB(action)
             if db_1.hasKey('useLogo') == 1 then useLogo = db_1.getIntValue('useLogo') == 1 end
             if db_1.hasKey('logoSVG') == 1 then logoSVG = db_1.getStringValue('logoSVG') end
             if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
+            if db_1.hasKey('homeBaseLocation') == 1 then homeBaseLocation = db_1.getStringValue('homeBaseLocation') end
+            if db_1.hasKey('homeBaseDistance') == 1 then homeBaseDistance = db_1.getIntValue('homeBaseDistance') end
+
+            if db_1.hasKey('autoVent') == 1 then autoVent = db_1.getIntValue('autoVent') == 1 end
+
+            if db_1.hasKey('hpWidgetX') == 1 then hpWidgetX = db_1.getFloatValue('hpWidgetX') end
+            if db_1.hasKey('hpWidgetY') == 1 then hpWidgetY = db_1.getFloatValue('hpWidgetY') end
+            if db_1.hasKey('hpWidgetScale') == 1 then hpWidgetScale = db_1.getFloatValue('hpWidgetScale') end
+            if db_1.hasKey('shieldHPColor') == 1 then shieldHPColor = db_1.getStringValue('shieldHPColor') end
+            if db_1.hasKey('ccsHPColor') == 1 then ccsHPColor = db_1.getStringValue('ccsHPColor') end
+
+            if db_1.hasKey('resistWidgetX') == 1 then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
+            if db_1.hasKey('resistWidgetY') == 1 then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
+            if db_1.hasKey('resistWidgetScale') == 1 then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
+            if db_1.hasKey('antiMatterColor') == 1 then antiMatterColor = db_1.getStringValue('antiMatterColor') end
+            if db_1.hasKey('electroMagneticColor') == 1 then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
+            if db_1.hasKey('kineticColor') == 1 then kineticColor = db_1.getStringValue('kineticColor') end
+            if db_1.hasKey('thermicColor') == 1 then thermicColor = db_1.getStringValue('thermicColor') end
+
+            if db_1.hasKey('transponderWidgetX') == 1 then transponderWidgetX = db_1.getFloatValue('transponderWidgetX') end
+            if db_1.hasKey('transponderWidgetY') == 1 then transponderWidgetY = db_1.getFloatValue('transponderWidgetY') end
+            if db_1.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = db_1.getFloatValue('transponderWidgetScale') end
+            if db_1.hasKey('transponderWidgetXmin') == 1 then transponderWidgetXmin = db_1.getFloatValue('transponderWidgetXmin') end
+            if db_1.hasKey('transponderWidgetYmin') == 1 then transponderWidgetYmin = db_1.getFloatValue('transponderWidgetYmin') end
+            if db_1.hasKey('transponderWidgetScalemin') == 1 then transponderWidgetScalemin = db_1.getFloatValue('transponderWidgetScalemin') end
+
         elseif action == 'save' then
+            if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
             if toggleBrakes then db_1.setIntValue('toggleBrakes',1) else db_1.setIntValue('toggleBrakes',0) end
             if caerusOption then db_1.setIntValue('caerusOption',1) else db_1.setIntValue('caerusOption',0) end
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
@@ -841,6 +1123,30 @@ function globalDB(action)
             if useLogo then db_1.setIntValue('useLogo',1) else db_1.setIntValue('useLogo',0) end
             db_1.setStringValue('logoSVG',logoSVG)
             if minimalWidgets then db_1.setIntValue('minimalWidgets',1) else db_1.setIntValue('minimalWidgets',0) end
+            if homeBaseLocation then db_1.setStringValue('homeBaseLocation',homeBaseLocation) end
+            db_1.setIntValue('homeBaseDistance',homeBaseDistance)
+            if autoVent then db_1.setIntValue('autoVent',1) else db_1.setIntValue('autoVent',0) end
+
+            db_1.setFloatValue('hpWidgetX',hpWidgetX)
+            db_1.setFloatValue('hpWidgetY',hpWidgetY)
+            db_1.setFloatValue('hpWidgetScale',hpWidgetScale)
+            db_1.setStringValue('shieldHPColor',shieldHPColor)
+            db_1.setStringValue('ccsHPColor',ccsHPColor)
+
+            db_1.setFloatValue('resistWidgetX',resistWidgetX)
+            db_1.setFloatValue('resistWidgetY',resistWidgetY)
+            db_1.setFloatValue('resistWidgetScale',resistWidgetScale)
+            db_1.setStringValue('antiMatterColor',antiMatterColor)
+            db_1.setStringValue('electroMagneticColor',electroMagneticColor)
+            db_1.setStringValue('kineticColor',kineticColor)
+            db_1.setStringValue('thermicColor',thermicColor)
+
+            db_1.setFloatValue('transponderWidgetX',transponderWidgetX)
+            db_1.setFloatValue('transponderWidgetY',transponderWidgetY)
+            db_1.setFloatValue('transponderWidgetScale',transponderWidgetScale)
+            db_1.setFloatValue('transponderWidgetXmin',transponderWidgetXmin)
+            db_1.setFloatValue('transponderWidgetYmin',transponderWidgetYmin)
+            db_1.setFloatValue('transponderWidgetScalemin',transponderWidgetScalemin)
         end
     end
 end
@@ -852,7 +1158,6 @@ function Kinematic.computeAccelerationTime(initial, acceleration, final)
     -- ans: t = (vf - vi)/a
     return (final - initial)/acceleration
 end
-
 
 function Kinematic.computeDistanceAndTime(initial,final,mass,thrust,t50,brakeThrust)
 
@@ -914,7 +1219,6 @@ function Kinematic.computeDistanceAndTime(initial,final,mass,thrust,t50,brakeThr
     return distanceToMax+d, timeToMax+t
 end
 
-
 function Kinematic.computeTravelTime(initial, acceleration, distance)
     if distance == 0 then return 0 end
     if acceleration ~= 0 then
@@ -924,7 +1228,6 @@ function Kinematic.computeTravelTime(initial, acceleration, distance)
     assert(initial > 0, 'Acceleration and initial speed are both zero.')
     return distance/initial
 end
-
 
 function isNumber(n)  return type(n)           == 'number' end
 function isSNumber(n) return type(tonumber(n)) == 'number' end
