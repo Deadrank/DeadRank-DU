@@ -250,7 +250,6 @@ if construct.isWarping() == 1 then
 end
 -----------------------------------------
 
-
 -- Generate Screen overlay --
 if speed ~= nil then generateScreen() end
 -----------------------------

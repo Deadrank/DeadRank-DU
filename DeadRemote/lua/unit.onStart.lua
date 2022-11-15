@@ -14,7 +14,8 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.0.2'
+hudVersion = 'v4.0.3'
+system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
 validatePilot = false --export
@@ -176,7 +177,7 @@ milEng = false
 
 -- Shield Initialize --
 dmgTick = 0
-homeBaseVec = nil
+homeBaseVec = vec3()
 if homeBaseLocation ~= '' then
     homeBaseVec = vec3(convertWaypoint(homeBaseLocation))
 end
