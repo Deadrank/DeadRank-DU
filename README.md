@@ -54,6 +54,8 @@ Any items listed above as manual link, must be linked *before* running  the auto
  - `coreid`: Prints your ships core ID
  - `clear damage`: Clears damage from the current chair against the current target
  - `clear all damage`: Clears all damage from the current chair against all targets
+ - `? <string>`: Search the databank for values that contain the `<string>`
+ - `/G <key> <value>`: Searches for the `<key>` in the databank and if found, sets it to `<value>`
 
 ### Key Lua Parameters
  - `useDB`:  If a databank is connected, use any parameters stored in it over what is entered in the lua parameters. If you want to change parameter values, you need to ensure this is unchecked (Default = enabled)
