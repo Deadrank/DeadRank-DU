@@ -87,7 +87,6 @@ if auto_follow then
             followID = targetID
             targetSpeed = db_1.getFloatValue('targetSpeed') + followSpeedMod
             targetDist = db_1.getFloatValue('targetDistance')
-            if db_1.hasKey('followDistance') == 1 then followDistance = db_1.getFloatValue('followDistance') else followDistance = defautlFollowDistance end
 
             -- Set cruise speed to targets speed
             brakeInput = 0

@@ -524,17 +524,13 @@ function radarWidget()
 end
 
 function identifiedWidget()
-    local identList = radar_1.getIdentifiedConstructIds()
-    local targetID = radar_1.getTargetId()
-    if not contains(identList,targetID) and targetID ~= 0 then table.insert(identList,targetID) end
-    if targetID == 0 then warnings['cored'] = nil warnings['friendly'] = nil end
-
+    local id = radar_1.getTargetId()
     local iw = ''
-    local count = 1
+    if id ~= 0 then
+        if targetID == 0 then warnings['cored'] = nil warnings['friendly'] = nil end
 
-    local targetSpeedSVG = ''
+        local targetSpeedSVG = ''
 
-    for i,id in pairs(identList) do
         local size = radar_1.getConstructCoreSize(id)
         local dmg = 0
         if write_db and dmgTracker[tostring(id)] then write_db.setFloatValue('damage - ' .. tostring(id) .. ' - ' .. pilotName,dmgTracker[tostring(id)]) end
@@ -576,182 +572,166 @@ function identifiedWidget()
         local lineColor = 'lightgrey'
         local targetIdentified = radar_1.isConstructIdentified(id) == 1
 
-        local x, y
-        if not minimalWidgets and id ~= targetID then 
-            y = 11.25+2.5*(count-1)
-            x = 1
-            if count <= 5 and id ~= targetID then
-                iw = iw .. [[
-                    <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 50" width="10vw">
-                        <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
-                        <text style="fill: ]]..cardText..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">]]..string.format('%s - [%s] %s (%s)',size,uniqueCode,shortName,distString)..[[</text>
-                    </svg>
-                ]]
-                count = count + 1
+
+        if abandonded or showAlerts then warnings['cored'] = 'svgTarget' else warnings['cored'] = nil end
+        if friendly or showAlerts then warnings['friendly'] = 'svgGroup' else warnings['friendly'] = nil end
+
+        local speedVec = vec3(construct.getWorldVelocity())
+        local mySpeed = speedVec:len() * 3.6
+        local myMass = construct.getMass()
+
+        local targetSpeedString = 'Not Identified'
+        if targetIdentified then targetSpeed = radar_1.getConstructSpeed(id) * 3.6 targetSpeedString = formatNumber(targetSpeed,'speed') end
+        local speedDiff = 0
+        if targetIdentified then speedDiff = mySpeed-targetSpeed end
+        
+        local targetSpeedColor = neutralFontColor
+        if targetIdentified then
+            if speedDiff < -1000 then targetSpeedColor = warning_outline_color
+            elseif speedDiff > 1000 then targetSpeedColor = 'rgb(56, 255, 56)'
             end
         end
-        if id == targetID then
-            if abandonded or showAlerts then warnings['cored'] = 'svgTarget' else warnings['cored'] = nil end
-            if friendly or showAlerts then warnings['friendly'] = 'svgGroup' else warnings['friendly'] = nil end
+        targetSpeedSVG = [[
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="73">Speed:</text>
+            <text style="fill: ]]..targetSpeedColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="80" y="73">]]..targetSpeedString..[[</text>
+        ]]
 
-            local speedVec = vec3(construct.getWorldVelocity())
-            local mySpeed = speedVec:len() * 3.6
-            local myMass = construct.getMass()
+        local updateTimer = false
+        if system.getArkTime() - lastUpdateTime > 0.5 and lastUpdateTime ~= 0 then 
+            lastUpdateTime = system.getArkTime()
+            updateTimer = true
+        elseif lastUpdateTime == 0 then
+            lastUpdateTime = system.getArkTime()
+            lastDistance = distance
+        end
 
-            local targetSpeedString = 'Not Identified'
-            if targetIdentified then targetSpeed = radar_1.getConstructSpeed(id) * 3.6 targetSpeedString = formatNumber(targetSpeed,'speed') end
-            local speedDiff = 0
-            if targetIdentified then speedDiff = mySpeed-targetSpeed end
-            
-            local targetSpeedColor = neutralFontColor
-            if targetIdentified then
-                if speedDiff < -1000 then targetSpeedColor = warning_outline_color
-                elseif speedDiff > 1000 then targetSpeedColor = 'rgb(56, 255, 56)'
+        if updateTimer then
+            local localGapCompare = 'Stable'
+            local gap = distance - lastDistance
+            if gap < -250 then localGapCompare = 'Closing' 
+            elseif gap > 250 then localGapCompare = 'Parting'
+            end
+            gapCompare = localGapCompare
+            lastDistance = distance
+        end
+        local gapColor = neutralFontColor
+        if gapCompare == 'Closing' then gapColor = 'rgb(56, 255, 56)' elseif gapCompare == 'Parting' then gapColor = warning_outline_color end
+        local distanceCompareSVG = [[
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="81" x2="22" y2="104"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="100">Gap:</text>
+            <text style="fill: ]]..gapColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="65" y="100">]]..tostring(gapCompare)..[[</text>
+        ]]
+
+        if updateTimer and targetIdentified then
+            local localSpeedCompare = 'No Change'
+            if lastSpeed then
+                local speedChange = targetSpeed - lastSpeed
+                if speedChange < -100 then localSpeedCompare = 'Braking'
+                elseif speedChange > 100 then localSpeedCompare = 'Accelerating'
                 end
+                speedCompare = localSpeedCompare
             end
-            targetSpeedSVG = [[
-                <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
-                <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="73">Speed:</text>
-                <text style="fill: ]]..targetSpeedColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="80" y="73">]]..targetSpeedString..[[</text>
+            lastSpeed = targetSpeed
+        elseif not targetIdentified then
+            speedCompare = 'Not Identified'
+        end
+        local speedCompareColor = neutralFontColor
+        if speedCompare == 'Braking' then speedCompareColor = warning_outline_color elseif speedCompare == 'Accelerating' then speedCompareColor = 'rgb(56, 255, 56)' end
+        local speedCompareSVG = [[
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="108" x2="22" y2="131"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="127">&#8796;Speed:</text>
+            <text style="fill: ]]..speedCompareColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="127">]]..tostring(speedCompare)..[[</text>
+        ]]
+
+        local dmgSVG = [[
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="135" x2="22" y2="158"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="154">Damage:</text>
+            <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="154">]]..string.format('%s (%.2f%%)',dmg,(1-dmgRatio)*100)..[[</text>
+        ]]
+
+        local mass = radar_1.getConstructMass(id)
+        local topSpeed = (50000/3.6-10713*(mass-10000)/(853926+(mass-10000)))*3.6
+        if targetIdentified then
+            topSpeed = clamp(topSpeed,20000,50000)
+        else
+            topSpeed = 0
+        end
+        local topSpeedSVG = ''
+        if topSpeed > 0 then
+            topSpeedSVG = [[
+                <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="162" x2="22" y2="185"/>
+                <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="181">Top Speed:</text>
+                <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="110" y="181">]]..formatNumber(topSpeed,'speed')..[[</text>
             ]]
+        end
 
-            local updateTimer = false
-            if system.getArkTime() - lastUpdateTime > 0.5 and lastUpdateTime ~= 0 then 
-                lastUpdateTime = system.getArkTime()
-                updateTimer = true
-            elseif lastUpdateTime == 0 then
-                lastUpdateTime = system.getArkTime()
-                lastDistance = distance
-            end
-
-            if updateTimer then
-                local localGapCompare = 'Stable'
-                local gap = distance - lastDistance
-                if gap < -250 then localGapCompare = 'Closing' 
-                elseif gap > 250 then localGapCompare = 'Parting'
-                end
-                gapCompare = localGapCompare
-                lastDistance = distance
-            end
-            local gapColor = neutralFontColor
-            if gapCompare == 'Closing' then gapColor = 'rgb(56, 255, 56)' elseif gapCompare == 'Parting' then gapColor = warning_outline_color end
-            local distanceCompareSVG = [[
-                <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="81" x2="22" y2="104"/>
-                <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="100">Gap:</text>
-                <text style="fill: ]]..gapColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="65" y="100">]]..tostring(gapCompare)..[[</text>
+        local info = radar_1.getConstructInfos(id)
+        local weapons = 'False'
+        if info['weapons'] ~= 0 then weapons = 'True' end
+        local dataSVG = ''
+        if targetIdentified then
+            dataSVG = [[
+                <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="189" x2="22" y2="212"/>
+                <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="208">Armed:</text>
+                <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="208">]]..weapons..[[</text>
             ]]
+        end
 
-            if updateTimer and targetIdentified then
-                local localSpeedCompare = 'No Change'
-                if lastSpeed then
-                    local speedChange = targetSpeed - lastSpeed
-                    if speedChange < -100 then localSpeedCompare = 'Braking'
-                    elseif speedChange > 100 then localSpeedCompare = 'Accelerating'
-                    end
-                    speedCompare = localSpeedCompare
-                end
-                lastSpeed = targetSpeed
-            elseif not targetIdentified then
-                speedCompare = 'Not Identified'
-            end
-            local speedCompareColor = neutralFontColor
-            if speedCompare == 'Braking' then speedCompareColor = warning_outline_color elseif speedCompare == 'Accelerating' then speedCompareColor = 'rgb(56, 255, 56)' end
-            local speedCompareSVG = [[
-                <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="108" x2="22" y2="131"/>
-                <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="127">&#8796;Speed:</text>
-                <text style="fill: ]]..speedCompareColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="127">]]..tostring(speedCompare)..[[</text>
-            ]]
-
-            local dmgSVG = [[
-                <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="135" x2="22" y2="158"/>
-                <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="154">Damage:</text>
-                <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="154">]]..string.format('%s (%.2f%%)',dmg,(1-dmgRatio)*100)..[[</text>
-            ]]
-
-            local mass = radar_1.getConstructMass(id)
-            local topSpeed = (50000/3.6-10713*(mass-10000)/(853926+(mass-10000)))*3.6
-            if targetIdentified then
-                topSpeed = clamp(topSpeed,20000,50000)
+        local owner = ''
+        if radar_1.hasMatchingTransponder(id) == 1 then
+            owner = radar_1.getConstructOwnerEntity(id)
+            if owner['isOrganization'] then
+                owner = system.getOrganization(owner['id'])
+                owner = owner['tag']
             else
-                topSpeed = 0
+                owner = system.getPlayerName(owner['id'])
             end
-            local topSpeedSVG = ''
-            if topSpeed > 0 then
-                topSpeedSVG = [[
-                    <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="162" x2="22" y2="185"/>
-                    <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="181">Top Speed:</text>
-                    <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="110" y="181">]]..formatNumber(topSpeed,'speed')..[[</text>
-                ]]
-            end
+        elseif friendlySIDs[id] then
+            owner = friendlySIDs[id]
+        end
+        if owner ~= '' then 
+            owner = [[<text style="fill: white; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="5">]]..string.format('Owned by: %s (%s)',owner,id)..[[</text>]]
+        end
 
-            local info = radar_1.getConstructInfos(id)
-            local weapons = 'False'
-            if info['weapons'] ~= 0 then weapons = 'True' end
-            local dataSVG = ''
-            if targetIdentified then
-                dataSVG = [[
-                    <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="189" x2="22" y2="212"/>
-                    <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="208">Armed:</text>
-                    <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="208">]]..weapons..[[</text>
-                ]]
-            end
+        local x,y,s
+        y = 11.25
+        x = 1.75
+        s = 11.25
+        iw = iw .. [[
+            <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
+                ]]..owner..[[
+                <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
+                <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
+                <polygon style="stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 225 18 227"/>
+                <text style="fill: ]]..cardText..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">]]..string.format('%s - [%s] %s (%s)',size,uniqueCode,shortName,distString)..[[</text>
+                ]]..targetSpeedSVG..[[
+                ]]..distanceCompareSVG..[[
+                ]]..speedCompareSVG..[[
+                ]]..dmgSVG
 
-            local owner = ''
-            if radar_1.hasMatchingTransponder(id) == 1 then
-                owner = radar_1.getConstructOwnerEntity(id)
-                if owner['isOrganization'] then
-                    owner = system.getOrganization(owner['id'])
-                    owner = owner['tag']
-                else
-                    owner = system.getPlayerName(owner['id'])
-                end
-            elseif friendlySIDs[id] then
-                owner = friendlySIDs[id]
-            end
-            if owner ~= '' then 
-                owner = [[<text style="fill: white; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="5">]]..string.format('Owned by: %s (%s)',owner,id)..[[</text>]]
-            end
+        if targetIdentified then
+            iw = iw .. topSpeedSVG .. dataSVG
+        end
 
-            y = 11.25
-            x = 10
-            s = 11.25
-            if minimalWidgets then x = 49.5 y = -0.9 s = 10 end
+        iw = iw.. [[
+            </svg>
+        ]]
+
+        if targetIndicators or showAlerts then
             iw = iw .. [[
-                <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
-                    ]]..owner..[[
-                    <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
-                    <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
-                    <polygon style="stroke-linejoin: round; fill: ]]..cardFill..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 225 18 227"/>
-                    <text style="fill: ]]..cardText..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">]]..string.format('%s - [%s] %s (%s)',size,uniqueCode,shortName,distString)..[[</text>
-                    ]]..targetSpeedSVG..[[
-                    ]]..distanceCompareSVG..[[
-                    ]]..speedCompareSVG..[[
-                    ]]..dmgSVG
-
-            if targetIdentified then
-                iw = iw .. topSpeedSVG .. dataSVG
-            end
-
-            iw = iw.. [[
+                <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+                    <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.30 * screenWidth) ..[[" y="]].. tostring(.50 * screenHeight) ..[[" style="fill: ]]..speedCompareColor..[[;">
+                        ]]..warningSymbols['svgTarget']..[[
+                    </svg>
+                    <text x="]].. tostring(.327 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) .. [[" style="fill: ]]..neutralFontColor..[[;" font-size="1.7vh" font-weight="bold">Speed Change:</text>
+                    <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..speedCompare..[[</text>
+                    <text x="]].. tostring(.359 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) .. [[" style="fill: ]]..neutralFontColor..[[;" font-size="1.7vh" font-weight="bold">Speed: </text>
+                    <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..targetSpeedString..[[</text>
                 </svg>
             ]]
-
-            if targetIndicators or showAlerts then
-                iw = iw .. [[
-                    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                        <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.30 * screenWidth) ..[[" y="]].. tostring(.50 * screenHeight) ..[[" style="fill: ]]..speedCompareColor..[[;">
-                            ]]..warningSymbols['svgTarget']..[[
-                        </svg>
-                        <text x="]].. tostring(.327 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) .. [[" style="fill: ]]..neutralFontColor..[[;" font-size="1.7vh" font-weight="bold">Speed Change:</text>
-                        <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..speedCompare..[[</text>
-                        <text x="]].. tostring(.359 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) .. [[" style="fill: ]]..neutralFontColor..[[;" font-size="1.7vh" font-weight="bold">Speed: </text>
-                        <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..targetSpeedString..[[</text>
-                    </svg>
-                ]]
-            end
         end
     end
-    
     return iw
 end
 

@@ -13,7 +13,19 @@ if AR_Mode == 'ALL' then
         for _,key in pairs(write_db.getKeyList()) do
             if string.starts(key,'abnd-') and not string.starts(key,'abnd-name-') then
                 abndPos = write_db.getStringValue(key)
-                AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = convertWaypoint(abndPos)
+                local abndVec = convertWaypoint(abndPos)
+                local dist = vec3(abndVec - constructPosition):len()*0.000005
+                if radar_1 and dist < 1.95 then
+                    if radar_1.getConstructDistance(string.sub(key,6)) ~= 0 then
+                        AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = abndVec
+                    else
+                        system.print('-- Removing '.. write_db.getStringValue(string.gsub(key,'-','-name-')) ..' ('.. write_db.getStringValue(key) ..')')
+                        write_db.clearValue(string.gsub(key,'-','-name-'))
+                        write_db.clearValue(key)
+                    end
+                else
+                    AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = abndVec
+                end
             end
         end
     end
@@ -67,7 +79,7 @@ end
 ARSVG = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
 for name,pos in pairs(AR_Generate) do
     local pDist = vec3(pos - constructPosition):len()
-    if pDist*0.000005 < abandonedCoreDist or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') then 
+    if (pDist*0.000005 < abandonedCoreDist and pDist*0.000005 > 1.95 ) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') then 
         local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
         if pInfo[3] ~= 0 then
             if pInfo[1] < .01 then pInfo[1] = .01 end

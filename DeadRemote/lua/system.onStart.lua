@@ -1029,7 +1029,6 @@ function globalDB(action)
             if db_1.hasKey('showFuelPanel') == 1 then showFuelPanel = db_1.getIntValue('showFuelPanel') == 1 end
             if db_1.hasKey('showHelper') == 1 then showHelper = db_1.getIntValue('showHelper') == 1 end
             if db_1.hasKey('defaultHoverHeight') == 1 then defaultHoverHeight = db_1.getIntValue('defaultHoverHeight') end
-            if db_1.hasKey('defautlFollowDistance') == 1 then defautlFollowDistance = db_1.getIntValue('defautlFollowDistance') end
             if db_1.hasKey('topHUDLineColorSZ') == 1 then topHUDLineColorSZ = db_1.getStringValue('topHUDLineColorSZ') end
             if db_1.hasKey('topHUDFillColorSZ') == 1 then topHUDFillColorSZ = db_1.getStringValue('topHUDFillColorSZ') end
             if db_1.hasKey('textColorSZ') == 1 then textColorSZ = db_1.getStringValue('textColorSZ') end
@@ -1094,7 +1093,6 @@ function globalDB(action)
             if showHelper then db_1.setIntValue('showHelper',1) else db_1.setIntValue('showHelper',0) end
             if validatePilot then db_1.setIntValue('validatePilot',1) else db_1.setIntValue('validatePilot',0) end
             db_1.setIntValue('defaultHoverHeight',defaultHoverHeight)
-            db_1.setIntValue('defautlFollowDistance',defautlFollowDistance)
             db_1.setStringValue('topHUDLineColorSZ',topHUDLineColorSZ)
             db_1.setStringValue('topHUDFillColorSZ',topHUDFillColorSZ)
             db_1.setStringValue('textColorSZ',textColorSZ)
