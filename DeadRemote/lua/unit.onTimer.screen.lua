@@ -1,5 +1,7 @@
 Nav:update()
 
+arkTime = system.getArkTime()
+
 -- Check player seated status --
 seated = player.isSeated()
 if seated == 1 and player.isFrozen() == 0 then
