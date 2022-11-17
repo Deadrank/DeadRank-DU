@@ -151,7 +151,6 @@ inSZ = construct.isInPvPZone() == 0
 SZD = construct.getDistanceToSafeZone()
 
 --- Weapons --
-initialResistWait = 15 --export
 weaponDataList = {}
 shieldDmgTrack = {
     ['L'] = L_Shield_HP,

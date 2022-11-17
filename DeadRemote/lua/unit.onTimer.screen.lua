@@ -232,7 +232,7 @@ if shield_1 then
     end
 
     local coreHP = 0
-    if core_1 then coreHP = (core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress() end
+    if core then coreHP = (core.getMaxCoreStress()-core.getCoreStress())/core.getMaxCoreStress() end
 end
 -- End Shield Updates --
 

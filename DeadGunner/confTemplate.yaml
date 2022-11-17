@@ -1,4 +1,4 @@
-name: DeadGunner v4.0.4
+name: DeadGunner v4.0.5
 pvp: true
 
 slots:
@@ -13,12 +13,6 @@ slots:
         select: manual
     db:
         class: DataBank
-        select: all
-    shield:
-        class: ShieldGeneratorUnit
-        select: all
-    transponder:
-        class: TransponderUnit
         select: all
 
 handlers:

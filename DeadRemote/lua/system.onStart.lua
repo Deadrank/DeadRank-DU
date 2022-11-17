@@ -647,9 +647,9 @@ function hpWidget()
         shieldPercent = shield_1.getShieldHitpoints()/shield_1.getMaxShieldHitpoints()*100
     end
     CCSPercent = 0
-    if core_1 then
-        if core_1.getMaxCoreStress() then
-            CCSPercent = 100*(core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress()
+    if core then
+        if core.getMaxCoreStress() then
+            CCSPercent = 100*(core.getMaxCoreStress()-core.getCoreStress())/core.getMaxCoreStress()
         end
     end
     if CCSPercent < 25 and CCSPercent > 5 and db_1 then

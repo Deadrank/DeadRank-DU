@@ -372,7 +372,6 @@ function globalDB(action)
             write_db.setFloatValue('warning_size',warning_size)
             write_db.setStringValue('warning_outline_color',warning_outline_color)
             write_db.setStringValue('warning_fill_color',warning_fill_color)
-            if showCode then write_db.setIntValue('showCode',1) else write_db.setIntValue('showCode',0) end
 
             write_db.setStringValue('antiMatterColor',antiMatterColor)
             write_db.setStringValue('electroMagneticColor',electroMagneticColor)

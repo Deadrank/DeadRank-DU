@@ -1,5 +1,18 @@
 arkTime = system.getArkTime()
 
+-- SZ Boundary --
+inSZ = construct.isInPvPZone() == 0
+SZD = construct.getDistanceToSafeZone()
+bgColor = bottomHUDFillColorSZ 
+fontColor = textColorSZ
+lineColor = bottomHUDLineColorSZ
+if not inSZ then 
+    lineColor = bottomHUDLineColorPVP
+    bgColor = bottomHUDFillColorPVP
+    fontColor = textColorPVP
+end
+---------------------
+
 if bootTimer >= 2 then
     generateHTML()
 end
@@ -18,7 +31,7 @@ if AR_Mode == 'ALL' then
                 if radar_1 and dist < 1.95 then
                     if radar_1.getConstructDistance(string.sub(key,6)) ~= 0 then
                         AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = abndVec
-                    else
+                    elseif not inSZ then
                         system.print('-- Removing '.. write_db.getStringValue(string.gsub(key,'-','-name-')) ..' ('.. write_db.getStringValue(key) ..')')
                         write_db.clearValue(string.gsub(key,'-','-name-'))
                         write_db.clearValue(key)
@@ -79,7 +92,7 @@ end
 ARSVG = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
 for name,pos in pairs(AR_Generate) do
     local pDist = vec3(pos - constructPosition):len()
-    if (pDist*0.000005 < abandonedCoreDist and pDist*0.000005 > 1.95 ) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') then 
+    if (pDist*0.000005 < abandonedCoreDist and pDist*0.000005 > 1.95 or inSZ ) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') then 
         local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
         if pInfo[3] ~= 0 then
             if pInfo[1] < .01 then pInfo[1] = .01 end
@@ -126,20 +139,6 @@ for name,pos in pairs(AR_Generate) do
 end
 ARSVG = ARSVG .. '</svg>'
 -----------------------------------------------------------
-
-
--- SZ Boundary --
-inSZ = construct.isInPvPZone() == 0
-SZD = construct.getDistanceToSafeZone()
-bgColor = bottomHUDFillColorSZ 
-fontColor = textColorSZ
-lineColor = bottomHUDLineColorSZ
-if not inSZ then 
-    lineColor = bottomHUDLineColorPVP
-    bgColor = bottomHUDFillColorPVP
-    fontColor = textColorPVP
-end
----------------------
 
 -- Radar Updates --
 if radar_1 and cr == nil then
