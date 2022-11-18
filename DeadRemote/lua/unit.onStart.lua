@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.0.5'
+hudVersion = 'v4.0.6'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
@@ -129,9 +129,8 @@ rollTimer = 120 --Roll code timer in seconds
 if pcall(require,'autoconf/custom/transponder') then 
     codeSeed = tonumber(require('autoconf/custom/transponder'))
 end
-if codeSeed ~= nil then
-    unit.setTimer('code',0.25)
-end
+unit.setTimer('code',0.25)
+
 -----------------
 
 ---- Initialization ---

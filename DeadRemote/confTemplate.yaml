@@ -1,4 +1,4 @@
-name: DeadRemote v4.0.5
+name: DeadRemote v4.0.6
 
 slots:
     core:
@@ -10,12 +10,6 @@ slots:
         class: AntiGravityGeneratorUnit
     warpdrive:
         class: WarpDriveUnit
-    atmofueltank:
-        class: AtmoFuelContainer
-        select: all
-    spacefueltank:
-        class: SpaceFuelContainer
-        select: all
     rocketfueltank:
         class: RocketFuelContainer
         select: all
@@ -29,6 +23,12 @@ slots:
         select: all
     transponder:
         class: TransponderUnit
+        select: all
+    spacefueltank:
+        class: SpaceFuelContainer
+        select: all
+    atmofueltank:
+        class: AtmoFuelContainer
         select: all
 
 handlers:
