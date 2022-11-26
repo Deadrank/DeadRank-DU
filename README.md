@@ -165,6 +165,17 @@ The HUD also includes many other smaller features including:
 ## Additional Files
 This remote HUD can take advantage of additional files locally put in the `lua/autoconf/custom` folder. The advantage of using these custom files is that none of the data is stored on the controller itself. So sensative information can't be retrieved from the controller or databank even if the ship is captured. The two files the remote uses are the following.
 
+### DeadRemote_CustomFileIndex.lua
+This file is used to list out all custom waypoint files you will use with DeadRemote. Each file can have a custom display name which is shown when cycling between the various AR Modes. The format of the file is the following:
+```
+return {
+	{DisplayName = "Default File",FilePath = 'autoconf/custom/AR_Waypoints'},
+	{DisplayName = "Asteroids: Near SafeZone",FilePath = 'autoconf/custom/waypoints/Asteroids_NearSafeZone'},
+	{DisplayName = "Asteroids: Near Jago",FilePath = 'autoconf/custom/waypoints/Asteroids_NearJago'},
+	{DisplayName = "Asteroids: Near Teoma",FilePath = 'autoconf/custom/waypoints/Asteroids_NearTeoma'},
+	{DisplayName = "Personal Waypoints",FilePath = 'autoconf/custom/waypoints/Personal_Waypoints'}
+}
+```
 ### AR_Waypoints.lua
 This file is used to load AR points into your HUD that you use on a regular basis so they do not have to be re-entered every time the remote starts. The format of the file is the following:
 ```
