@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.0.8'
+hudVersion = 'v4.0.9'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
@@ -24,9 +24,9 @@ autoVent = true --export Autovent shield at 0 hp
 homeBaseLocation = '' --export Location of home base (to turn off shield)
 homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
 defaultHoverHeight = 42 --export
-topHUDLineColorSZ = 'rgba(125, 150, 160, 1)' --export
-topHUDFillColorSZ = 'rgba(20, 114, 209, 0.75)' --export
-textColorSZ = 'rgba(200, 225, 235, 1)' --export
+topHUDLineColorSZ = 'rgba(150, 175, 185, 1)' --export
+topHUDFillColorSZ = 'rgba(25, 25, 50, 0.35)' --export
+textColorSZ = 'rgba(225, 250, 265, 1)' --export
 topHUDLineColorPVP = 'lightgrey' --export
 topHUDFillColorPVP = 'rgba(255, 0, 0, 0.75)' --export
 textColorPVP = 'black' --export
@@ -147,37 +147,41 @@ AR_Temp_Points = {}
 
 AR_Array = {}
 
-
+legacyFile = false
 if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
     customFiles = require('autoconf/custom/DeadRemote_CustomFileIndex')
     if type(customFiles) == "table" then
-        --system.print(dumpTable(customFiles))
         for waypointFileId,waypointFile in ipairs(customFiles) do
             system.print('Found waypointFileId: '..waypointFileId..' displayName='..waypointFile.DisplayName..' waypointFilePath='..waypointFile.FilePath)
-        
             if pcall(require,waypointFile.FilePath) then
                 waypoints = require(waypointFile.FilePath)
                 if type(waypoints) == "table" then
                     table.insert(validWaypointFiles,waypointFile)
                     AR_Array[#validWaypointFiles] = {}
                     system.print('Adding waypoints from '..waypointFile.FilePath)
-    for name,pos in pairs(waypoints) do
-        AR_Custom_Points[name] = pos
-                        AR_Array[#validWaypointFiles][name]=pos
-        AR_Custom = true
-    end
+                    for name,pos in pairs(waypoints) do
+                        AR_Custom_Points[name] = pos
+                                        AR_Array[#validWaypointFiles][name]=pos
+                        AR_Custom = true
+                    end
                 else
                     system.print('Failed to load waypoints from '..waypointFile.FilePath)
-end
+                end
             else
                 system.print('Failed to load waypoints from '..waypointFile.FilePath)
             end
         end
     end
+else
+    legacyFile = true
+    if pcall(require,'autoconf/custom/AR_Waypoints') then 
+        waypoints = require('autoconf/custom/AR_Waypoints') 
+        for name,pos in pairs(waypoints) do
+            AR_Custom_Points[name] = pos
+            AR_Custom = true
+        end
+    end
 end
---system.print(dumpTable(validWaypointFiles))
---system.print(dumpTable(AR_Custom_Points))
---system.print(dumpTable(AR_Array[1]))
 
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()

@@ -444,22 +444,30 @@ end
 function planetARWidget()
     local arw = planetAR
 
-    if string.find(AR_Mode,"FILE") ~= nil then
-        i, j = string.find(AR_Mode,"FILE")
-        fileNumber = tonumber(string.sub(AR_Mode,j+1))
-        --Catch if they reduced the number of custom files
-        if fileNumber > #validWaypointFiles then AR_Mode= "None" end
+    if legacyFile then
         arw = arw .. [[
-        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..validWaypointFiles[fileNumber].DisplayName..[[</text>
-        </svg>
-        ]]
+            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
+            </svg>
+            ]]
     else
-    arw = arw .. [[
-        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
-        </svg>
-    ]]
+        if string.find(AR_Mode,"FILE") ~= nil then
+            i, j = string.find(AR_Mode,"FILE")
+            fileNumber = tonumber(string.sub(AR_Mode,j+1))
+            --Catch if they reduced the number of custom files
+            if fileNumber > #validWaypointFiles then AR_Mode= "None" end
+            arw = arw .. [[
+                <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+                    <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..validWaypointFiles[fileNumber].DisplayName..[[</text>
+                </svg>
+                ]]
+        else
+            arw = arw .. [[
+            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
+            </svg>
+            ]]
+        end
     end
     return arw
 end
@@ -468,8 +476,8 @@ function shipNameWidget()
     local snw = ''
     snw = snw .. [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
-            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.042 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Code: ]]..tostring(construct.getId())..[[</text>
+            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.13 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
+            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.142 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Code: ]]..tostring(construct.getId())..[[</text>
         </svg>
     ]]
     return snw
@@ -1012,7 +1020,7 @@ function generateScreen()
             html = html .. positionInfoWidget()
             html = html .. shipNameWidget()
         end
-        if transponder_1 then html = html .. transponderWidget() end
+        if transponder_1 and codeCount > 0 then html = html .. transponderWidget() end
         html = html .. hpWidget()
         if shield_1 then html = html .. resistWidget() end
         html = html .. engineWidget()
