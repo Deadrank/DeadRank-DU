@@ -196,7 +196,7 @@ end
 -- Engine commands
 local keepCollinearity = 1 -- for easier reading
 local dontKeepCollinearity = 0 -- for easier reading
-local tolerancePercentToSkipOtherPriorities = 1 -- if we are within this tolerance (in%), we don't go to the next priorities
+local tolerancePercentToSkipOtherPriorities = 1 -- if we are within this tolerance (in%), we do not go to the next priorities
 
 -- Rotation
 local angularAcceleration = torqueFactor * (targetAngularVelocity - constructAngularVelocity)

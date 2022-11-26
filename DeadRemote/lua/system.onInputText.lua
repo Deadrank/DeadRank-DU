@@ -77,7 +77,7 @@ if string.starts(text,'warp') then
             -- Once we know which one is the smallest, compare
             -- it to our current smallest distance and see who
             -- wins! If this one is smaller, we have a new
-            -- winner! Let's record the name and distance of the
+            -- winner! Lets record the name and distance of the
             -- new winner.
             if not minDist or dist < minDist then
                 minDist = dist

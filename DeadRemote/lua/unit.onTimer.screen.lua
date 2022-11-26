@@ -117,6 +117,10 @@ end
 -- Generate on screen planets for Augmented Reality view --
 AR_Generate = {}
 if autopilot_dest_pos ~= nil then AR_Generate['AutoPilot'] = convertWaypoint(autopilot_dest_pos) end
+
+--Correcting cases where the user was using the legacy FROM_FILE mode
+if AR_Mode == 'FROM_FILE' then AR_Mode = "ALL" end
+
 if AR_Mode == 'ALL' then
     for k,v in pairs(AR_Custom_Points) do 
         AR_Generate[k] = convertWaypoint(v)
@@ -127,10 +131,18 @@ if AR_Mode == 'ALL' then
     for k,v in pairs(AR_Temp_Points) do 
         AR_Generate[k] = convertWaypoint(v)
     end
-elseif AR_Mode == 'FROM_FILE' then
-    for k,v in pairs(AR_Custom_Points) do 
+elseif string.find(AR_Mode,"FILE") ~= nil then
+    i, j = string.find(AR_Mode,"FILE")
+    fileNumber = tonumber(string.sub(AR_Mode,j+1))
+    --Catch if they reduced the number of custom files
+if fileNumber > #validWaypointFiles then AR_Mode= "None"
+else
+    for k,v in pairs(AR_Array[fileNumber]) do 
         AR_Generate[k] = convertWaypoint(v)
     end
+    --AR_Generate = AR_Array_Converted[tonumber(fileNumber)]
+    --if autopilot_dest_pos ~= nil then AR_Generate['AutoPilot'] = convertWaypoint(autopilot_dest_pos) end
+end
 elseif AR_Mode == 'TEMPORARY' then
     for k,v in pairs(AR_Temp_Points) do 
         AR_Generate[k] = convertWaypoint(v)
@@ -232,7 +244,7 @@ if shield_1 then
     end
 
     local coreHP = 0
-    if core then coreHP = (core.getMaxCoreStress()-core.getCoreStress())/core.getMaxCoreStress() end
+    if core_1 then coreHP = (core_1.getMaxCoreStress()-core_1.getCoreStress())/core_1.getMaxCoreStress() end
 end
 -- End Shield Updates --
 

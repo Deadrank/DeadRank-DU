@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.0.6'
+hudVersion = 'v4.0.7'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
@@ -91,7 +91,8 @@ shipInfoWidgetX = 76.5
 shipInfoWidgetY = -0.9
 shipInfoWidgetScale = 10
 
-
+-- WayPoint File Info
+validWaypointFiles = {}
 ------------------------------------
 
 userCode = {}
@@ -143,13 +144,41 @@ AR_Custom_Points = {}
 AR_Custom = false
 AR_Temp = false
 AR_Temp_Points = {}
-if pcall(require,'autoconf/custom/AR_Waypoints') then 
-    waypoints = require('autoconf/custom/AR_Waypoints') 
+
+AR_Array = {}
+
+
+if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
+    customFiles = require('autoconf/custom/DeadRemote_CustomFileIndex')
+    if type(customFiles) == "table" then
+        --system.print(dumpTable(customFiles))
+        for waypointFileId,waypointFile in ipairs(customFiles) do
+            system.print('Found waypointFileId: '..waypointFileId..' displayName='..waypointFile.DisplayName..' waypointFilePath='..waypointFile.FilePath)
+        
+            if pcall(require,waypointFile.FilePath) then
+                waypoints = require(waypointFile.FilePath)
+                if type(waypoints) == "table" then
+                    table.insert(validWaypointFiles,waypointFile)
+                    AR_Array[#validWaypointFiles] = {}
+                    system.print('Adding waypoints from '..waypointFile.FilePath)
     for name,pos in pairs(waypoints) do
         AR_Custom_Points[name] = pos
+                        AR_Array[#validWaypointFiles][name]=pos
         AR_Custom = true
     end
+                else
+                    system.print('Failed to load waypoints from '..waypointFile.FilePath)
 end
+            else
+                system.print('Failed to load waypoints from '..waypointFile.FilePath)
+            end
+        end
+    end
+end
+--system.print(dumpTable(validWaypointFiles))
+--system.print(dumpTable(AR_Custom_Points))
+--system.print(dumpTable(AR_Array[1]))
+
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 maxFuel = 0
@@ -248,7 +277,7 @@ end
 
 -- landing gear
 -- make sure every gears are synchonized with the first
-gearExtended = (Nav.control.isAnyLandingGearDeployed() == 1) -- make sure it's a lua boolean
+gearExtended = (Nav.control.isAnyLandingGearDeployed() == 1) -- make sure it is a lua boolean
 if gearExtended then
     Nav.control.deployLandingGears()
 else

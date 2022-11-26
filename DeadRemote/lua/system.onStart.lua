@@ -52,7 +52,7 @@ function convertWaypoint(wp)
 end
 
 function string.starts(String,Start)
-   return string.sub(String,1,string.len(Start))==Start
+    return string.sub(String,1,string.len(Start))==Start
 end
 
 function formatNumber(val, numType)
@@ -111,7 +111,7 @@ function pipeDist(A,B,loc,reachable)
 
         -- If neither above condition was met, then the
         -- destination point must have be directly out from
-        -- somewhere along the warp pipe. Let's calculate
+        -- somewhere along the warp pipe. Lets calculate
         -- that distance
         else
             dist = vec3(AE:cross(BE)):len()/vec3(AB):len()
@@ -175,15 +175,15 @@ end
 
 function contains(tablelist, val)
     for i=1,#tablelist do
-       if tablelist[i] == val then 
-          return true
-       end
+        if tablelist[i] == val then 
+            return true
+        end
     end
     return false
- end
+    end
 
 
- function WeaponWidgetCreate()
+    function WeaponWidgetCreate()
     if type(weapon) == 'table' and #weapon > 0 then
         local WeaponPanaelIdList = {}
         for i = 1, #weapon do
@@ -443,12 +443,24 @@ end
 
 function planetARWidget()
     local arw = planetAR
+
+    if string.find(AR_Mode,"FILE") ~= nil then
+        i, j = string.find(AR_Mode,"FILE")
+        fileNumber = tonumber(string.sub(AR_Mode,j+1))
+        --Catch if they reduced the number of custom files
+        if fileNumber > #validWaypointFiles then AR_Mode= "None" end
+        arw = arw .. [[
+        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
+            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..validWaypointFiles[fileNumber].DisplayName..[[</text>
+        </svg>
+        ]]
+    else
     arw = arw .. [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
         </svg>
     ]]
-
+    end
     return arw
 end
 
@@ -1184,7 +1196,7 @@ function Kinematic.computeDistanceAndTime(initial,final,mass,thrust,t50,brakeThr
         end
 
         local speedchk = speedUp and function(s) return s >= final end or
-                                     function(s) return s <= final end
+                                        function(s) return s <= final end
         timeToMax  = 2*t50
 
         if speedchk(v(timeToMax)) then
@@ -1210,7 +1222,7 @@ function Kinematic.computeDistanceAndTime(initial,final,mass,thrust,t50,brakeThr
         end
         initial = v(timeToMax)
     end
-    -- At full thrust, motion follows Newton's formula:
+    -- At full thrust, motion follows Newtons formula:
     local a = a0+b0
     local t = Kinematic.computeAccelerationTime(initial, a, final)
     local d = initial*t + a*t*t/2
