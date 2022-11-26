@@ -233,3 +233,8 @@ if text:lower() == 'setsl' then
         system.print('-- Set Squad Leader --')
     end
 end
+if text:lower() == 'clear tracking' then
+    system.print('-- Clearing tracked data --')
+    manual_trajectory = {}
+    trajectory_calc = {}
+end

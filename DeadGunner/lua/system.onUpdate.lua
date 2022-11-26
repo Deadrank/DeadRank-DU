@@ -17,10 +17,11 @@ if bootTimer >= 2 then
     generateHTML()
 end
 
-local constructPosition = vec3(construct.getWorldPosition())
+constructPosition = vec3(construct.getWorldPosition())
 
 -- Generate on screen combat points for Augmented Reality view --
 AR_Generate = {}
+local tID = radar_1.getTargetId()
 if AR_Mode == 'ALL' then
     if write_db then
         for _,key in pairs(write_db.getKeyList()) do
@@ -60,6 +61,28 @@ if AR_Mode == 'ALL' then
             AR_Generate['Squad Leader [LAST KNOWN]'] = convertWaypoint(sl_pos)
         end
     end
+    if manual_trajectory then
+        local rem = {}
+        for tID,tbl in pairs(manual_trajectory) do
+            for i,v in pairs(manual_trajectory[tostring(tID)]) do
+                local tDelta = arkTime-v['ts']
+                if tDelta > 5*60 then 
+                    table.insert(rem,i,1)
+                else
+                    AR_Generate[string.format('T-%.0f [%s]',tDelta,string.sub(tostring(tID),-3))] = v['pos']
+                end
+            end
+            if #rem > 0 then
+                for _,i in pairs(rem) do 
+                    table.remove(manual_trajectory[tostring(tID)],i)
+                end
+            end
+        end
+        for id,v in pairs(trajectory_calc) do
+            local dist = v['speed']*(arkTime-v['ts'])
+            AR_Generate[string.format('Location [%s]',string.sub(tostring(id),-3))] = v['p1'] + dist*(v['p2']-v['p1'] )/vec3(v['p2']-v['p1'] ):len()
+        end
+    end
 elseif AR_Mode == 'FLEET' then
     if FC then
         if radar_1.hasMatchingTransponder(FC) == 1 then
@@ -87,6 +110,27 @@ elseif AR_Mode == 'ABANDONDED' then
                 AR_Generate['[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-'))] = convertWaypoint(abndPos)
             end
         end
+    end
+elseif AR_Mode == 'TRAJECTORY' then
+    local rem = {}
+    for id,tbl in pairs(manual_trajectory) do
+        for i,v in pairs(manual_trajectory[tostring(id)]) do
+            local tDelta = arkTime-v['ts']
+            if tDelta > 5*60 then 
+                table.insert(rem,i,1)
+            else
+                AR_Generate[string.format('T-%.0f [%s]',tDelta,string.sub(tostring(id),-3))] = v['pos']
+            end
+        end
+        if #rem > 0 then
+            for _,i in pairs(rem) do 
+                table.remove(manual_trajectory[tostring(id)],i)
+            end
+        end
+    end
+    for id,v in pairs(trajectory_calc) do
+        local dist = v['speed']*(arkTime-v['ts'])
+        AR_Generate[string.format('Location [%s]',string.sub(tostring(id),-3))] = v['p1'] + dist*(v['p2']-v['p1'] )/vec3(v['p2']-v['p1'] ):len()
     end
 end
 ARSVG = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
@@ -125,6 +169,20 @@ for name,pos in pairs(AR_Generate) do
                         <line x1="0" y1="0" x2="]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                         <line x1="]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                         <text x="]]..tostring(depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                        </g>]]
+            elseif string.starts(name,'T-') then
+                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                        <circle cx="0" cy="0" r="]].. depth*0.80 ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 130, 0, .5);stroke-width:2;" />
+                        <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                        </g>]]
+            elseif string.starts(name,'Location ') then
+                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                        <circle cx="0" cy="0" r="]].. depth*0.80 ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 255, 0, .5);stroke-width:2;" />
+                        <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
+                        <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                         </g>]]
             else
                 ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">

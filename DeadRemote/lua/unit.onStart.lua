@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.0.9'
+hudVersion = 'v4.1.0'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
@@ -24,12 +24,12 @@ autoVent = true --export Autovent shield at 0 hp
 homeBaseLocation = '' --export Location of home base (to turn off shield)
 homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
 defaultHoverHeight = 42 --export
-topHUDLineColorSZ = 'rgba(150, 175, 185, 1)' --export
+topHUDLineColorSZ = 'rgba(150, 175, 185, .75)' --export
 topHUDFillColorSZ = 'rgba(25, 25, 50, 0.35)' --export
 textColorSZ = 'rgba(225, 250, 265, 1)' --export
-topHUDLineColorPVP = 'lightgrey' --export
-topHUDFillColorPVP = 'rgba(255, 0, 0, 0.75)' --export
-textColorPVP = 'black' --export
+topHUDLineColorPVP = 'rgba(220, 50, 50, .75)' --export
+topHUDFillColorPVP = 'rgba(175, 75, 75, 0.30)' --export
+textColorPVP = 'rgba(225, 250, 265, 1)' --export
 fuelTextColor = 'rgba(200, 225, 235, 1)' --export
 neutralFontColor = 'white' --export
 neutralLineColor = 'lightgrey' --export

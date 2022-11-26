@@ -404,7 +404,7 @@ function positionInfoWidget()
         L ]] .. tostring(.0*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
         L ]] .. tostring(.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
         "
-        stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[[" />
+        stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[["/>
 
         <path d="
         M ]] .. tostring(1.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
@@ -1008,7 +1008,12 @@ function generateScreen()
     if db_1 and db_1.hasKey('minimalWidgets') then
         minimalWidgets = db_1.getIntValue('minimalWidgets') == 1
     end 
-    html = [[ <html> <body style="font-family: Calibri;"> ]]
+    html = [[ <html>
+        <style>
+            svg { filter: drop-shadow(0px 0px 1px rgba(255,255,255,.5));}
+        </style>
+            <body style="font-family: Calibri;">
+     ]]
     html = html .. brakeWidget()
     if showScreen then 
         if minimalWidgets then

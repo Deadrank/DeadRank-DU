@@ -1,4 +1,4 @@
-name: DeadGunner v4.0.9
+name: DeadGunner v4.1.0
 pvp: true
 
 slots:
@@ -65,6 +65,10 @@ handlers:
       args: ['lshift']
       lua: |
 {{system.onActionStart.lshift.lua}}
+    onActionStart:
+      args: ['up']
+      lua: |
+{{system.onActionStart.up.lua}}
     onActionStop:
       args: ['lshift']
       lua: |
