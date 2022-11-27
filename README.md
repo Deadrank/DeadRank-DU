@@ -1,5 +1,16 @@
 # Dead's PvP Script Suite
 
+## New features in 4.1.1
+ - Trajectory Estimator:
+   1) Target a construct (identification not required)
+   2) Aim at the construct (diamond on the center of the screen)
+   3) Hit the `space bar` to mark it's current position
+   4) Repeat steps (2) and (3) again
+   5) Destination is set 20su along the calculated trajectory, estimated travel indicator is started, estimated target speed is printed to lua chat
+ - Damage Chart: Chart showing your Outgoing DPS vs Incoming DPS. Chart shows totals, not DPS against a specific target and is avg'd into 10 second chunks
+ - Revamped default color scheme to be a little more immersive
+ - `alt`+`shift`+`4` now sets your auto-pilot destination to your home base location (if you have one set/saved to the databank)
+
 ## Downloads
 Simply right-click on the links below and select "Save Link As..." to download the configuration files:
  - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
