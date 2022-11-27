@@ -156,6 +156,12 @@ inSZ = construct.isInPvPZone() == 0
 SZD = construct.getDistanceToSafeZone()
 
 --- Weapons --
+dpsTracker = {}
+dpsChart = {}
+dpsChart[1] = 0
+dpsChart[2] = 0
+dpsChart[3] = 0
+dpsChart[4] = 0
 weaponDataList = {}
 shieldDmgTrack = {
     ['L'] = L_Shield_HP,

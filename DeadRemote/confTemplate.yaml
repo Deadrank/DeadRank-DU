@@ -1,4 +1,4 @@
-name: DeadRemote v4.1.0
+name: DeadRemote v4.1.1
 
 slots:
     core:
@@ -262,3 +262,7 @@ handlers:
       args: ['option9']
       lua: |
 {{system.onActionStart.opt9.lua}}
+  shield_1:
+    onAbsorbed(damage,rawDamage):
+      lua: |
+{{shield.onAbsorbed.lua}}

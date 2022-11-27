@@ -20,15 +20,19 @@ if targetSelected then
         local p2Time = manual_trajectory[tostring(id)][length-2]['ts']
         local distCalc = vec3(p2-tLoc):len()
         local speed = distCalc/(cTime - p2Time)*3.6
-        local trajectory = p2 + 20/.000005*(tLoc-p2 )/vec3(tLoc-p2 ):len()
-        trajectory_calc[tostring(id)] = {
-            ['p1'] = tLoc,
-            ['ts'] = cTime,
-            ['speed'] = speed/3.6,
-            ['p2'] = trajectory
-        }
-        system.print(string.format('-- Target Calculated speed: %.0f km/h',speed))
-        system.setWaypoint(string.format('::pos{0,0,%.4f,%.4f,%.4f}',trajectory.x,trajectory.y,trajectory.z))
+        if speed > 2000 then
+            local trajectory = p2 + 20/.000005*(tLoc-p2 )/vec3(tLoc-p2 ):len()
+            trajectory_calc[tostring(id)] = {
+                ['p1'] = tLoc,
+                ['ts'] = cTime,
+                ['speed'] = speed/3.6,
+                ['p2'] = trajectory
+            }
+            system.print(string.format('-- Target Calculated speed: %.0f km/h',speed))
+            system.setWaypoint(string.format('::pos{0,0,%.4f,%.4f,%.4f}',trajectory.x,trajectory.y,trajectory.z))
+        else
+            system.print('-- Target is close to stationary --')
+        end
     end
 else
     system.print('-- No target selected --')

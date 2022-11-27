@@ -862,6 +862,43 @@ function resistWidget()
     return rw
 end
 
+function dpsWidget()
+    local dw = ''
+
+    local x,y,s
+    y = 28.25
+    x = 1.75
+    s = 11.25
+    local ts = system.getArkTime()
+    if dpsTracker[string.format('%.0f',ts/10)] == nil then
+        dpsTracker[string.format('%.0f',(ts-10)/10)] = nil
+        dpsTracker[string.format('%.0f',ts/10)] = 0
+        table.insert(dpsChart,1,0)
+    end
+    if #dpsChart > 24 then
+        table.remove(dpsChart,#dpsChart)
+    end
+    local cDPS = (dpsChart[1]+dpsChart[2])/20000
+    dw = dw .. [[
+        <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
+            <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(0,0,0,0)" />
+            <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
+            <polygon style="stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="18 17 12 22 12 62 15 66 15 125 18 127"/>
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="127" x2="266" y2="127"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">DPS Chart</text>
+            <text style="fill: rgba(175, 75, 75, 0.90); font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="175" y="35">]].. string.format('%.2f',cDPS) ..[[k</text>
+            ]]
+        
+    for k,v in pairs(dpsChart) do
+        dw = dw .. [[<circle cx="]].. tostring(23 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(175, 75, 75, 0.90);rgba(175, 75, 75, 0.90);stroke-width:0;opacity:0.75;" />]]
+    end
+
+    dw = dw.. [[
+        </svg>
+    ]]
+    return dw
+end
+
 function transponderWidget()
     local tw = ''
     if transponder_1 ~= nil then
@@ -1025,7 +1062,7 @@ function generateScreen()
             html = html .. positionInfoWidget()
             html = html .. shipNameWidget()
         end
-        if transponder_1 and codeCount > 0 then html = html .. transponderWidget() end
+        if transponder_1 then html = html .. transponderWidget() end
         html = html .. hpWidget()
         if shield_1 then html = html .. resistWidget() end
         html = html .. engineWidget()
@@ -1033,6 +1070,7 @@ function generateScreen()
             html = html .. [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
                 </svg>]]
         end
+        html = html .. dpsWidget()
     end
     html = html .. planetARWidget()
     html = html .. helpWidget()

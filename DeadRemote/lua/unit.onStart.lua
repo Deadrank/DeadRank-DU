@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.1.0'
+hudVersion = 'v4.1.1'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
@@ -136,6 +136,12 @@ unit.setTimer('code',0.25)
 
 ---- Initialization ---
 arkTime = system.getArkTime()
+dpsTracker = {}
+dpsChart = {}
+dpsChart[1] = 0
+dpsChart[2] = 0
+dpsChart[3] = 0
+dpsChart[4] = 0
 constructPosition = vec3(construct.getWorldPosition())
 cr = nil
 followID = nil

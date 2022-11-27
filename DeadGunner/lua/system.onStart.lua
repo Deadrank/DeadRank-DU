@@ -555,10 +555,10 @@ function identifiedWidget()
         local friendly = tMatch or shipIDMatch
 
         local abandonded = radar_1.isConstructAbandoned(id) == 1
-        local cardFill = warning_outline_color
+        local cardFill = bottomHUDFillColorPVP
         local cardText = textColorPVP
         if friendly then cardFill = bottomHUDFillColorSZ cardText = textColorSZ
-        elseif abandonded then cardFill = 'darkgrey' cardText = 'black'
+        elseif abandonded then cardFill = '	rgba(169, 169, 169,.35)' cardText = 'black'
         end
 
         local distance = radar_1.getConstructDistance(id)
@@ -593,7 +593,7 @@ function identifiedWidget()
         targetSpeedSVG = [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="73">Speed:</text>
-            <text style="fill: ]]..targetSpeedColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="80" y="73">]]..targetSpeedString..[[</text>
+            <text style="fill: ]]..targetSpeedColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="84" y="73">]]..targetSpeedString..[[</text>
         ]]
 
         local updateTimer = false
@@ -619,7 +619,7 @@ function identifiedWidget()
         local distanceCompareSVG = [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="81" x2="22" y2="104"/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="100">Gap:</text>
-            <text style="fill: ]]..gapColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="65" y="100">]]..tostring(gapCompare)..[[</text>
+            <text style="fill: ]]..gapColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="69" y="100">]]..tostring(gapCompare)..[[</text>
         ]]
 
         if updateTimer and targetIdentified then
@@ -640,13 +640,13 @@ function identifiedWidget()
         local speedCompareSVG = [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="108" x2="22" y2="131"/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="127">&#8796;Speed:</text>
-            <text style="fill: ]]..speedCompareColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="127">]]..tostring(speedCompare)..[[</text>
+            <text style="fill: ]]..speedCompareColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="99" y="127">]]..tostring(speedCompare)..[[</text>
         ]]
 
         local dmgSVG = [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="135" x2="22" y2="158"/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="154">Damage:</text>
-            <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="154">]]..string.format('%s (%.2f%%)',dmg,(1-dmgRatio)*100)..[[</text>
+            <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="99" y="154">]]..string.format('%s (%.2f%%)',dmg,(1-dmgRatio)*100)..[[</text>
         ]]
 
         local mass = radar_1.getConstructMass(id)
@@ -734,6 +734,43 @@ function identifiedWidget()
     return iw
 end
 
+function dpsWidget()
+    local dw = ''
+
+    local x,y,s
+    y = 28.25
+    x = 1.75
+    s = 11.25
+    local ts = system.getArkTime()
+    if dpsTracker[string.format('%.0f',ts/10)] == nil then
+        dpsTracker[string.format('%.0f',(ts-10)/10)] = nil
+        dpsTracker[string.format('%.0f',ts/10)] = 0
+        table.insert(dpsChart,1,0)
+    end
+    if #dpsChart > 24 then
+        table.remove(dpsChart,#dpsChart)
+    end
+    local cDPS = (dpsChart[1]+dpsChart[2])/20000
+    dw = dw .. [[
+        <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
+            <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(0,0,0,0)" />
+            <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
+            <polygon style="stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="18 17 12 22 12 62 15 66 15 125 18 127"/>
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="127" x2="266" y2="127"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">DPS Chart</text>
+            <text style="fill: rgba(10, 250, 10, .9); font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="110" y="35">]].. string.format('%.2f',cDPS) ..[[k</text>
+            ]]
+        
+    for k,v in pairs(dpsChart) do
+        dw = dw .. [[<circle cx="]].. tostring(20 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(10, 250, 10, .9);stroke:rgba(10, 250, 10, .9);stroke-width:0;opacity:0.75;" />]]
+    end
+
+    dw = dw.. [[
+        </svg>
+    ]]
+    return dw
+end
+
 function warningsWidget()
     local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     local warningText = {}
@@ -782,6 +819,7 @@ function generateHTML()
         if weapon_1 then html = html .. weaponsWidget() end
         if radar_1 then html = html .. radarWidget() end
         if radar_1 then html = html .. identifiedWidget() end
+        if weapon_1 then html = html .. dpsWidget() end
     end
     
     html = html .. warningsWidget()
