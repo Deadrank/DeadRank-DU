@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.1.1'
+hudVersion = 'v4.1.2'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export

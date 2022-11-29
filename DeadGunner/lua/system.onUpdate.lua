@@ -136,7 +136,7 @@ end
 ARSVG = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
 for name,pos in pairs(AR_Generate) do
     local pDist = vec3(pos - constructPosition):len()
-    if (pDist*0.000005 < abandonedCoreDist and pDist*0.000005 > 1.95 or inSZ ) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
+    if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ) ) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
         local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
         if pInfo[3] ~= 0 then
             if pInfo[1] < .01 then pInfo[1] = .01 end
