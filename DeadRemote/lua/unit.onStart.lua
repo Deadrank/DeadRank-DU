@@ -14,7 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.1.2'
+hudVersion = 'v4.1.4'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
@@ -144,6 +144,7 @@ dpsChart[3] = 0
 dpsChart[4] = 0
 constructPosition = vec3(construct.getWorldPosition())
 cr = nil
+cr_ar = nil
 followID = nil
 followSpeedMod = 0
 AR_Custom_Points = {}
@@ -413,5 +414,5 @@ warningSymbols['svgBrakes'] = [[
             ]]
 
 
-unit.setTimer('screen',0.025)
+unit.setTimer('screen',0.03)
 system.showScreen(1)

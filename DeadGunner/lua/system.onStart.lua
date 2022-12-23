@@ -115,7 +115,6 @@ function updateRadar(filter)
 
     local radarList = radar_1.getConstructIds()
     local constructList = {}
-    if #radarList > max_radar_load then radarOverload = true else radarOverload = false end
     radarContactNumber = #radarList
 
     local enemyLShips = 0
@@ -160,14 +159,14 @@ function updateRadar(filter)
                         write_db.setStringValue('abnd-'..tostring(id),string.format('::pos{0,0,%.2f,%.2f,%.2f}',core_pos[1],core_pos[2],core_pos[3]))
                         write_db.setStringValue('abnd-name-'..tostring(id),nameOrig)
                     end
-                else
+               else
                     write_db.setStringValue('abnd-'..tostring(id),string.format('::pos{0,0,%.2f,%.2f,%.2f}',core_pos[1],core_pos[2],core_pos[3]))
-                    write_db.setStringValue('abnd-name-'..tostring(id),nameOrig)
+                   write_db.setStringValue('abnd-name-'..tostring(id),nameOrig)
                 end
             end
         end
 
-        if  (radarOverload and shipType == 5 and not abandonded) or identified or id == target or (not radarOverload and not (hideAbandonedCores and abandonded)) then
+        if  identified or id == target or (not (hideAbandonedCores and abandonded)) then
             local shipSize = radar_1.getConstructCoreSize(id)--construct.size--
             local threatLevel = radar_1.getThreatRateFrom(id)--construct.targetThreatState--
             if threatLevel == 2 then localIdentifiedBy = localIdentifiedBy + 1
@@ -205,7 +204,7 @@ function updateRadar(filter)
                 if filter == 'enemy' and not friendly then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -217,7 +216,7 @@ function updateRadar(filter)
                 elseif filter == 'identified' and identified then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
                         if radarSort == 'Size' then
                             table.insert(shipsBySize[shipSize],replacedData)
                         else
@@ -227,7 +226,7 @@ function updateRadar(filter)
                 elseif filter == 'friendly' and friendly then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -239,7 +238,7 @@ function updateRadar(filter)
                 elseif filter == 'primary' and tostring(primary) == uniqueCode then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -251,7 +250,7 @@ function updateRadar(filter)
                 elseif radarFilter == 'All' then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub(nameOrig,uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
                         if identified or tostring(id) == target then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -266,20 +265,22 @@ function updateRadar(filter)
         end
         n = n + 1
     end
-
     coroutine.yield()
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
     data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
     if radarSort == 'Size' then
         for _,ship in pairs(shipsBySize['XS']) do table.insert(constructList,ship) end
+        coroutine.yield()
         for _,ship in pairs(shipsBySize['S']) do table.insert(constructList,ship) end
+        coroutine.yield()
         for _,ship in pairs(shipsBySize['M']) do table.insert(constructList,ship) end
+        coroutine.yield()
         for _,ship in pairs(shipsBySize['L']) do table.insert(constructList,ship) end
+        coroutine.yield()
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
     else
         data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
     end
-
     radarStats = tempRadarStats
     radarWidgetData = data
     identifiedBy = localIdentifiedBy
@@ -514,11 +515,6 @@ function radarWidget()
         warnings['attackedBy'] = nil
     end
 
-    if radarOverload or showAlerts then 
-        warnings['radarOverload'] = 'svgCritical'
-    else
-        warnings['radarOverload'] = nil
-    end
     return rw
 end
 
@@ -775,7 +771,6 @@ function warningsWidget()
     local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     local warningText = {}
     warningText['attackedBy'] = string.format('%.0f ships attacking',attackedBy)
-    warningText['radarOverload'] = 'Radar Overloaded'
     warningText['cored'] = 'Target is Destroyed'
     warningText['friendly'] = 'Target is Friendly'
     warningText['noRadar'] = 'No Radar Linked'
@@ -784,7 +779,6 @@ function warningsWidget()
 
     local warningColor = {}
     warningColor['attackedBy'] = 'red'
-    warningColor['radarOverload'] = 'orange'
     warningColor['cored'] = 'orange'
     warningColor['friendly'] = 'green'
     warningColor['noRadar'] = 'red'

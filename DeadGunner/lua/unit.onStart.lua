@@ -95,7 +95,6 @@ cr_time = nil
 cr_delta = nil
 constructListData = {}
 radarWidgetData = nil
-radarOverload = false
 radarDataID = nil
 radarStart = false
 filterSize = {}

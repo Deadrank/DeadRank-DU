@@ -212,7 +212,7 @@ elseif cr ~= nil then
         else
             cr_delta = system.getArkTime() - cr_time
             cr_time = system.getArkTime()
-            if (cr_delta > 1 and radarOverload) or showAlerts then
+            if cr_delta > 1 or showAlerts then
                 warnings['radar_delta'] = 'svgCritical'
             else
                 warnings['radar_delta'] = nil
