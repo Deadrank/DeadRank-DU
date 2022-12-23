@@ -174,7 +174,7 @@ function updateRadar(filter)
             end
             local tMatch = radar_1.hasMatchingTransponder(id) == 1
             local name = nameOrig--:gsub('%[',''):gsub('%]','')
-            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)')
+            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)'):gsub('%.','%%.')
             local uniqueCode = string.sub(tostring(id),-3)
             local uniqueName = string.format('[%s] %s',uniqueCode,name)
             if tMatch then 
@@ -204,7 +204,7 @@ function updateRadar(filter)
                 if filter == 'enemy' and not friendly then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -216,7 +216,7 @@ function updateRadar(filter)
                 elseif filter == 'identified' and identified then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
                         if radarSort == 'Size' then
                             table.insert(shipsBySize[shipSize],replacedData)
                         else
@@ -226,7 +226,7 @@ function updateRadar(filter)
                 elseif filter == 'friendly' and friendly then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -238,7 +238,7 @@ function updateRadar(filter)
                 elseif filter == 'primary' and tostring(primary) == uniqueCode then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -250,7 +250,7 @@ function updateRadar(filter)
                 elseif radarFilter == 'All' then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig,'"name":"'..uniqueName)
+                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
                         if identified or tostring(id) == target then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
