@@ -1,6 +1,5 @@
-# Dead's PvP Script Suite
+# Dead's PvP Script Suite (Current version 4.1.4)
 
-## New features in 4.1.1
  - Trajectory Estimator:
    1) Target a construct (identification not required)
    2) Aim at the construct (diamond on the center of the screen)
