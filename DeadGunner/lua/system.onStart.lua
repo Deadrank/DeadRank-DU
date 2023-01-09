@@ -115,6 +115,7 @@ function updateRadar(filter)
 
     local radarList = radar_1.getConstructIds()
     local constructList = {}
+    local primaryList = {}
     radarContactNumber = #radarList
 
     local enemyLShips = 0
@@ -151,6 +152,7 @@ function updateRadar(filter)
         local shipType = radar_1.getConstructKind(id)
         local abandonded = radar_1.isConstructAbandoned(id) == 1
         local nameOrig = radar_1.getConstructName(id) --construct.name--
+        local uniqueCode = string.sub(tostring(id),-3)
         if abandonded then
             local core_pos = radar_1.getConstructWorldPos(id)
             if write_db then
@@ -175,16 +177,16 @@ function updateRadar(filter)
             local tMatch = radar_1.hasMatchingTransponder(id) == 1
             local name = nameOrig--:gsub('%[',''):gsub('%]','')
             nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)'):gsub('%.','%%.')
-            local uniqueCode = string.sub(tostring(id),-3)
+            
             local uniqueName = string.format('[%s] %s',uniqueCode,name)
             if tMatch then 
                 local owner = radar_1.getConstructOwnerEntity(id)
                 if owner['isOrganization'] then
                     owner = system.getOrganization(owner['id'])
-                    uniqueName = string.format('[%s] %s',owner['tag'],name)
+                    uniqueCode = string.format('%s',owner['tag'])
                 else
                     owner = system.getPlayerName(owner['id'])
-                    uniqueName = string.format('[%s] %s',owner,name)
+                    uniqueCode = string.format('%s',owner)
                 end
             elseif abandonded then
                 uniqueName = string.format('[CORED] %s',name)
@@ -204,7 +206,7 @@ function updateRadar(filter)
                 if filter == 'enemy' and not friendly then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
+                        local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -216,7 +218,7 @@ function updateRadar(filter)
                 elseif filter == 'identified' and identified then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
+                        local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
                         if radarSort == 'Size' then
                             table.insert(shipsBySize[shipSize],replacedData)
                         else
@@ -226,7 +228,7 @@ function updateRadar(filter)
                 elseif filter == 'friendly' and friendly then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
+                        local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -238,7 +240,7 @@ function updateRadar(filter)
                 elseif filter == 'primary' and tostring(primary) == uniqueCode then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
+                        local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
                         if identified then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -250,7 +252,7 @@ function updateRadar(filter)
                 elseif radarFilter == 'All' then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
-                        local replacedData = str:gsub('"name":"'..nameOrig..'"','"name":"'..uniqueName..'"')
+                        local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
                         if identified or tostring(id) == target then
                             table.insert(constructList,1,replacedData)
                         elseif radarSort == 'Size' then
@@ -261,12 +263,24 @@ function updateRadar(filter)
                     end
                 end
             end
+            if contains(primaries,uniqueCode) and targetRadar then
+                local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                for str in rawData do
+                    local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
+                    if identified then
+                        table.insert(primaryList,1,replacedData)
+                    else
+                        table.insert(primaryList,replacedData)
+                    end
+                end
+            end
             if n % 50 == 0 then coroutine.yield() end
         end
         n = n + 1
     end
     coroutine.yield()
     data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
+    primaryData = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(primaryList,',')..']')
     data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
     if radarSort == 'Size' then
         for _,ship in pairs(shipsBySize['XS']) do table.insert(constructList,ship) end
@@ -288,13 +302,13 @@ function updateRadar(filter)
     return data
 end
 
-function RadarWidgetCreate()
+function RadarWidgetCreate(title)
     local _data = radar_1.getWidgetData()--updateRadar(radarFilter)
-    local _panel = system.createWidgetPanel("RADAR")
+    local _panel = system.createWidgetPanel(title)
     local _widget = system.createWidget(_panel, "radar")
-    radarDataID = system.createData(_data)
-    system.addDataToWidget(radarDataID, _widget)
-    return radarDataID
+    local ID = system.createData(_data)
+    system.addDataToWidget(ID, _widget)
+    return ID,_panel
 end
 
 function ARWidget()
@@ -478,9 +492,9 @@ function radarWidget()
 
     rw = rw .. [[
         <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 240" width="]]..s..[[vw">
-            <rect x="6%" y="6%" width="87%" height="52%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
+            <rect x="6%" y="6%" width="87%" height="60%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
-            <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 135 18 138"/>
+            <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 154 18 157"/>
             <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information (]]..tostring(radarContactNumber)..[[)</text>
         ]]
     rw = rw .. [[
@@ -505,6 +519,18 @@ function radarWidget()
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="127">Friendly Ships:</text>
             <text style="fill: ]]..friendlyTextColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="150" y="127">]]..friendlyShipNum..[[</text>
 
+            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="135" x2="22" y2="158"/>
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="30" y="154">L:</text>
+            <text style="fill: ]]..friendlyTextColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="50" y="154">]]..radarStats['friendly']['L']..[[</text>
+
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="68" y="154">M:</text>
+            <text style="fill: ]]..friendlyTextColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="95" y="154">]]..radarStats['friendly']['M']..[[</text>
+
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="115" y="154">S:</text>
+            <text style="fill: ]]..friendlyTextColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="135" y="154">]]..radarStats['friendly']['S']..[[</text>
+
+            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="155" y="154">XS:</text>
+            <text style="fill: ]]..friendlyTextColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="185" y="154">]]..radarStats['friendly']['XS']..[[</text>
         ]]
 
     rw = rw .. '</svg>'

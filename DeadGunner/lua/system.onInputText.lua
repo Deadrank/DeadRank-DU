@@ -238,3 +238,40 @@ if text:lower() == 'clear tracking' then
     manual_trajectory = {}
     trajectory_calc = {}
 end
+if string.starts(text:lower(), 'a') and (#text == 4) and type(tonumber(string.sub(text,2))) then
+    if not contains(primaries,string.sub(text,2)) then
+        system.print(string.format('-- Adding %s to primary radar--',string.sub(text,2)))
+        table.insert(primaries,string.sub(text,2))
+    end
+end
+if string.starts(text:lower(), 'd') and (#text == 4 or #text == 2) and type(tonumber(string.sub(text,2))) then
+    if string.sub(text,2) == '0' then
+        system.print('-- Clearing Primary Radar --')
+        primaries = {}
+    else
+        
+        local r = nil
+        for k,v in pairs(primaries) do
+            if v == string.sub(text,2) then r = k end
+        end
+        if r then
+            system.print(string.format('-- Removing %s from primary radar --',string.sub(text,2)))
+            table.remove(primaries,r)
+        end
+    end
+end
+if text:lower() == 'primary radar off' then
+    targetRadar = false
+    if primaryRadarPanelID then
+        system.print('-- Disabling primary target radar widget --')
+        system.destroyWidgetPanel(primaryRadarPanelID)
+        primaryRadarPanelID = nil
+    end
+end
+if text:lower() == 'primary radar on' then
+    targetRadar = true
+    if not primaryRadarPanelID then
+        system.print('-- Enabling primary target radar --')
+        primaryRadarID,primaryRadarPanelID = RadarWidgetCreate('PRIMARY TARGETS')
+    end
+end

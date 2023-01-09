@@ -965,7 +965,7 @@ function minimalShipInfo()
             <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Auto Pilot Mode: ]]..apStatus..eta..[[</text>]]
     if caerusOption then
         msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.92 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>]]
-        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.935 * screenHeight) ..[[" style="fill: ]]..topHUDFillColorSZ..[[" font-size="1.42vh" font-weight="bold">SZ Dist: ]]..SZDStr..[[</text></text>]]
+        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.935 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">SZ Dist: ]]..SZDStr..[[</text></text>]]
     end
     msi = msi .. [[</svg>
     ]]

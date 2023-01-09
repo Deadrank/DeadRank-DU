@@ -37,7 +37,8 @@ end
 for _,id in pairs(construct.getPlayersOnBoard()) do 
     dockedMass = dockedMass + construct.getBoardedPlayerMass(id)
 end
-brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speed/3.6,0,mass + dockedMass,0,0,maxBrake)
+apBrakeDist,brakeTime = Kinematic.computeDistanceAndTime(speedVec:len(),0,mass + dockedMass,0,0,maxBrake)
+brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speedVec:len(),0,mass,0,0,maxBrake)
 accelVec = vec3(construct.getWorldAcceleration())
 accel = accelVec:len()
 
@@ -207,7 +208,7 @@ Nav:setEngineTorqueCommand('torque', angularAcceleration, keepCollinearity, 'air
 -- Brakes
 local brakeAcceleration = vec3()
 if autopilot then
-    if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= brakeDist + AP_Brake_Buffer or closestPlanetDist < 0.65/.000005 then
+    if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer or closestPlanetDist < 0.65/.000005 or brakesOn then
         brakeAcceleration = -maxBrake * constructVelocityDir
         brakeInput = 1
     elseif autopilot_dest ~= nil and not brakesOn then
@@ -235,7 +236,7 @@ end
 local longitudinalCommandType = Nav.axisCommandManager:getAxisCommandType(axisCommandId.longitudinal)
 local longitudinalAcceleration = vec3()
 
-if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= brakeDist + AP_Brake_Buffer then
+if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer then
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
     longitudinalAcceleration = vec3()
     Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
@@ -302,7 +303,7 @@ end
 Nav:setBoosterCommand('rocket_engine')
 
 -- Disable Auto-Pilot when destination is reached --
-if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= brakeDist + 100 + AP_Brake_Buffer and speed < 5 then
+if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= brakeDist + 1000 + AP_Brake_Buffer and speed < 1000 then
     system.print('-- Autopilot complete --')
     autopilot_dest_pos = nil
     autopilot = false

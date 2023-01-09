@@ -1,5 +1,10 @@
-# Dead's PvP Script Suite (Current version 4.1.4)
-
+# Dead's PvP Script Suite (Current version 4.1.5)
+ - Primary Target Radar:
+   1) A new radar widget is now shown by default (can be disabled via lua parameter `targetRadar`)
+   2) Add ships to primary radar using `a###` command in lua chat (`a` then the 3 digit ship code)
+   3) Remove ships from the primary radar using `d###` command in lua chat (`d` then the 3 digit ship code)
+   4) Clear the primary radar completely using `d0` command in lua chat
+   5) The extra radar widget can be removed or added from the screen with either `primary radar off` or `primary radar on`
  - Trajectory Estimator:
    1) Target a construct (identification not required)
    2) Aim at the construct (diamond on the center of the screen)

@@ -1,5 +1,8 @@
 if bootTimer == 2 then
-    if radar_1 then radarData = RadarWidgetCreate() end
+    if radar_1 then 
+        radarDataID,panel = RadarWidgetCreate('RADAR')
+        if targetRadar then primaryRadarID,primaryRadarPanelID = RadarWidgetCreate('PRIMARY TARGETS') end
+    end
     
     radarStart = true
     if radar_1 then unit.setTimer('radar',0.15) end
