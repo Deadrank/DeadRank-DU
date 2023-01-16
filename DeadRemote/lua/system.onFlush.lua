@@ -30,16 +30,14 @@ if #enabledEngineTags > 0 then
 end
 maxThrust = construct.getMaxThrustAlongAxis(maxThrustTags,construct.getOrientationForward())
 maxSpaceThrust = math.abs(maxThrust[3])
+
 local dockedMass = 0
-local playerMass = 0
-local dockedConstructMass = 0
 for _,id in pairs(construct.getDockedConstructs()) do 
     dockedMass = dockedMass + construct.getDockedConstructMass(id)
 end
 for _,id in pairs(construct.getPlayersOnBoard()) do 
     dockedMass = dockedMass + construct.getBoardedPlayerMass(id)
 end
-dockedMass = playerMass + dockedConstructMass
 apBrakeDist,brakeTime = Kinematic.computeDistanceAndTime(speedVec:len(),0,mass + dockedMass,0,0,maxBrake)
 brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speedVec:len(),0,mass + dockedMass,0,0,maxBrake)
 accelVec = vec3(construct.getWorldAcceleration())
