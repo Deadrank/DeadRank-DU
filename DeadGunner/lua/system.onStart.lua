@@ -176,9 +176,15 @@ function updateRadar(filter)
             end
             local tMatch = radar_1.hasMatchingTransponder(id) == 1
             local name = nameOrig--:gsub('%[',''):gsub('%]','')
-            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)'):gsub('%.','%%.')
+            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)'):gsub('%.','%%.'):gsub('%}','%%}'):gsub('%{','%%{')
+            local hasBadChar = (string.find(name,'%}') and not string.find(name,'%{')) or (string.find(name,'%{') and not string.find(name,'%}')) or (string.find(name,'%]') and not string.find(name,'%[')) or (string.find(name,'%[') and not string.find(name,'%]'))
+            if hasBadChar then 
+                local cleanName = name:gsub('%}',''):gsub('%{',''):gsub('%]',''):gsub('%[',''):gsub('%)',''):gsub('%(','')
+                data = data:gsub('"name":"'..nameOrig..'"','"name":"'..cleanName..'"')
+            end
             
-            local uniqueName = string.format('[%s] %s',uniqueCode,name)
+            
+            local coreID = uniqueCode
             if tMatch then 
                 local owner = radar_1.getConstructOwnerEntity(id)
                 if owner['isOrganization'] then
@@ -189,13 +195,14 @@ function updateRadar(filter)
                     uniqueCode = string.format('%s',owner)
                 end
             elseif abandonded then
-                uniqueName = string.format('[CORED] %s',name)
+                uniqueCode = '[CORED]'
             end
 
             local shipIDMatch = false
             if useShipID then for k,v in pairs(friendlySIDs) do if id == k then shipIDMatch = true end end end
             local friendly = tMatch or shipIDMatch
             
+            if tMatch then radarFriendlies[id] = {[1] = uniqueCode, [2] = radar_1.getConstructWorldPos(id)} else radarFriendlies[id] = nil end
             if shipType == 5 and not abandonded then
                 if friendly then tempRadarStats['friendly'][shipSize] = tempRadarStats['friendly'][shipSize] + 1
                 else tempRadarStats['enemy'][shipSize] = tempRadarStats['enemy'][shipSize] + 1
@@ -204,7 +211,7 @@ function updateRadar(filter)
 
             if contains(filterSize,shipSize) or tostring(id) == target then
                 if filter == 'enemy' and not friendly then
-                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
+                    local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}')
                     for str in rawData do
                         local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
                         if identified then
@@ -237,7 +244,7 @@ function updateRadar(filter)
                             table.insert(constructList,replacedData)
                         end
                     end
-                elseif filter == 'primary' and tostring(primary) == uniqueCode then
+                elseif filter == 'primary' and tostring(primary) == coreID then
                     local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                     for str in rawData do
                         local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')
@@ -263,7 +270,7 @@ function updateRadar(filter)
                     end
                 end
             end
-            if contains(primaries,uniqueCode) and targetRadar then
+            if contains(primaries,coreID) and targetRadar then
                 local rawData = data:gmatch('{"constructId":"'..tostring(id)..'"[^}]*}[^}]*}') 
                 for str in rawData do
                     local replacedData = str:gsub('"name":"','"name":"['..uniqueCode..']')

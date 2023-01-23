@@ -96,6 +96,7 @@ cr_time = nil
 cr_delta = nil
 constructListData = {}
 radarWidgetData = nil
+radarFriendlies = {}
 radarDataID = nil
 primaryRadarID = nil
 primaryRadarPanelID = nil
