@@ -1,5 +1,6 @@
 cPos = vec3(construct.getWorldPosition())
 local inWS = false
+radarFriendlies[tostring(id)] = nil
 if warpScan then
     for k,v in pairs(warpScan) do if id == k then inWS = true break end end
     if not inSZ and SZD*0.000005 > radarBuffer or szAlerts then
