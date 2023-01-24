@@ -142,8 +142,9 @@ for _,v in pairs(AR_Generate) do
     local name = v[1]
     local pos = v[2]
     local pDist = vec3(pos - constructPosition):len()
-    if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ) ) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
+    if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ) ) or (string.starts(name,'[') and not string.starts(name,'[CORED]')) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
         local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
+
         if pInfo[3] ~= 0 then
             if pInfo[1] < .01 then pInfo[1] = .01 end
             if pInfo[2] < .01 then pInfo[2] = .01 end
