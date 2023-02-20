@@ -158,7 +158,7 @@ if string.starts(text,'::pos{') then
 
             system.print('-- Trajectory points added --')
         end
-        if #trackerList == 3 then table.remove(3) end
+        if #trackerList == 3 then table.remove(trackerList,3) end
     else
         autopilot_dest = vec3(convertWaypoint(matches[1]))
         autopilot_dest_pos = matches[1]
