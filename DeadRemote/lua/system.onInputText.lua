@@ -146,10 +146,10 @@ if string.starts(text,'::pos{') then
             AR_Temp_Points['Spotted'] = trackerList[1]
             local P1 = vec3(convertWaypoint(trackerList[2]))
             local P2 = vec3(convertWaypoint(trackerList[1]))
-            local T10 = P1+10/.000005*(P2 - P1)/vec3(P2-P1):len()
+            local T5 = P1+5/.000005*(P2 - P1)/vec3(P2-P1):len()
             local T30 = P1+30/.000005*(P2 - P1)/vec3(P2-P1):len()
             local T50 = P1+50/.000005*(P2 - P1)/vec3(P2-P1):len()
-            AR_Temp_Points['T10'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T10['x'],T10['y'],T10['z'])
+            AR_Temp_Points['T5'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T5['x'],T5['y'],T5['z'])
             AR_Temp_Points['T30'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T30['x'],T30['y'],T30['z'])
             AR_Temp_Points['T50'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T50['x'],T50['y'],T50['z'])
 
