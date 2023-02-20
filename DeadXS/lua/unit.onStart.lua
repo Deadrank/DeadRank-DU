@@ -95,6 +95,10 @@ shipInfoWidgetScale = 10
 
 ------------------------------------
 
+boosterOn = false
+boosterPulseOn = false
+boosterCount = 0
+
 userCode = {}
 userCode[validPilotCode] = pilotName
 if db_1 ~= nil and useDB then
@@ -579,3 +583,7 @@ end
 
 unit.setTimer('screen',0.025)
 system.showScreen(1)
+
+system.print('----')
+system.print(Nav.boosterState)
+system.print('----')

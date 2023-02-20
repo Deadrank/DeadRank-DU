@@ -610,6 +610,7 @@ function warningsWidget()
     warningText['lowFuel'] = fuelWarningText
     warningText['brakes'] = 'Brakes Locked'
     warningText['venting'] = 'Shield Venting'
+    warningText['cored'] = 'Target is Destroyed'
 
     local warningColor = {}
     warningColor['lowFuel'] = 'red'
@@ -625,7 +626,7 @@ function warningsWidget()
 
     local count = 0
     for k,v in pairs(warnings) do
-        if v ~= nil then
+        if v ~= nil and warning then
             ww = ww .. [[
                 <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.24 * screenWidth) ..[[" y="]].. tostring(.20 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
                     ]]..warningSymbols[v]..[[

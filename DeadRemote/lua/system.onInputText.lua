@@ -133,10 +133,38 @@ end
 if string.starts(text,'::pos{') then
     matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
-    autopilot_dest = vec3(convertWaypoint(matches[1]))
-    autopilot_dest_pos = matches[1]
-    system.print('-- Autopilot destination set --')
-    system.print(matches[1])
+    if trackerMode then
+        if #trackerList == 0 then
+            table.insert(trackerList,matches[1])
+            system.print(string.format('-- 1st Position: %s',matches[1]))
+        elseif trackerList[1] == matches[1] then system.print('-- 2nd trajectory point is the same as the first --')
+        else
+            table.insert(trackerList,1,matches[1])
+            system.print(string.format('-- 1st Position: %s',trackerList[2]))
+            system.print(string.format('-- 2nd Position: %s',matches[1]))
+
+            AR_Temp_Points['Spotted'] = trackerList[1]
+            local P1 = vec3(convertWaypoint(trackerList[2]))
+            local P2 = vec3(convertWaypoint(trackerList[1]))
+            local T10 = P1+10/.000005*(P2 - P1)/vec3(P2-P1):len()
+            local T30 = P1+30/.000005*(P2 - P1)/vec3(P2-P1):len()
+            local T50 = P1+50/.000005*(P2 - P1)/vec3(P2-P1):len()
+            AR_Temp_Points['T10'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T10['x'],T10['y'],T10['z'])
+            AR_Temp_Points['T30'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T30['x'],T30['y'],T30['z'])
+            AR_Temp_Points['T50'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T50['x'],T50['y'],T50['z'])
+
+            autopilot_dest = T50
+            autopilot_dest_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T50['x'],T50['y'],T50['z'])
+
+            system.print('-- Trajectory points added --')
+        end
+        if #trackerList == 3 then table.remove(3) end
+    else
+        autopilot_dest = vec3(convertWaypoint(matches[1]))
+        autopilot_dest_pos = matches[1]
+        system.print('-- Autopilot destination set --')
+        system.print(matches[1])
+    end
 end
 if string.starts(text,'distance') then
     system.print('-- Distances to AR Points --')
@@ -239,3 +267,5 @@ if string.starts(text:lower(),'hide ') and not string.starts(text,'hide code') t
         end
     end
 end
+if text:lower() == 'asteroid pipes on' then asteroidPipes = true system.print('-- Enable Asteroid pipe file --') end
+if text:lower() == 'asteroid pipes off' then asteroidPipes = false system.print('-- Disabled Asteroid pipe file --') end

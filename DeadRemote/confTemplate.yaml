@@ -1,4 +1,4 @@
-name: DeadRemote v4.1.8
+name: DeadRemote v4.1.10
 
 slots:
     core:
@@ -6,15 +6,6 @@ slots:
     db:
         class: DataBank
         select: all
-    antigrav:
-        class: AntiGravityGeneratorUnit
-    warpdrive:
-        class: WarpDriveUnit
-    rocketfueltank:
-        class: RocketFuelContainer
-        select: all
-    gyro:
-        class: GyroUnit
     radar:
         class: RadarPVPUnit
         select: manual
@@ -27,9 +18,18 @@ slots:
     spacefueltank:
         class: SpaceFuelContainer
         select: all
+    rocketfueltank:
+        class: RocketFuelContainer
+        select: all
+    antigrav:
+        class: AntiGravityGeneratorUnit
+    warpdrive:
+        class: WarpDriveUnit
     atmofueltank:
         class: AtmoFuelContainer
         select: all
+    gyro:
+        class: GyroUnit
 
 handlers:
   unit:
@@ -41,6 +41,10 @@ handlers:
       args: ['overlap']
       lua: |
 {{unit.onTimer.overlap.lua}}
+    onTimer:
+      args: ['booster']
+      lua: |
+{{unit.onTimer.booster.lua}}
     onStart:
       lua: |
 {{unit.onStart.lua}}

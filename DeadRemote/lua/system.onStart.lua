@@ -151,6 +151,24 @@ function closestPipe()
             end
         end
     end
+
+    if asteroidPipes then
+        for name,center in pairs(asteroidPipeList) do
+            for name2,center2 in pairs(planets) do
+                if name ~= name2 and pipes[string.format('%s - %s',name2,name)] == nil then
+                    pipes[string.format('%s - %s',name,name2)] = {}
+                    local c1 = convertWaypoint(center)
+                    table.insert(pipes[string.format('%s - %s',name,name2)],vec3(c1['x'],c1['y'],c1['z']))
+                    table.insert(pipes[string.format('%s - %s',name,name2)],center2)
+                    if i % 50 == 0 then
+                        coroutine.yield()
+                    end
+                    i = i + 1
+                end
+            end
+        end
+    end
+
     local cPipe = 'None'
     local cDist = 9999999999
     local cLoc = vec3(construct.getWorldPosition())
@@ -500,7 +518,7 @@ function helpWidget()
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+4: Engage AutoPilot to current AP destination (shown in VR)</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+5: TBD</text>
+                Alt+5: Enable/Disalbe Tracking mode (position tags in lua chat used for trajectory calculation instead of auto-pilot)</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
                 Alt+6: Set AutoPilot destination to the nearest safe zone</text>
             <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
@@ -1085,6 +1103,7 @@ function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
             if db_1.hasKey('generateAutoCode') == 1 then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
+            if db_1.hasKey('asteroidPipes') == 1 then asteroidPipes = db_1.getIntValue('asteroidPipes') == 1 end
             if db_1.hasKey('toggleBrakes') == 1 then toggleBrakes = db_1.getIntValue('toggleBrakes') == 1 end
             if db_1.hasKey('caerusOption') == 1 then caerusOption = db_1.getIntValue('caerusOption') == 1 end
             if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
@@ -1149,6 +1168,7 @@ function globalDB(action)
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
+            if asteroidPipes then db_1.setIntValue('asteroidPipes',1) else db_1.setIntValue('asteroidPipes',0) end
             if toggleBrakes then db_1.setIntValue('toggleBrakes',1) else db_1.setIntValue('toggleBrakes',0) end
             if caerusOption then db_1.setIntValue('caerusOption',1) else db_1.setIntValue('caerusOption',0) end
             if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end

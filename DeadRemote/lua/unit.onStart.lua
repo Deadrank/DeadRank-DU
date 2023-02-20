@@ -14,16 +14,20 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.1.8'
+hudVersion = 'v4.1.10'
 system.print('-- '..hudVersion..' --')
 useDB = true --export
 caerusOption = false --export
 validatePilot = false --export
 toggleBrakes = true --export
 autoVent = true --export Autovent shield at 0 hp
+asteroidPipes = false --export Calculate pipes to "Asteroids.lua" file
+trackerMode = false --export Use input position tags as location trackers instead of auto-pilot
+trackerList = {}
 homeBaseLocation = '' --export Location of home base (to turn off shield)
 homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
 defaultHoverHeight = 42 --export
+boosterSpeedThreshold = 55000 --export km/h
 topHUDLineColorSZ = 'rgba(150, 175, 185, .75)' --export
 topHUDFillColorSZ = 'rgba(25, 25, 50, 0.35)' --export
 textColorSZ = 'rgba(225, 250, 265, 1)' --export
@@ -94,6 +98,10 @@ shipInfoWidgetScale = 10
 -- WayPoint File Info
 validWaypointFiles = {}
 ------------------------------------
+boosterOn = false
+boosterPulseOn = false
+boosterCount = 0
+
 
 userCode = {}
 userCode[validPilotCode] = pilotName
@@ -151,6 +159,7 @@ AR_Custom_Points = {}
 AR_Custom = false
 AR_Temp = false
 AR_Temp_Points = {}
+asteroidPipeList = {}
 
 AR_Array = {}
 
@@ -162,6 +171,7 @@ if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
             system.print('Found waypointFileId: '..waypointFileId..' displayName='..waypointFile.DisplayName..' waypointFilePath='..waypointFile.FilePath)
             if pcall(require,waypointFile.FilePath) then
                 waypoints = require(waypointFile.FilePath)
+                if asteroidPipes and waypointFile.DisplayName == 'Asteroids' then asteroidPipeList = waypoints end
                 if type(waypoints) == "table" then
                     table.insert(validWaypointFiles,waypointFile)
                     AR_Array[#validWaypointFiles] = {}
