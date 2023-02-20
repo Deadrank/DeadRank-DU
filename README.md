@@ -1,4 +1,5 @@
-# Dead's PvP Script Suite (Current version 4.1.9)
+# Dead's PvP Script Suite (Current version 4.1.10)
+ - Added tracking mode (alt-5) that changes the way the script handles position tags entered into lua chat (tracking mode or autopilot)
  - Primary Target Radar:
    1) A new radar widget is now shown by default (can be disabled via lua parameter `targetRadar`)
    2) Add ships to primary radar using `a###` command in lua chat (`a` then the 3 digit ship code)
