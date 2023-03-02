@@ -201,6 +201,10 @@ local dontKeepCollinearity = 0 -- for easier reading
 local tolerancePercentToSkipOtherPriorities = 1 -- if we are within this tolerance (in%), we do not go to the next priorities
 
 -- Rotation
+if not dampening then
+    constructAngularVelocity = vec3()
+end
+
 local angularAcceleration = torqueFactor * (targetAngularVelocity - constructAngularVelocity)
 local airAcceleration = vec3(construct.getWorldAirFrictionAngularAcceleration())
 angularAcceleration = angularAcceleration - airAcceleration -- Try to compensate air friction

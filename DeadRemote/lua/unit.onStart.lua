@@ -14,8 +14,9 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.1.10'
+hudVersion = 'v4.1.11'
 system.print('-- '..hudVersion..' --')
+screenRefreshRate = 0.1 --export
 useDB = true --export
 caerusOption = false --export
 validatePilot = false --export
@@ -64,6 +65,7 @@ showDockingPanel = false --export
 showFuelPanel = false --export
 showHelper = false --export
 showShieldWidget = false --export
+dampening = true --inertial dampening
 
 minimalWidgets = false
 -- HP (Shield/CCS) widget --
@@ -424,5 +426,5 @@ warningSymbols['svgBrakes'] = [[
             ]]
 
 
-unit.setTimer('screen',0.03)
+unit.setTimer('screen',screenRefreshRate)
 system.showScreen(1)

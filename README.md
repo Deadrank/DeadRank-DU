@@ -1,4 +1,6 @@
-# Dead's PvP Script Suite (Current version 4.1.10)
+# Dead's PvP Script Suite (Current version 4.1.11)
+ - Added Lua Parameter for screen refresh rate on the remote and adjusted the default rate (hopefully increase FPS)
+ - Added option to disable adjustor dampening (`alt-d`)
  - Added tracking mode (alt-5) that changes the way the script handles position tags entered into lua chat (tracking mode or autopilot)
  - Primary Target Radar:
    1) A new radar widget is now shown by default (can be disabled via lua parameter `targetRadar`)
