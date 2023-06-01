@@ -1,4 +1,4 @@
-if Nav.control.isAnyHeadlightSwitchedOn() == 1 then
+if Nav.control.isAnyHeadlightSwitchedOn() then
     Nav.control.switchOffHeadlights()
 else
     Nav.control.switchOnHeadlights()

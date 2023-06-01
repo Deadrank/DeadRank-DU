@@ -68,7 +68,7 @@ for i,dbName in pairs(db) do
 end
 if not found then
     for i,dbName in pairs(db) do
-        if dbName.hasKey('usedBy') == 0 then
+        if not dbName.hasKey('usedBy') then
             write_db = dbName
             write_db.setStringValue('usedBy',chairID)
             found = true
@@ -157,7 +157,7 @@ if write_db ~= nil then
     end
 end
 
-inSZ = construct.isInPvPZone() == 0
+inSZ = not construct.isInPvPZone()
 SZD = construct.getDistanceToSafeZone()
 
 --- Weapons --

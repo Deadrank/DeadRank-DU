@@ -1,7 +1,7 @@
 arkTime = system.getArkTime()
 
 -- SZ Boundary --
-inSZ = construct.isInPvPZone() == 0
+inSZ = not construct.isInPvPZone()
 SZD = construct.getDistanceToSafeZone()
 bgColor = bottomHUDFillColorSZ 
 fontColor = textColorSZ
@@ -44,7 +44,7 @@ if AR_Mode == 'ALL' then
         end
     end
     if FC then
-        if radar_1.hasMatchingTransponder(FC) == 1 then
+        if radar_1.hasMatchingTransponder(FC) then
             local temp = radar_1.getConstructWorldPos(FC)
             fc_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
             table.insert(AR_Generate,{[1]='Fleet Commander', [2] = convertWaypoint(fc_pos)})
@@ -53,7 +53,7 @@ if AR_Mode == 'ALL' then
         end
     end
     if SL then
-        if radar_1.hasMatchingTransponder(SL) == 1 then
+        if radar_1.hasMatchingTransponder(SL) then
             local temp = radar_1.getConstructWorldPos(SL)
             sl_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
             table.insert(AR_Generate,{[1]='Squad Leader', [2] = convertWaypoint(sl_pos)})
@@ -89,7 +89,7 @@ if AR_Mode == 'ALL' then
     end
 elseif AR_Mode == 'FLEET' then
     if FC then
-        if radar_1.hasMatchingTransponder(FC) == 1 then
+        if radar_1.hasMatchingTransponder(FC) then
             local temp = radar_1.getConstructWorldPos(FC)
             fc_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
             table.insert(AR_Generate,{[1]='Fleet Commander', [2] = convertWaypoint(fc_pos)})
@@ -98,7 +98,7 @@ elseif AR_Mode == 'FLEET' then
         end
     end
     if SL then
-        if radar_1.hasMatchingTransponder(SL) == 1 then
+        if radar_1.hasMatchingTransponder(SL) then
             local temp = radar_1.getConstructWorldPos(SL)
             sl_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',temp[1],temp[2],temp[3])
             table.insert(AR_Generate,{[1]='Squad Leader', [2] = convertWaypoint(sl_pos)})
@@ -242,7 +242,7 @@ local target = tostring(radar_1.getTargetId())
 if auto_follow then
     if not followID then followID = target end
     if followID then
-        local identified = radar_1.isConstructIdentified(followID) == 1
+        local identified = radar_1.isConstructIdentified(followID)
         if identified then
             local tSpeed = radar_1.getConstructSpeed(followID) * 3.6
             local tDist = radar_1.getConstructDistance(followID)

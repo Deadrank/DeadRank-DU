@@ -9,7 +9,7 @@ if string.starts(text:lower(),'addships') then
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
     if #matches > 1 then
         id = matches[2]
-        if radar_1.hasMatchingTransponder(id) == 1 then
+        if radar_1.hasMatchingTransponder(id) then
             local owner = radar_1.getConstructOwnerEntity(id)
             if owner['isOrganization'] then
                 owner = system.getOrganization(owner['id'])
@@ -27,7 +27,7 @@ if string.starts(text:lower(),'addships') then
         end
     else
         for _,id in ipairs(radar_1.getConstructIds()) do
-            if radar_1.hasMatchingTransponder(id) == 1 then
+            if radar_1.hasMatchingTransponder(id) then
                 local owner = radar_1.getConstructOwnerEntity(id)
                 if owner['isOrganization'] then
                     owner = system.getOrganization(owner['id'])
@@ -53,7 +53,7 @@ if string.starts(text:lower(),'delshipid') then
     for k,v in pairs(friendlySIDs) do if k == matches[2] then r = k end end
     if r ~= nil then friendlySIDs[r] = nil end
     if write_db ~= nil and #matches == 2 then
-        if write_db.hasKey('sc-' .. tostring(matches[2])) == 1 then write_db.setStringValue('sc-' .. tostring(matches[2]),nil) end
+        if write_db.hasKey('sc-' .. tostring(matches[2])) then write_db.setStringValue('sc-' .. tostring(matches[2]),nil) end
     end
     system.print('-- Construct removed from Friendly ID list --')
 end
@@ -212,7 +212,7 @@ if text:lower() == 'setfc' then
     elseif radar_1.getTargetId() == 0 then
         system.print('-- No target --')
         FC = nil
-    elseif radar_1.hasMatchingTransponder(radar_1.getTargetId()) == 0 then
+    elseif not radar_1.hasMatchingTransponder(radar_1.getTargetId()) then
         system.print('-- Target does not have matching transponder --')
     else
         FC = radar_1.getTargetId()
@@ -226,7 +226,7 @@ if text:lower() == 'setsl' then
     elseif radar_1.getTargetId() == 0 then
         system.print('-- No target --')
         SL = nil
-    elseif radar_1.hasMatchingTransponder(radar_1.getTargetId()) == 0 then
+    elseif not radar_1.hasMatchingTransponder(radar_1.getTargetId()) then
         system.print('-- Target does not have matching transponder --')
     else
         SL = radar_1.getTargetId()

@@ -6,12 +6,12 @@ end
 if accelerating then
     system.print('Accelerating')
     if boosterCount % 3 == 0 then
-        if Nav.boosterState == 1 then 
+        if Nav.boosterState then 
             --system.print('Boosters off')
             Nav:toggleBoosters()
         end
     else
-        if Nav.boosterState == 0 then
+        if not Nav.boosterState then
             --system.print('Boosters on')
             Nav:toggleBoosters()
         end
@@ -19,12 +19,12 @@ if accelerating then
 else
     system.print('Maintaining')
     if boosterCount % 3 == 0 then
-        if Nav.boosterState == 0 then 
+        if not Nav.boosterState then 
             --system.print('Boosters on')
             Nav:toggleBoosters()
         end
     else
-        if Nav.boosterState == 1 then 
+        if Nav.boosterState then 
             --system.print('Boosters off')
             Nav:toggleBoosters()
         end

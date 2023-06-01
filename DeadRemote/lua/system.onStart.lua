@@ -805,7 +805,7 @@ function resistWidget()
     local resistTimerColor = shieldHPColor
     if resistTimer > 0 then resistTimerColor = warning_outline_color end 
 
-    if shield_1.isVenting() == 0 then
+    if not shield_1.isVenting() then
         warnings['venting'] = nil
     else 
         warnings['venting'] = 'svgCritical'
@@ -922,7 +922,7 @@ function transponderWidget()
     if transponder_1 ~= nil then
         local transponderColor = warning_outline_color
         local transponderStatus = 'offline'
-        if transponder_1.isActive() == 1 then transponderColor = shieldHPColor transponderStatus = 'Active' end
+        if transponder_1.isActive() then transponderColor = shieldHPColor transponderStatus = 'Active' end
         local tags = transponder_1.getTags()
 
         local x,y,s
@@ -1102,69 +1102,69 @@ end
 function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
-            if db_1.hasKey('generateAutoCode') == 1 then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
-            if db_1.hasKey('asteroidPipes') == 1 then asteroidPipes = db_1.getIntValue('asteroidPipes') == 1 end
-            if db_1.hasKey('toggleBrakes') == 1 then toggleBrakes = db_1.getIntValue('toggleBrakes') == 1 end
-            if db_1.hasKey('caerusOption') == 1 then caerusOption = db_1.getIntValue('caerusOption') == 1 end
-            if db_1.hasKey('validatePilot') == 1 then validatePilot = db_1.getIntValue('validatePilot') == 1 end
-            if db_1.hasKey('showRemotePanel') == 1 then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
-            if db_1.hasKey('showDockingPanel') == 1 then showDockingPanel = db_1.getIntValue('showDockingPanel') == 1 end
-            if db_1.hasKey('showFuelPanel') == 1 then showFuelPanel = db_1.getIntValue('showFuelPanel') == 1 end
-            if db_1.hasKey('showHelper') == 1 then showHelper = db_1.getIntValue('showHelper') == 1 end
-            if db_1.hasKey('defaultHoverHeight') == 1 then defaultHoverHeight = db_1.getIntValue('defaultHoverHeight') end
-            if db_1.hasKey('topHUDLineColorSZ') == 1 then topHUDLineColorSZ = db_1.getStringValue('topHUDLineColorSZ') end
-            if db_1.hasKey('topHUDFillColorSZ') == 1 then topHUDFillColorSZ = db_1.getStringValue('topHUDFillColorSZ') end
-            if db_1.hasKey('textColorSZ') == 1 then textColorSZ = db_1.getStringValue('textColorSZ') end
-            if db_1.hasKey('topHUDLineColorPVP') == 1 then topHUDLineColorPVP = db_1.getStringValue('topHUDLineColorPVP') end
-            if db_1.hasKey('topHUDFillColorPVP') == 1 then topHUDFillColorPVP = db_1.getStringValue('topHUDFillColorPVP') end
-            if db_1.hasKey('textColorPVP') == 1 then textColorPVP = db_1.getStringValue('textColorPVP') end
-            if db_1.hasKey('fuelTextColor') == 1 then fuelTextColor = db_1.getStringValue('fuelTextColor') end
-            if db_1.hasKey('Direction_Indicator_Size') == 1 then Direction_Indicator_Size = db_1.getFloatValue('Direction_Indicator_Size') end
-            if db_1.hasKey('Direction_Indicator_Color') == 1 then Direction_Indicator_Color = db_1.getStringValue('Direction_Indicator_Color') end
-            if db_1.hasKey('Prograde_Indicator_Size') == 1 then Prograde_Indicator_Size = db_1.getFloatValue('Prograde_Indicator_Size') end
-            if db_1.hasKey('Prograde_Indicator_Color') == 1 then Prograde_Indicator_Color = db_1.getStringValue('Prograde_Indicator_Color') end
-            if db_1.hasKey('AP_Brake_Buffer') == 1 then AP_Brake_Buffer = db_1.getFloatValue('AP_Brake_Buffer') end
-            if db_1.hasKey('AP_Max_Rotation_Factor') == 1 then AP_Max_Rotation_Factor = db_1.getFloatValue('AP_Max_Rotation_Factor') end
-            if db_1.hasKey('AR_Mode') == 1 then AR_Mode = db_1.getStringValue('AR_Mode') end
-            if db_1.hasKey('AR_Range') == 1 then AR_Range = db_1.getFloatValue('AR_Range') end
-            if db_1.hasKey('AR_Size') == 1 then AR_Size = db_1.getFloatValue('AR_Size') end
-            if db_1.hasKey('AR_Fill') == 1 then AR_Fill = db_1.getStringValue('AR_Fill') end
-            if db_1.hasKey('AR_Outline') == 1 then AR_Outline = db_1.getStringValue('AR_Outline') end
-            if db_1.hasKey('AR_Opacity') == 1 then AR_Opacity = db_1.getStringValue('AR_Opacity') end
-            if db_1.hasKey('AR_Exclude_Moons') == 1 then AR_Exclude_Moons = db_1.getIntValue('AR_Exclude_Moons') == 1 end
-            if db_1.hasKey('EngineTagColor') == 1 then EngineTagColor = db_1.getStringValue('EngineTagColor') end
-            if db_1.hasKey('Indicator_Width') == 1 then Indicator_Width = db_1.getFloatValue('Indicator_Width') end
-            if db_1.hasKey('warning_size') == 1 then warning_size = db_1.getFloatValue('warning_size') end
-            if db_1.hasKey('warning_outline_color') == 1 then warning_outline_color = db_1.getStringValue('warning_outline_color') end
-            if db_1.hasKey('warning_fill_color') == 1 then warning_fill_color = db_1.getStringValue('warning_fill_color') end
-            if db_1.hasKey('useLogo') == 1 then useLogo = db_1.getIntValue('useLogo') == 1 end
-            if db_1.hasKey('logoSVG') == 1 then logoSVG = db_1.getStringValue('logoSVG') end
-            if db_1.hasKey('minimalWidgets') == 1 then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
-            if db_1.hasKey('homeBaseLocation') == 1 then homeBaseLocation = db_1.getStringValue('homeBaseLocation') end
-            if db_1.hasKey('homeBaseDistance') == 1 then homeBaseDistance = db_1.getIntValue('homeBaseDistance') end
+            if db_1.hasKey('generateAutoCode') then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
+            if db_1.hasKey('asteroidPipes') then asteroidPipes = db_1.getIntValue('asteroidPipes') == 1 end
+            if db_1.hasKey('toggleBrakes') then toggleBrakes = db_1.getIntValue('toggleBrakes') == 1 end
+            if db_1.hasKey('caerusOption') then caerusOption = db_1.getIntValue('caerusOption') == 1 end
+            if db_1.hasKey('validatePilot') then validatePilot = db_1.getIntValue('validatePilot') == 1 end
+            if db_1.hasKey('showRemotePanel') then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
+            if db_1.hasKey('showDockingPanel') then showDockingPanel = db_1.getIntValue('showDockingPanel') == 1 end
+            if db_1.hasKey('showFuelPanel') then showFuelPanel = db_1.getIntValue('showFuelPanel') == 1 end
+            if db_1.hasKey('showHelper') then showHelper = db_1.getIntValue('showHelper') == 1 end
+            if db_1.hasKey('defaultHoverHeight') then defaultHoverHeight = db_1.getIntValue('defaultHoverHeight') end
+            if db_1.hasKey('topHUDLineColorSZ') then topHUDLineColorSZ = db_1.getStringValue('topHUDLineColorSZ') end
+            if db_1.hasKey('topHUDFillColorSZ') then topHUDFillColorSZ = db_1.getStringValue('topHUDFillColorSZ') end
+            if db_1.hasKey('textColorSZ') then textColorSZ = db_1.getStringValue('textColorSZ') end
+            if db_1.hasKey('topHUDLineColorPVP') then topHUDLineColorPVP = db_1.getStringValue('topHUDLineColorPVP') end
+            if db_1.hasKey('topHUDFillColorPVP') then topHUDFillColorPVP = db_1.getStringValue('topHUDFillColorPVP') end
+            if db_1.hasKey('textColorPVP') then textColorPVP = db_1.getStringValue('textColorPVP') end
+            if db_1.hasKey('fuelTextColor') then fuelTextColor = db_1.getStringValue('fuelTextColor') end
+            if db_1.hasKey('Direction_Indicator_Size') then Direction_Indicator_Size = db_1.getFloatValue('Direction_Indicator_Size') end
+            if db_1.hasKey('Direction_Indicator_Color') then Direction_Indicator_Color = db_1.getStringValue('Direction_Indicator_Color') end
+            if db_1.hasKey('Prograde_Indicator_Size') then Prograde_Indicator_Size = db_1.getFloatValue('Prograde_Indicator_Size') end
+            if db_1.hasKey('Prograde_Indicator_Color') then Prograde_Indicator_Color = db_1.getStringValue('Prograde_Indicator_Color') end
+            if db_1.hasKey('AP_Brake_Buffer') then AP_Brake_Buffer = db_1.getFloatValue('AP_Brake_Buffer') end
+            if db_1.hasKey('AP_Max_Rotation_Factor') then AP_Max_Rotation_Factor = db_1.getFloatValue('AP_Max_Rotation_Factor') end
+            if db_1.hasKey('AR_Mode') then AR_Mode = db_1.getStringValue('AR_Mode') end
+            if db_1.hasKey('AR_Range') then AR_Range = db_1.getFloatValue('AR_Range') end
+            if db_1.hasKey('AR_Size')then AR_Size = db_1.getFloatValue('AR_Size') end
+            if db_1.hasKey('AR_Fill') then AR_Fill = db_1.getStringValue('AR_Fill') end
+            if db_1.hasKey('AR_Outline') then AR_Outline = db_1.getStringValue('AR_Outline') end
+            if db_1.hasKey('AR_Opacity') then AR_Opacity = db_1.getStringValue('AR_Opacity') end
+            if db_1.hasKey('AR_Exclude_Moons') then AR_Exclude_Moons = db_1.getIntValue('AR_Exclude_Moons') == 1 end
+            if db_1.hasKey('EngineTagColor') then EngineTagColor = db_1.getStringValue('EngineTagColor') end
+            if db_1.hasKey('Indicator_Width') then Indicator_Width = db_1.getFloatValue('Indicator_Width') end
+            if db_1.hasKey('warning_size') then warning_size = db_1.getFloatValue('warning_size') end
+            if db_1.hasKey('warning_outline_color') then warning_outline_color = db_1.getStringValue('warning_outline_color') end
+            if db_1.hasKey('warning_fill_color') then warning_fill_color = db_1.getStringValue('warning_fill_color') end
+            if db_1.hasKey('useLogo') then useLogo = db_1.getIntValue('useLogo') == 1 end
+            if db_1.hasKey('logoSVG') then logoSVG = db_1.getStringValue('logoSVG') end
+            if db_1.hasKey('minimalWidgets') then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
+            if db_1.hasKey('homeBaseLocation') then homeBaseLocation = db_1.getStringValue('homeBaseLocation') end
+            if db_1.hasKey('homeBaseDistance') then homeBaseDistance = db_1.getIntValue('homeBaseDistance') end
 
-            if db_1.hasKey('autoVent') == 1 then autoVent = db_1.getIntValue('autoVent') == 1 end
+            if db_1.hasKey('autoVent') then autoVent = db_1.getIntValue('autoVent') == 1 end
 
-            if db_1.hasKey('hpWidgetX') == 1 then hpWidgetX = db_1.getFloatValue('hpWidgetX') end
-            if db_1.hasKey('hpWidgetY') == 1 then hpWidgetY = db_1.getFloatValue('hpWidgetY') end
-            if db_1.hasKey('hpWidgetScale') == 1 then hpWidgetScale = db_1.getFloatValue('hpWidgetScale') end
-            if db_1.hasKey('shieldHPColor') == 1 then shieldHPColor = db_1.getStringValue('shieldHPColor') end
-            if db_1.hasKey('ccsHPColor') == 1 then ccsHPColor = db_1.getStringValue('ccsHPColor') end
+            if db_1.hasKey('hpWidgetX') then hpWidgetX = db_1.getFloatValue('hpWidgetX') end
+            if db_1.hasKey('hpWidgetY') then hpWidgetY = db_1.getFloatValue('hpWidgetY') end
+            if db_1.hasKey('hpWidgetScale') then hpWidgetScale = db_1.getFloatValue('hpWidgetScale') end
+            if db_1.hasKey('shieldHPColor') then shieldHPColor = db_1.getStringValue('shieldHPColor') end
+            if db_1.hasKey('ccsHPColor') then ccsHPColor = db_1.getStringValue('ccsHPColor') end
 
-            if db_1.hasKey('resistWidgetX') == 1 then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
-            if db_1.hasKey('resistWidgetY') == 1 then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
-            if db_1.hasKey('resistWidgetScale') == 1 then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
-            if db_1.hasKey('antiMatterColor') == 1 then antiMatterColor = db_1.getStringValue('antiMatterColor') end
-            if db_1.hasKey('electroMagneticColor') == 1 then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
-            if db_1.hasKey('kineticColor') == 1 then kineticColor = db_1.getStringValue('kineticColor') end
-            if db_1.hasKey('thermicColor') == 1 then thermicColor = db_1.getStringValue('thermicColor') end
+            if db_1.hasKey('resistWidgetX') then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
+            if db_1.hasKey('resistWidgetY') then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
+            if db_1.hasKey('resistWidgetScale') then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
+            if db_1.hasKey('antiMatterColor') then antiMatterColor = db_1.getStringValue('antiMatterColor') end
+            if db_1.hasKey('electroMagneticColor') then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
+            if db_1.hasKey('kineticColor') then kineticColor = db_1.getStringValue('kineticColor') end
+            if db_1.hasKey('thermicColor') then thermicColor = db_1.getStringValue('thermicColor') end
 
-            if db_1.hasKey('transponderWidgetX') == 1 then transponderWidgetX = db_1.getFloatValue('transponderWidgetX') end
-            if db_1.hasKey('transponderWidgetY') == 1 then transponderWidgetY = db_1.getFloatValue('transponderWidgetY') end
-            if db_1.hasKey('transponderWidgetScale') == 1 then transponderWidgetScale = db_1.getFloatValue('transponderWidgetScale') end
-            if db_1.hasKey('transponderWidgetXmin') == 1 then transponderWidgetXmin = db_1.getFloatValue('transponderWidgetXmin') end
-            if db_1.hasKey('transponderWidgetYmin') == 1 then transponderWidgetYmin = db_1.getFloatValue('transponderWidgetYmin') end
-            if db_1.hasKey('transponderWidgetScalemin') == 1 then transponderWidgetScalemin = db_1.getFloatValue('transponderWidgetScalemin') end
+            if db_1.hasKey('transponderWidgetX') then transponderWidgetX = db_1.getFloatValue('transponderWidgetX') end
+            if db_1.hasKey('transponderWidgetY') then transponderWidgetY = db_1.getFloatValue('transponderWidgetY') end
+            if db_1.hasKey('transponderWidgetScale') then transponderWidgetScale = db_1.getFloatValue('transponderWidgetScale') end
+            if db_1.hasKey('transponderWidgetXmin') then transponderWidgetXmin = db_1.getFloatValue('transponderWidgetXmin') end
+            if db_1.hasKey('transponderWidgetYmin') then transponderWidgetYmin = db_1.getFloatValue('transponderWidgetYmin') end
+            if db_1.hasKey('transponderWidgetScalemin') then transponderWidgetScalemin = db_1.getFloatValue('transponderWidgetScalemin') end
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end

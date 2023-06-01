@@ -5,7 +5,7 @@ for id,pos in pairs(unknownRadar) do
     system.print('First contact:')
     system.print(string.format('::pos{0,0,%s,%s,%s}',pos['x'],pos['y'],pos['z']))
     local cored = ''
-    if radar_1.isConstructAbandoned(id) == 1 then
+    if radar_1.isConstructAbandoned(id) then
         cored = '[CORED] '
     end
     system.print(string.format('Name: %s%s',cored,radar_1.getConstructName(id)))

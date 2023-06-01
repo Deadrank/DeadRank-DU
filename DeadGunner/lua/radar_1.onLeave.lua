@@ -9,7 +9,7 @@ if warpScan then
         if szAlerts then system.print(string.format('-- [%s] %s left radar',id,radar_1.getConstructName(id))) end
         if inWS then
             local cored = ''
-            if radar_1.isConstructAbandoned(id) == 1 then
+            if radar_1.isConstructAbandoned(id) then
                 cored = '[CORED] '
             end
             system.print('----------------------')
