@@ -14,6 +14,7 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
+
 hudVersion = 'v4.2.0'
 system.print('-- '..hudVersion..' --')
 screenRefreshRate = 0.1 --export

@@ -176,11 +176,11 @@ function updateRadar(filter)
             end
             local tMatch = radar_1.hasMatchingTransponder(id)
             local name = nameOrig--:gsub('%[',''):gsub('%]','')
-            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)'):gsub('%.','%%.'):gsub('%}','%%}'):gsub('%{','%%{')
-            local hasBadChar = (string.find(name,'%}') and not string.find(name,'%{')) or (string.find(name,'%{') and not string.find(name,'%}')) or (string.find(name,'%]') and not string.find(name,'%[')) or (string.find(name,'%[') and not string.find(name,'%]'))
+            nameOrig = nameOrig:gsub('%]','%%]'):gsub('%[','%%['):gsub('%(','%%('):gsub('%)','%%)'):gsub('%.','%%.'):gsub('%}','%%}'):gsub('%{','%%{'):gsub('"',[[\"]])
+            local hasBadChar = (string.find(name,'"') or string.find(name,'%}') or string.find(name,'%{')) or (string.find(name,'%[') or string.find(name,'%]')) or (string.find(name,'%)') or string.find(name,'%()'))
             if hasBadChar then 
-                local cleanName = name:gsub('%}',''):gsub('%{',''):gsub('%]',''):gsub('%[',''):gsub('%)',''):gsub('%(','')
-                data = data:gsub('"name":"'..nameOrig..'"','"name":"'..cleanName..'"')
+                local cleanName = name:gsub('%}',''):gsub('%{',''):gsub('%]',''):gsub('%[',''):gsub('%)',''):gsub('%(',''):gsub('"','')
+                data = data:gsub('"name":"'..nameOrig..'"','"name":" '..cleanName..'"')
             end
             
             
@@ -286,7 +286,7 @@ function updateRadar(filter)
         n = n + 1
     end
     coroutine.yield()
-    data = data:gsub('{"constructId[^}]*}[^}]*},*', "")
+    data = data:gsub('{"constructsList":.*%],"currentTargetId":"', '{"constructsList":[],"currentTargetId":"')
     primaryData = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(primaryList,',')..']')
     data = data:gsub('"errorMessage":""','"errorMessage":"'..radarFilter..'-'..radarSort..'"')
     if radarSort == 'Size' then
