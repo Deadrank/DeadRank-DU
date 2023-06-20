@@ -37,7 +37,7 @@ if closestPlanetDist < 40000 and autopilot then
 end
 
 -- Safe Zone Distance --
-inSZ = construct.isInPvPZone() == 0
+inSZ = not construct.isInPvPZone()
 SZD = math.abs(construct.getDistanceToSafeZone())
 local tempSZD = vec3(constructPosition - SZ):len()
 nearestSZPOS = system.getWaypointFromPlayerPos()
