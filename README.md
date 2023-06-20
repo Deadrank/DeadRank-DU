@@ -1,7 +1,6 @@
 # Dead's PvP Script Suite (Current version 4.2.0 - Compatible with Dual Universe patch 1.4)
  - Updated all scripts to compensate for functions that now return true booleans instead of "1" or "0" as was done prior to DU 1.4.
-
-# Previous patch notes
+ - Fixed an issue that could cause the radar widget to malfunction
  - Added Lua Parameter for screen refresh rate on the remote and adjusted the default rate (hopefully increase FPS)
  - Added option to disable adjustor dampening (`alt-d`)
  - Added tracking mode (alt-5) that changes the way the script handles position tags entered into lua chat (tracking mode or autopilot)
