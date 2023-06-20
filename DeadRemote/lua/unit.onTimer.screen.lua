@@ -4,9 +4,9 @@ arkTime = system.getArkTime()
 
 -- Check player seated status --
 seated = player.isSeated()
-if seated == 1 and player.isFrozen() == 0 then
+if seated and not player.isFrozen() then
     player.freeze(1)
-elseif seated == 0 and player.isFrozen() == 1 then
+elseif not seated and player.isFrozen() then
     player.freeze(0)
 end
 ----------------------------------
@@ -37,7 +37,7 @@ if closestPlanetDist < 40000 and autopilot then
 end
 
 -- Safe Zone Distance --
-inSZ = construct.isInPvPZone() == 0
+inSZ = not construct.isInPvPZone()
 SZD = math.abs(construct.getDistanceToSafeZone())
 local tempSZD = vec3(constructPosition - SZ):len()
 nearestSZPOS = system.getWaypointFromPlayerPos()
@@ -197,9 +197,9 @@ if shield_1 then
     end
 
     local hp = shield_1.getShieldHitpoints()
-    if shield_1.isVenting() == 0 and hp == 0 and autoVent then
+    if not shield_1.isVenting() and hp == 0 and autoVent then
         shield_1.startVenting()
-    elseif shield_1.isActive() == 0 and shield_1.isVenting() == 0 or vec3(homeBaseVec - constructPosition):len() < homeBaseDistance*1000 then
+    elseif not shield_1.isActive() and not shield_1.isVenting() or vec3(homeBaseVec - constructPosition):len() < homeBaseDistance*1000 then
         if homeBaseVec then
             if vec3(homeBaseVec - constructPosition):len() >= homeBaseDistance*1000 then
                 shield_1.activate()
@@ -226,7 +226,7 @@ end
 --------------------------------------------------
 
 ------- Warp Drive Brake activation ------
-if construct.isWarping() == 1 then
+if construct.isWarping() then
     brakeInput = 1
     brakesOn = true
 end

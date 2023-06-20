@@ -5,13 +5,13 @@ if lAlt then
     else
         boosterCount = 0
         unit.stopTimer('booster')
-        if Nav.boosterState == 1 then 
+        if Nav.boosterState then 
             Nav:toggleBoosters()
             system.print('Boosters Off (end)')
         end
     end
 else
-    if player.isFrozen() == 1 or seated == 1 then
+    if player.isFrozen() or seated then
         Nav:toggleBoosters()
     end
 end

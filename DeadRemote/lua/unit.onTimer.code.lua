@@ -1,6 +1,6 @@
 if transponder_1 ~= nil then
     tags = transponder_1.getTags()
-    if transponder_1.isActive() ~= 1 then transponder_1.activate() end
+    if not transponder_1.isActive() then transponder_1.activate() end
 end
 
 if transponder_1 and codeSeed then

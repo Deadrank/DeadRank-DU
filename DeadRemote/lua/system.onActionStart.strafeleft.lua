@@ -1,3 +1,3 @@
-if player.isFrozen() == 1 or seated == 1 then
+if player.isFrozen() or seated then
     Nav.axisCommandManager:updateCommandFromActionStart(axisCommandId.lateral, -1.0)
 end

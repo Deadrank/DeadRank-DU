@@ -149,12 +149,20 @@ if string.starts(text,'::pos{') then
             local T5 = P1+5/.000005*(P2 - P1)/vec3(P2-P1):len()
             local T30 = P1+30/.000005*(P2 - P1)/vec3(P2-P1):len()
             local T50 = P1+50/.000005*(P2 - P1)/vec3(P2-P1):len()
-            AR_Temp_Points['T5'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T5['x'],T5['y'],T5['z'])
-            AR_Temp_Points['T30'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T30['x'],T30['y'],T30['z'])
-            AR_Temp_Points['T50'] = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T50['x'],T50['y'],T50['z'])
+            local t5p = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T5['x'],T5['y'],T5['z'])
+            local t30p = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T30['x'],T30['y'],T30['z'])
+            local t50p = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T50['x'],T50['y'],T50['z'])
+            AR_Temp_Points['T5'] = t5p
+            AR_Temp_Points['T30'] = t30p
+            AR_Temp_Points['T50'] = t50p
+
+            system.print(string.format('--  5su Position: %s',t5p))
+            system.print(string.format('-- 30su Position: %s',t30p))
+            system.print(string.format('-- 50su Position: %s',t50p))
 
             autopilot_dest = T50
             autopilot_dest_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',T50['x'],T50['y'],T50['z'])
+            system.setWaypoint(autopilot_dest_pos)
 
             system.print('-- Trajectory points added --')
         end

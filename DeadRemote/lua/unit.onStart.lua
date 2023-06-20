@@ -14,7 +14,8 @@ table.insert(predefinedTags,'freight')
 showAlerts = false
 
 ---------------------------------------
-hudVersion = 'v4.1.12'
+
+hudVersion = 'v4.2.0'
 system.print('-- '..hudVersion..' --')
 screenRefreshRate = 0.1 --export
 useDB = true --export
@@ -290,7 +291,7 @@ if shield_1 ~= nil and showShieldWidget then shield_1.showWidget() end
 
 -- freeze the player in he is remote controlling the construct
 seated = player.isSeated()
-if seated == 1 then
+if seated then
     player.freeze(1)
 end
 
@@ -300,7 +301,7 @@ end
 
 -- landing gear
 -- make sure every gears are synchonized with the first
-gearExtended = (Nav.control.isAnyLandingGearDeployed() == 1) -- make sure it is a lua boolean
+gearExtended = (Nav.control.isAnyLandingGearDeployed()) -- make sure it is a lua boolean
 if gearExtended then
     Nav.control.deployLandingGears()
 else
