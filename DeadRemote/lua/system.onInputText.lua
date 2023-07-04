@@ -277,3 +277,10 @@ if string.starts(text:lower(),'hide ') and not string.starts(text,'hide code') t
 end
 if text:lower() == 'asteroid pipes on' then asteroidPipes = true system.print('-- Enable Asteroid pipe file --') end
 if text:lower() == 'asteroid pipes off' then asteroidPipes = false system.print('-- Disabled Asteroid pipe file --') end
+if string.starts(text:lower(),'sp ') then
+    local matches = {}
+    for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+    if #matches ~= 2 then system.print('-- Invalid input --')
+    elseif resistProfiles[matches[2]:lower()] then shieldProfile = matches[2]:lower() system.print('-- Shield profile set: '..matches[2]:lower())
+    else system.print('-- Shield profile not found --') system.print('-- Current profile: '..shieldProfile) end
+end

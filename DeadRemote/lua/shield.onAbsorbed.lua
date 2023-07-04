@@ -1,4 +1,7 @@
 local ts = system.getArkTime()
+if not dmgTick then
+    dmgTick = ts
+end
 if dpsTracker[string.format('%.0f',ts/10)] then
     dpsTracker[string.format('%.0f',ts/10)] = dpsTracker[string.format('%.0f',ts/10)] + damage
     dpsChart[1] = dpsTracker[string.format('%.0f',ts/10)]

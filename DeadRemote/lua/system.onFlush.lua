@@ -213,7 +213,7 @@ Nav:setEngineTorqueCommand('torque', angularAcceleration, keepCollinearity, 'air
 -- Brakes
 local brakeAcceleration = vec3()
 if autopilot then
-    if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer or closestPlanetDist < 0.65/.000005 or brakesOn then
+    if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer or (closestPlanetDist < 0.65/.000005 and not string.find(closestPlanetStr,'Moon')) or brakesOn then
         brakeAcceleration = -maxBrake * constructVelocityDir
         brakeInput = 1
     elseif autopilot_dest ~= nil and not brakesOn then

@@ -15,7 +15,7 @@ showAlerts = false
 
 ---------------------------------------
 
-hudVersion = 'v4.2.0'
+hudVersion = 'v4.2.1'
 system.print('-- '..hudVersion..' --')
 screenRefreshRate = 0.1 --export
 useDB = true --export
@@ -70,6 +70,18 @@ dampening = true --inertial dampening
 
 minimalWidgets = false
 -- HP (Shield/CCS) widget --
+shieldProfile = 'auto'
+resistProfiles = {}
+resistProfiles['auto'] = {['am']=0, ['em']=0, ['kn']=0, ['th']=0}
+resistProfiles['cannon'] = {['am']=0, ['em']=0, ['kn']=0.5, ['th']=0.5}
+resistProfiles['railgun'] = {['am']=0.5, ['em']=0.5, ['kn']=0, ['th']=0}
+resistProfiles['missile'] = {['am']=0.5, ['em']=0, ['kn']=0.5, ['th']=0}
+resistProfiles['laser'] = {['am']=0, ['em']=0.5, ['kn']=0, ['th']=0.5}
+resistProfiles['am'] = {['am']=1, ['em']=0, ['kn']=0, ['th']=0}
+resistProfiles['em'] = {['am']=0, ['em']=1, ['kn']=0, ['th']=0}
+resistProfiles['kn'] = {['am']=0, ['em']=0, ['kn']=1, ['th']=0}
+resistProfiles['th'] = {['am']=0, ['em']=0, ['kn']=0, ['th']=1}
+
 hpWidgetX = 33 --export
 hpWidgetY = 88 --export
 hpWidgetScale = 17 --export

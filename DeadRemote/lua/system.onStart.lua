@@ -1151,6 +1151,7 @@ function globalDB(action)
             if db_1.hasKey('shieldHPColor') then shieldHPColor = db_1.getStringValue('shieldHPColor') end
             if db_1.hasKey('ccsHPColor') then ccsHPColor = db_1.getStringValue('ccsHPColor') end
 
+            if db_1.hasKey('shieldProfile') then shieldProfile = db_1.getStringValue('shieldProfile') end
             if db_1.hasKey('resistWidgetX') then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
             if db_1.hasKey('resistWidgetY') then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
             if db_1.hasKey('resistWidgetScale') then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
@@ -1165,6 +1166,8 @@ function globalDB(action)
             if db_1.hasKey('transponderWidgetXmin') then transponderWidgetXmin = db_1.getFloatValue('transponderWidgetXmin') end
             if db_1.hasKey('transponderWidgetYmin') then transponderWidgetYmin = db_1.getFloatValue('transponderWidgetYmin') end
             if db_1.hasKey('transponderWidgetScalemin') then transponderWidgetScalemin = db_1.getFloatValue('transponderWidgetScalemin') end
+
+            if db_1.hasKey('screenRefreshRate') then screenRefreshRate = db_1.getFloatValue('screenRefreshRate') end
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
@@ -1215,6 +1218,7 @@ function globalDB(action)
             db_1.setStringValue('shieldHPColor',shieldHPColor)
             db_1.setStringValue('ccsHPColor',ccsHPColor)
 
+            db_1.setStringValue('shieldProfile',shieldProfile)
             db_1.setFloatValue('resistWidgetX',resistWidgetX)
             db_1.setFloatValue('resistWidgetY',resistWidgetY)
             db_1.setFloatValue('resistWidgetScale',resistWidgetScale)
@@ -1229,6 +1233,7 @@ function globalDB(action)
             db_1.setFloatValue('transponderWidgetXmin',transponderWidgetXmin)
             db_1.setFloatValue('transponderWidgetYmin',transponderWidgetYmin)
             db_1.setFloatValue('transponderWidgetScalemin',transponderWidgetScalemin)
+            db_1.setFloatValue('screenRefreshRate',screenRefreshRate)
         end
     end
 end
