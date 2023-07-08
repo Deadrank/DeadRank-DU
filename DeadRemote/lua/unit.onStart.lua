@@ -15,9 +15,9 @@ showAlerts = false
 
 ---------------------------------------
 
-hudVersion = 'v4.2.1'
+hudVersion = 'v4.2.2'
 system.print('-- '..hudVersion..' --')
-screenRefreshRate = 0.1 --export
+screenRefreshRate = 0.05 --export
 useDB = true --export
 caerusOption = false --export
 validatePilot = false --export

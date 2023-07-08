@@ -200,13 +200,18 @@ if shield_1 then
         system.print('-- Detected invalid shield profile --')
         shieldProfile = 'auto'
     else
-        if not ((csr[1] == srp and csr[2] == srp and csr[3] == srp and csr[4] == srp) or rcd ~= 0) then
-            shield_1.setResistances(
-                srp*resistProfiles[shieldProfile]['am'],
-                srp*resistProfiles[shieldProfile]['em'],
-                srp*resistProfiles[shieldProfile]['kn'],
-                srp*resistProfiles[shieldProfile]['th']
-            )
+        if not (csr[1] == srp*resistProfiles[shieldProfile]['am']
+            and csr[2] == srp*resistProfiles[shieldProfile]['em']
+            and csr[3] == srp*resistProfiles[shieldProfile]['kn']
+            and csr[4] == srp*resistProfiles[shieldProfile]['th']) then
+            if not rcd ~= 0 then
+                shield_1.setResistances(
+                    srp*resistProfiles[shieldProfile]['am'],
+                    srp*resistProfiles[shieldProfile]['em'],
+                    srp*resistProfiles[shieldProfile]['kn'],
+                    srp*resistProfiles[shieldProfile]['th']
+                )
+            end
         end
     end
 

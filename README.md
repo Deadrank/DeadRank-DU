@@ -1,4 +1,6 @@
 # Dead's PvP Script Suite (Current version 4.2.1 - Compatible with Dual Universe patch 1.4+)
+## 4.2.2 Updates
+ - Fixed a bug where shield resist profile would continually reset even if profile wasn't changed
 ## 4.2.1 Updates
  - Added new lua comand for manually setting shield resists `sp <profile name>` can now be used in lua chat to set predefined shield profiles.
  Default profiles are:
@@ -14,7 +16,7 @@
  - Custom profiles can be added to unit.start (eventually will add a lua file import for this) and should be formatted as follows
     `resistProfiles['custom'] = {['am']=<am resist>, ['em']=<em resist>, ['kn']=<kn resist>, ['th']=<th resist>}`
     Each resist should be the percent of shield resistance set to that damage type. Total resists should add up to 1 (i.e. .1, .1, .4, .4).
-    
+
 ## Previous Updates
  - Updated all scripts to compensate for functions that now return true booleans instead of "1" or "0" as was done prior to DU 1.4.
  - Fixed an issue that could cause the radar widget to malfunction
