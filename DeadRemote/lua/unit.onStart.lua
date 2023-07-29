@@ -15,7 +15,7 @@ showAlerts = false
 
 ---------------------------------------
 
-hudVersion = 'v4.2.2'
+hudVersion = 'v4.2.3'
 system.print('-- '..hudVersion..' --')
 screenRefreshRate = 0.05 --export
 useDB = true --export
@@ -170,12 +170,12 @@ cr = nil
 cr_ar = nil
 followID = nil
 followSpeedMod = 0
+
 AR_Custom_Points = {}
 AR_Custom = false
 AR_Temp = false
 AR_Temp_Points = {}
 asteroidPipeList = {}
-
 AR_Array = {}
 
 legacyFile = false
@@ -193,7 +193,7 @@ if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
                     system.print('Adding waypoints from '..waypointFile.FilePath)
                     for name,pos in pairs(waypoints) do
                         AR_Custom_Points[name] = pos
-                                        AR_Array[#validWaypointFiles][name]=pos
+                        AR_Array[#validWaypointFiles][name]=pos
                         AR_Custom = true
                     end
                 else

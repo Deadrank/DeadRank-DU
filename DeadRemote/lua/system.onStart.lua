@@ -230,10 +230,10 @@ function flightWidget()
     if Nav.axisCommandManager:getMasterMode() == controlMasterModeId.travel then mode = 'Throttle ' .. tostring(Nav.axisCommandManager:getThrottleCommand(0) * 100) .. '%' modeBG = bgColor
     else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
     end
-    local sw = ''
+    local sw = {}
     if speed ~= nil then
         --Center Top
-        sw = [[
+        sw[#sw+1] = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
                 <path d="
                 M ]] .. tostring(.31*screenWidth) .. ' ' .. tostring(.001*screenHeight) ..[[ 
@@ -245,7 +245,7 @@ function flightWidget()
         
 
         -- Right Side
-        sw = sw .. [[<path d="
+        sw[#sw+1] = [[<path d="
                 M ]] .. tostring(.6635*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [[ 
                 L ]] .. tostring(.691*screenWidth) .. ' ' .. tostring(.0387*screenHeight) .. [[
                 L ]] .. tostring(.80*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
@@ -255,7 +255,7 @@ function flightWidget()
                 stroke="]]..lineColor..[[" stroke-width="1" fill="]].. modeBG ..[[" />]]
                 
         if not maxBrake then maxBrake = 0 end
-        sw = sw .. [[<path d="
+        sw[#sw+1] = [[<path d="
                 M ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[ 
                 L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
                 stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
@@ -289,9 +289,9 @@ function flightWidget()
             </svg>
             ]]
     else
-        sw = ''
+        sw[#sw+1] = ''
     end
-    return sw
+    return table.concat(sw,'')
 end
 
 function fuelWidget()
@@ -307,14 +307,15 @@ function fuelWidget()
     curFuelStr = string.format('%.2f%%',sFuelPercent)
 
     --Center bottom ribbon
-    local fw = string.format([[
+    local fw = {}
+    fw[#fw+1] = string.format([[
         <svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;">
             <linearGradient id="sFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
             <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
             <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
             </linearGradient>]],sFuelPercent,sFuelPercent)
 
-    fw = fw .. [[
+    fw[#fw+1] = [[
         <path d="
         M ]] .. tostring(.336*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [[ 
         L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
@@ -366,21 +367,21 @@ function fuelWidget()
         warnings['lowFuel'] = nil
     end
 
-    fw = fw .. '</svg>'
+    fw[#fw+1] = '</svg>'
 
-    return fw
+    return table.concat(fw,'')
 end
 
 function apStatusWidget()
     local bg = bgColor
     local apStatus = 'inactive'
-    if auto_follow then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'following' end
     if autopilot then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' end
     if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' end
-    local apw = [[
+    local apw = {}
+    apw[#apw+1] = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             -- Left Top Side]]
-    apw = apw .. [[<path d="
+            apw[#apw+1] = [[<path d="
         M ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [[ 
         L ]] .. tostring(.309*screenWidth) .. ' ' .. tostring(.0387*screenHeight) .. [[
         L ]] .. tostring(.2*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
@@ -399,20 +400,20 @@ function apStatusWidget()
         local minutes = balance % 60
         balance = balance // 60
         local hours = balance % 60
-        apw = apw .. [[
+        apw[#apw+1] = [[
             <text x="]].. tostring(.280 * screenWidth) ..[[" y="]].. tostring(.055 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">ETA: ]]..string.format('%.0f:%.0f.%.0f',hours,minutes,seconds)..[[</text>
         ]]
     end
 
-    apw = apw .. [[</svg>]]
-    return apw
+    apw[#apw+1] = [[</svg>]]
+    return table.concat(apw,'')
 end
 
 function positionInfoWidget()
     local piw = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            -- Far Left Top Side]]
-    piw = piw .. [[<path d="
+            -- Far Left Top Side
+            <path d="
         M ]] .. tostring(.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
         L ]] .. tostring(.115*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[
         L ]] .. tostring(.124*screenWidth) .. ' ' .. tostring(.025*screenHeight) .. [[
@@ -460,10 +461,11 @@ function engineWidget()
 end
 
 function planetARWidget()
-    local arw = planetAR
+    local arw = {}
+    arw[#arw+1] = planetAR
 
     if legacyFile then
-        arw = arw .. [[
+        arw[#arw+1] = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
                 <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
             </svg>
@@ -474,25 +476,24 @@ function planetARWidget()
             fileNumber = tonumber(string.sub(AR_Mode,j+1))
             --Catch if they reduced the number of custom files
             if fileNumber > #validWaypointFiles then AR_Mode= "None" end
-            arw = arw .. [[
+            arw[#arw+1] = [[
                 <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
                     <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..validWaypointFiles[fileNumber].DisplayName..[[</text>
                 </svg>
                 ]]
         else
-            arw = arw .. [[
+            arw[#arw+1] = [[
             <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
                 <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
             </svg>
             ]]
         end
     end
-    return arw
+    return table.concat(arw,'')
 end
 
 function shipNameWidget()
-    local snw = ''
-    snw = snw .. [[
+    local snw = [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.13 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
             <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.142 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Code: ]]..tostring(construct.getId())..[[</text>
@@ -565,7 +566,8 @@ function travelIndicatorWidget()
     local p = constructPosition + 2/.000005 * vec3(construct.getWorldOrientationForward())
     local pInfo = library.getPointOnScreen({p['x'],p['y'],p['z']})
 
-    local tiw = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local tiw = {}
+    tiw[#tiw+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     if pInfo[3] ~= 0 then
         if pInfo[1] < .01 then pInfo[1] = .01 end
         if pInfo[2] < .01 then pInfo[2] = .01 end
@@ -581,7 +583,7 @@ function travelIndicatorWidget()
         else
             translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
         end
-        tiw = tiw .. [[<g transform="translate]]..translate..[[">
+        tiw[#tiw+1] = [[<g transform="translate]]..translate..[[">
                 <circle cx="0" cy="0" r="]].. Direction_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
                 <line x1="]].. Direction_Indicator_Size*1.5 ..[[" y1="0" x2="]].. -Direction_Indicator_Size*1.5 ..[[" y2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                 <line y1="]].. Direction_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Direction_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
@@ -605,7 +607,7 @@ function travelIndicatorWidget()
             else
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
-            tiw = tiw .. [[<g transform="translate]]..translate..[[">
+            tiw[#tiw+1] = [[<g transform="translate]]..translate..[[">
                     <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
                     <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                     <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
@@ -628,21 +630,22 @@ function travelIndicatorWidget()
             else
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
-            tiw = tiw .. [[<g transform="translate]]..translate..[[">
+            tiw[#tiw+1] = [[<g transform="translate]]..translate..[[">
                     <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
                     <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                     <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
                     </g>]]
         end
     end
-    tiw = tiw .. '</svg>'
-    return tiw
+    tiw[#tiw+1] = '</svg>'
+    return table.concat(tiw,'')
 end
 
 function warningsWidget()
-    local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local ww = {}
+    ww[#ww+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     if caerusOption then
-        ww = '<svg width="100%" height="100%" style="position: absolute;left:20%;top:59%;font-family: Calibri;">'
+        ww[#ww+1] = '<svg width="100%" height="100%" style="position: absolute;left:20%;top:59%;font-family: Calibri;">'
     end
     local warningText = {}
     warningText['lowFuel'] = fuelWarningText
@@ -664,7 +667,7 @@ function warningsWidget()
     local count = 0
     for k,v in pairs(warnings) do
         if v ~= nil then
-            ww = ww .. [[
+            ww[#ww+1] = [[
                 <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.24 * screenWidth) ..[[" y="]].. tostring(.20 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
                     ]]..warningSymbols[v]..[[
                 </svg>
@@ -673,12 +676,13 @@ function warningsWidget()
             count = count + 1
         end
     end
-    ww = ww .. '</svg>'
-    return ww
+    ww[#ww+1] = '</svg>'
+    return table.concat(ww,'')
 end
 
 function hpWidget()
-    local hw = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local hw = {}
+    hw[#hw+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     --Shield/CCS Widget
     shieldPercent = 0
     if shield_1 then
@@ -698,22 +702,22 @@ function hpWidget()
         if transponder_1 then transponder_1.setTags({}) end
     end
     if (shield_1 and shieldPercent < 15) or showAlerts then
-        hw = hw .. string.format([[
+        hw[#hw+1] = string.format([[
         <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: red;">
             ]]..warningSymbols['svgCritical']..[[
         </svg>
         <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.64 * screenHeight) ..[[" style="fill: red" font-size="3.42vh" font-weight="bold">SHIELD CRITICAL</text>
         ]])
     elseif (shield_1 and shieldPercent < 30) or showAlerts then
-        hw = hw .. string.format([[
+        hw[#hw+1] = string.format([[
         <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: orange;">
             ]]..warningSymbols['svgWarning']..[[
         </svg>
         <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.64 * screenHeight) ..[[" style="fill: orange" font-size="3.42vh" font-weight="bold">SHIELD LOW</text>
         ]])
     end
-    hw = hw .. '</svg>'
-    hw = hw .. [[
+    hw[#hw+1] = '</svg>'
+    hw[#hw+1] = [[
         <svg style="position: absolute; top: ]]..hpWidgetY..[[vh; left: ]]..hpWidgetX..[[vw;" viewBox="0 0 355 97" width="]]..tostring(hpWidgetScale)..[[vw">
             <polyline style="fill-opacity: 0; stroke-linejoin: round; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" points="2 78.902 250 78.902 276 50" bx:origin="0.564202 0.377551"/>
             <polyline style="stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" points="225 85.853 253.049 85.853 271 67.902" bx:origin="-1.23913 -1.086291"/>
@@ -725,10 +729,10 @@ function hpWidget()
             ]]
     local placement = 0
     for i = 4, CCSPercent, 4 do 
-        hw = hw .. [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..ccsHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="56" x2="]]..tostring(5+placement)..[["   y2="72" bx:origin="0 0.096154"/>]]  placement = placement + 10
+        hw[#hw+1] = [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..ccsHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="56" x2="]]..tostring(5+placement)..[["   y2="72" bx:origin="0 0.096154"/>]]  placement = placement + 10
     end
             
-    hw = hw .. [[
+    hw[#hw+1] = [[
             <line style="stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="5" y1="25.706" x2="5" y2="39.508" bx:origin="0 1.607143"/>
             <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="14.859" y1="31.621" x2="14.859" y2="39.508" bx:origin="0 2.0625"/>
             <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="24.718" y1="31.684" x2="24.718" y2="39.571" bx:origin="0 2.0545"/>
@@ -768,7 +772,7 @@ function hpWidget()
             if shield_1 then
                 local ventCD = shield_1.getVentingCooldown()
                 if ventCD > 0 then
-                    hw = hw .. [[
+                    hw[#hw+1] = [[
                         <text style="fill: ]]..warning_outline_color..[[; font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="66" y="91.01" bx:origin="-2.698544 2.296589">Vent Cooldown: </text>
                         <text style="fill: ]]..warning_outline_color..[[; font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="151" y="91.01" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',ventCD)..[[s</text>
                     ]]
@@ -776,17 +780,15 @@ function hpWidget()
             end
     local placement = 0
     for i = 4, shieldPercent, 4 do 
-        hw = hw .. [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..shieldHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="42" x2="]]..tostring(5+placement)..[["   y2="55" bx:origin="0 0.096154"/>]]  placement = placement + 10
+        hw[#hw+1] = [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..shieldHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="42" x2="]]..tostring(5+placement)..[["   y2="55" bx:origin="0 0.096154"/>]]  placement = placement + 10
     end
 
-    hw = hw .. '</svg>'
+    hw[#hw+1] = '</svg>'
 
-    return hw
+    return table.concat(hw,'')
 end
 
 function resistWidget()
-    local rw = ''
-
     local stress = shield_1.getStressRatioRaw()
     local amS = stress[1]
     local emS = stress[2]
@@ -811,7 +813,7 @@ function resistWidget()
         warnings['venting'] = 'svgCritical'
     end
 
-    rw = [[
+    local rw = [[
         <svg style="position: absolute; top: ]]..resistWidgetY..[[vh; left: ]]..resistWidgetX..[[vw;" viewBox="0 0 143 127" width="]]..resistWidgetScale..[[vw">
             <defs>
                 <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-am">
@@ -881,7 +883,7 @@ function resistWidget()
 end
 
 function dpsWidget()
-    local dw = ''
+    local dw = {}
 
     local x,y,s
     y = 28.25
@@ -897,7 +899,7 @@ function dpsWidget()
         table.remove(dpsChart,#dpsChart)
     end
     local cDPS = (dpsChart[1]+dpsChart[2])/20000
-    dw = dw .. [[
+    dw[#dw+1] = [[
         <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
             <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(0,0,0,0)" />
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
@@ -908,17 +910,17 @@ function dpsWidget()
             ]]
         
     for k,v in pairs(dpsChart) do
-        dw = dw .. [[<circle cx="]].. tostring(23 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(175, 75, 75, 0.90);rgba(175, 75, 75, 0.90);stroke-width:0;opacity:0.75;" />]]
+        dw[#dw+1] = [[<circle cx="]].. tostring(23 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(175, 75, 75, 0.90);rgba(175, 75, 75, 0.90);stroke-width:0;opacity:0.75;" />]]
     end
 
-    dw = dw.. [[
+    dw[#dw+1] = [[
         </svg>
     ]]
-    return dw
+    return table.concat(dw,'')
 end
 
 function transponderWidget()
-    local tw = ''
+    local tw = {}
     if transponder_1 ~= nil then
         local transponderColor = warning_outline_color
         local transponderStatus = 'offline'
@@ -936,7 +938,7 @@ function transponderWidget()
             s = transponderWidgetScale
         end
 
-        tw = [[
+        tw[#tw+1] = [[
             <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 ]]..tostring(101+#tags*24)..[[" width="]]..s..[[vw">
                 <rect x="6%" y="12%" width="87%" height="79%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
                 <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
@@ -949,17 +951,17 @@ function transponderWidget()
         for i,tag in pairs(tags) do
             local code = 'redacted'
             if codeCount > 0 then code = tag end
-            tw = tw .. [[<line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="]]..tostring(54+(i-1)*27)..[[" x2="22" y2="]]..tostring(80.7+(i-1)*27)..[["/>
+            tw[#tw+1] = [[<line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="]]..tostring(54+(i-1)*27)..[[" x2="22" y2="]]..tostring(80.7+(i-1)*27)..[["/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="]]..tostring(73+(i-1)*27)..[[">]]..code..[[</text>]]
         end
-        tw = tw .. '</svg>'
+        tw[#tw+1] = '</svg>'
     end
 
-    return tw
+    return table.concat(tw,'')
 end
 
 function minimalShipInfo()
-    local msi = ''
+    local msi = {}
 
     local bg = bgColor
     local apStatus = 'inactive'
@@ -978,23 +980,23 @@ function minimalShipInfo()
         eta = string.format(' (ETA %.0f:%s.%s)',hours,minutes,seconds)
     end
 
-    msi = msi .. [[
+    msi[#msi+1] = [[
         <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
             <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Auto Pilot Mode: ]]..apStatus..eta..[[</text>]]
     if caerusOption then
-        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.92 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>]]
-        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.935 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">SZ Dist: ]]..SZDStr..[[</text></text>]]
+        msi[#msi+1] = [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.92 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>]]
+        msi[#msi+1] = [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.935 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">SZ Dist: ]]..SZDStr..[[</text></text>]]
     end
-    msi = msi .. [[</svg>
+    msi[#msi+1] = [[</svg>
     ]]
 
-    msi = msi .. [[
+    msi[#msi+1] = [[
         <svg style="position: absolute; top: ]]..shipInfoWidgetY..[[vh; left: ]]..shipInfoWidgetX..[[vw;" viewBox="0 0 286 260" width="]]..shipInfoWidgetScale..[[vw">
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
             <polygon style="stroke-linejoin: round; fill: ]]..bg..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 258 18 260"/>
             <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">]]..string.format('%s (%s)',construct.getName(),pilotName)..[[</text>
         ]]
-    msi = msi .. [[
+        msi[#msi+1] = [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="40" y="73">Top Speed:</text>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 18px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="73" font-family: "monospace";>]]..formatNumber(maxSpeed,'speed')..[[</text>
@@ -1005,7 +1007,7 @@ function minimalShipInfo()
 
         ]]
 
-    msi = msi .. '</svg>'
+        msi[#msi+1] = '</svg>'
 
     curFuel = 0
     local fuelWarning = false
@@ -1018,7 +1020,7 @@ function minimalShipInfo()
     if sFuelPercent < 20 then fuelWarning = true end
     curFuelStr = string.format('%.2f%%',sFuelPercent)
 
-    msi = msi .. string.format([[
+    msi[#msi+1] = string.format([[
         <svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;">
             <linearGradient id="sFuel-vertical" x1="0%%" y1="100%%" x2="0%%" y2="0%%">
             <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
@@ -1029,7 +1031,7 @@ function minimalShipInfo()
     if Nav.axisCommandManager:getMasterMode() == controlMasterModeId.travel then mode = 'Throttle ' .. tostring(Nav.axisCommandManager:getThrottleCommand(0) * 100) .. '%' modeBG = fuelTextColor
     else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
     end
-    msi = msi .. [[
+    msi[#msi+1] = [[
                 <path d="
                     M ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
                     L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.185*screenHeight) .. [[
@@ -1039,11 +1041,11 @@ function minimalShipInfo()
                     stroke="]]..lineColor..[[" stroke-width="1" fill="url(#sFuel-vertical)" />
                 <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.198 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.32vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>]]
     if caerusOption then
-        msi = msi .. [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.90 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
+        msi[#msi+1] = [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.90 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
     else
-        msi = msi .. [[<text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.2115 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
+        msi[#msi+1] = [[<text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.2115 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
     end    
-    msi = msi .. [[</svg>
+    msi[#msi+1] = [[</svg>
         ]]
 
     if fuelTankWarning or fuelWarning or showAlerts then
@@ -1054,49 +1056,50 @@ function minimalShipInfo()
         warnings['lowFuel'] = nil
     end
 
-    msi = msi .. '</svg>'
+    msi[#msi+1] = '</svg>'
 
-    return msi
+    return table.concat(msi,'')
 end
 
 function generateScreen()
     if db_1 and db_1.hasKey('minimalWidgets') then
         minimalWidgets = db_1.getIntValue('minimalWidgets') == 1
     end 
-    html = [[ <html>
+    local htmlTable = {}
+    htmlTable[#htmlTable+1] = [[ <html>
         <style>
             svg { filter: drop-shadow(0px 0px 1px rgba(255,255,255,.5));}
         </style>
             <body style="font-family: Calibri;">
      ]]
-    html = html .. brakeWidget()
+     htmlTable[#htmlTable+1] = brakeWidget()
     if showScreen then 
         if minimalWidgets then
-            html = html .. minimalShipInfo()
+            htmlTable[#htmlTable+1] = minimalShipInfo()
         else
-            html = html .. flightWidget()
-            html = html .. fuelWidget()
-            html = html .. apStatusWidget()
-            html = html .. positionInfoWidget()
-            html = html .. shipNameWidget()
+            htmlTable[#htmlTable+1] = flightWidget()
+            htmlTable[#htmlTable+1] = fuelWidget()
+            htmlTable[#htmlTable+1] = apStatusWidget()
+            htmlTable[#htmlTable+1] = positionInfoWidget()
+            htmlTable[#htmlTable+1] = shipNameWidget()
         end
-        if transponder_1 then html = html .. transponderWidget() end
-        html = html .. hpWidget()
-        if shield_1 then html = html .. resistWidget() end
-        html = html .. engineWidget()
+        if transponder_1 then htmlTable[#htmlTable+1] = transponderWidget() end
+        htmlTable[#htmlTable+1] = hpWidget()
+        if shield_1 then htmlTable[#htmlTable+1] = resistWidget() end
+        htmlTable[#htmlTable+1] = engineWidget()
         if useLogo then
-            html = html .. [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
+            htmlTable[#htmlTable+1] = [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
                 </svg>]]
         end
-        html = html .. dpsWidget()
+        htmlTable[#htmlTable+1] = dpsWidget()
     end
-    html = html .. planetARWidget()
-    html = html .. helpWidget()
-    html = html .. travelIndicatorWidget()
-    html = html .. warningsWidget()
+    htmlTable[#htmlTable+1] = planetARWidget()
+    htmlTable[#htmlTable+1] = helpWidget()
+    htmlTable[#htmlTable+1] = travelIndicatorWidget()
+    htmlTable[#htmlTable+1] = warningsWidget()
 
-    html = html .. [[ </body> </html> ]]
-    system.setScreen(html)
+    htmlTable[#htmlTable+1] = [[ </body> </html> ]]
+    system.setScreen(table.concat(htmlTable, ''))
 end
 
 function globalDB(action)

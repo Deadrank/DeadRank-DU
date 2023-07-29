@@ -56,12 +56,12 @@ end
 ---------------------------
 
 -- Engine Tag Filtering --
-enabledEngineTagsStr = ''
+local engTable = {}
 local tempTag = nil
 local offset = 0
 for i,tag in pairs(enabledEngineTags) do
     if i % 2 == 0 then 
-        enabledEngineTagsStr = enabledEngineTagsStr .. [[
+        engTable[#engTable+1] = [[
             <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: ]]..EngineTagColor..[[;" font-weight="bold" font-size=".8vw">]]..tag.. ',' ..tempTag..[[</text>    
         ]]
         tempTag = nil
@@ -71,11 +71,12 @@ for i,tag in pairs(enabledEngineTags) do
     end
 end
 if tempTag ~= nil then 
-    enabledEngineTagsStr = enabledEngineTagsStr .. [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: ]]..EngineTagColor..[[;" font-weight="bold" font-size=".8vw">]]..tempTag..[[</text>]]
+    engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: ]]..EngineTagColor..[[;" font-weight="bold" font-size=".8vw">]]..tempTag..[[</text>]]
 end
-if enabledEngineTagsStr == '' then
-    enabledEngineTagsStr = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw">ALL</text>]]
+if #engTable == 0 then
+    engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size=".8vw">ALL</text>]]
 end
+enabledEngineTagsStr = table.concat(engTable,'')
 ----------------------------
 
 ---------------------------
@@ -120,9 +121,10 @@ elseif AR_Mode == 'PLANETS' then
         AR_Generate[k] = v
     end
 end
-planetAR = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+local planetARTable = {}
+planetARTable[#planetARTable+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
 for name,pos in pairs(AR_Generate) do
-    if not (name:find('Moon') or name:find('Haven') or name:find('Sanctuary') or name:find('Asteroid')) or not AR_Exclude_Moons then
+    if not (name:find('Moon') or name:find('Haven') or name:find('Sanctuary') or name:find('Asteroid')) or vec3(pos - constructPosition):len()*0.000005 < 20 or not AR_Exclude_Moons then
         local pDist = vec3(pos - constructPosition):len()
         if pDist*0.000005 < 500  or planets[name] == nil then 
             local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
@@ -151,14 +153,14 @@ for name,pos in pairs(AR_Generate) do
                     translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
                 end
                 if name == 'AutoPilot' then
-                    planetAR = planetAR .. [[<g transform="translate]]..translate..[[">
+                    planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">
                             <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <line x1="0" y1="0" x2="]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <line x1="]].. depth*1.2 ..[[" y1="]].. depth*1.2 ..[[" x2="]]..tostring(depth*1.2 + 30)..[[" y2="]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <text x="]]..tostring(depth*1.2)..[[" y="]].. depth*1.2+screenHeight*0.008 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.04*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                             </g>]]
                 else
-                    planetAR = planetAR .. [[<g transform="translate]]..translate..[[">
+                    planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">
                             <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
@@ -169,7 +171,8 @@ for name,pos in pairs(AR_Generate) do
         end
     end
 end
-planetAR = planetAR .. '</svg>'
+planetARTable[#planetARTable+1] = '</svg>'
+planetAR = table.concat(planetARTable, '')
 -----------------------------------------------------------
 
 -- Shield Updates --

@@ -1,4 +1,7 @@
 # Dead's PvP Script Suite (Current version 4.2.1 - Compatible with Dual Universe patch 1.4+)
+## 4.2.3 Updates
+ - Minor updates/bug fixes
+ - Added estimation of enemy shield resistance settings (lua print out on weapon hit).
 ## 4.2.2 Updates
  - Fixed a bug where shield resist profile would continually reset even if profile wasn't changed
 ## 4.2.1 Updates

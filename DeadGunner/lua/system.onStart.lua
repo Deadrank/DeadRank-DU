@@ -98,14 +98,16 @@ end
 
 function WeaponWidgetCreate()
     if type(weapon) == 'table' and #weapon > 0 then
-        local _panel = system.createWidgetPanel("Weapons")
         weaponDataList = {}
         for i = 1, #weapon do
             local weaponDataID = weapon[i].getWidgetDataId()
             local widgetType = weapon[i].getWidgetType()
-            local _widget = system.createWidget(_panel, "weapon")
-            system.addDataToWidget(weaponDataID,system.createWidget(_panel, widgetType))
-            if i % maxWeaponsPerWidget == 0 and i < #weapon then _panel = system.createWidgetPanel("Weapons") end
+            if weaponWidgets or string.starts(weapon[i].getName(),'Stasis') then
+                local _panel = system.createWidgetPanel("Weapons")
+                local _widget = system.createWidget(_panel, "weapon")
+                system.addDataToWidget(weaponDataID,system.createWidget(_panel, widgetType))
+                if i % maxWeaponsPerWidget == 0 and i < #weapon then _panel = system.createWidgetPanel("Weapons") end
+            end
         end
     end
 end
@@ -318,17 +320,6 @@ function RadarWidgetCreate(title)
     return ID,_panel
 end
 
-function ARWidget()
-    local arw = ARSVG
-    --test = arw .. [[
-    --    <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-    --        <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
-    --    </svg>
-    --]]
-
-    return arw
-end
-
 function globalDB(action)
     if write_db ~= nil then
         if action == 'get' then
@@ -365,6 +356,8 @@ function globalDB(action)
             if write_db.hasKey('radarInfoWidgetScalemin') then radarInfoWidgetScalemin = write_db.getFloatValue('radarInfoWidgetScalemin') end
 
             if write_db.hasKey('minimalWidgets') then minimalWidgets = write_db.getIntValue('minimalWidgets') == 1 end
+            if write_db.hasKey('weaponWidgets') then weaponWidgets = write_db.getIntValue('weaponWidgets') == 1 end
+            if write_db.hasKey('pilotSeat') then pilotSeat = write_db.getIntValue('pilotSeat') == 1 end
 
             for _,key in pairs(write_db.getKeyList()) do
                 if string.starts(key,'sc-') then
@@ -408,17 +401,20 @@ function globalDB(action)
             write_db.setFloatValue('radarInfoWidgetScalemin',radarInfoWidgetScalemin)
 
             if minimalWidgets then write_db.setIntValue('minimalWidgets',1) else write_db.setIntValue('minimalWidgets',0) end
+            if weaponWidgets then write_db.setIntValue('weaponWidgets',1) else write_db.setIntValue('weaponWidgets',0) end
+            if pilotSeat then write_db.setIntValue('pilotSeat',1) else write_db.setIntValue('pilotSeat',0) end
 
         end
     end
 end
 
 function weaponsWidget()
-    local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
-    local wtext = ''
+    local ww = {}
+    ww[#ww+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local wtext = {}
     if weapon_size > 0 then
         local wStatus = {[1] = 'Idle', [2] = 'Firing', [4] = 'Reloading', [5] = 'Unloading'}
-        ww = ww .. [[
+        ww[#ww+1] = [[
             <line x1="]].. 0.02*screenWidth ..[[" y1="]].. 0.665*screenHeight ..[[" x2="]].. 0.15*screenWidth ..[[" y2="]].. 0.665*screenHeight ..[[" style="stroke:]]..neutralLineColor..[[;stroke-width:0.25;opacity:]].. 1 ..[[;" />
             ]]
         local offset = 1
@@ -458,20 +454,21 @@ function weaponsWidget()
             elseif string.find(ammoType,'thermic') then ammoTypeColor = thermicColor ammoType = 'Thermic'
             end
             local weaponStr = string.format('<div style="position: absolute;font-weight: bold;font-size: .8vw;top: '.. tostring((0.66 - 0.015*i) * screenHeight) ..'px;left: '.. tostring(0.02* screenWidth) ..'px;"><div style="float: left;color: %s;">%s |&nbsp;</div><div style="float: left;color:%s;"> %.2f%% </div><div style="float: left;color: %s;"> | %s |&nbsp;</div><div style="float: left;color: %s;"> '..ammoType..'&nbsp;</div><div style="float: left;color: %s;">(%s) </div></div>',neutralFontColor,weaponName,probColor,probs*100,textColor,wStatus[w.getStatus()],ammoTypeColor,ammoColor,w.getAmmoCount())
-            wtext = wtext .. weaponStr
+            wtext[#wtext+1] = weaponStr
             offset = i
         end
+        wtext = table.concat(wtext,'')
         offset = offset + 1
-        ww = ww .. [[
+        ww[#ww+1] = [[
             <line x1="]].. 0.02*screenWidth ..[[" y1="]].. (0.675-offset*0.015)*screenHeight ..[[" x2="]].. 0.15*screenWidth ..[[" y2="]].. (0.675-offset*0.015)*screenHeight ..[[" style="stroke:]]..neutralLineColor..[[;stroke-width:0.25;opacity:]].. 1 ..[[;" />
             ]]
     end
-    ww = ww .. '</svg>' .. wtext
-    return ww
+    ww[#ww+1] = '</svg>' .. wtext
+    return table.concat(ww,'')
 end
 
 function radarWidget()
-    local rw = ''
+    local rw = {}
     local friendlyShipNum = radarStats['friendly']['L'] + radarStats['friendly']['M'] + radarStats['friendly']['S'] + radarStats['friendly']['XS']
     local enemyShipNum = radarStats['enemy']['L'] + radarStats['enemy']['M'] + radarStats['enemy']['S'] + radarStats['enemy']['XS']
     local radarRangeString = formatNumber(radarRange,'distance')
@@ -487,24 +484,24 @@ function radarWidget()
         s = radarInfoWidgetScale
     end
 
-    rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.185 * screenHeight) ..'px;left: '.. tostring(.875 * screenWidth) ..[[px;">
+    rw[#rw+1] = string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.185 * screenHeight) ..'px;left: '.. tostring(.875 * screenWidth) ..[[px;">
     <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Identification Range:&nbsp;</div><div style="float: left;color: rgb(25, 247, 255);">%s&nbsp;</div></div>]],radarRangeString)
   
 
-    rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.15 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
+    rw[#rw+1] = string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.15 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
     <div style="float: left;color: ]]..'white'..[[;">Identified By:&nbsp;</div><div style="float: left;color: orange;">%.0f&nbsp;</div><div style="float: left;color: ]]..'white'..[[;">ships</div></div>]],identifiedBy)
 
-    rw = rw .. string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.165 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
+    rw[#rw+1] = string.format([[<div style="position: absolute;font-weight: bold;font-size: .8vw;top: ]].. tostring(.165 * screenHeight) ..'px;left: '.. tostring(.90 * screenWidth) ..[[px;">
     <div style="float: left;color: ]]..'white'..[[;">&nbsp;&nbsp;Attacked By:&nbsp;</div><div style="float: left;color: ]]..warning_outline_color..[[;">%.0f&nbsp;</div><div style="float: left;color: ]]..'white'..[[;">ships</div></div>]],attackedBy)
 
-    rw = rw .. [[
+    rw[#rw+1] = [[
         <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 240" width="]]..s..[[vw">
             <rect x="6%" y="6%" width="87%" height="60%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
             <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 154 18 157"/>
             <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information (]]..tostring(radarContactNumber)..[[)</text>
         ]]
-    rw = rw .. [[
+        rw[#rw+1] = [[
             <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
             <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="73">Enemy Ships:</text>
             <text style="fill: ]]..warning_outline_color..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="73">]]..enemyShipNum..[[</text>
@@ -540,7 +537,7 @@ function radarWidget()
             <text style="fill: ]]..friendlyTextColor..[[; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="185" y="154">]]..radarStats['friendly']['XS']..[[</text>
         ]]
 
-    rw = rw .. '</svg>'
+        rw[#rw+1] = '</svg>'
 
     if attackedBy >= dangerWarning or showAlerts then
         warnings['attackedBy'] = 'svgWarning'
@@ -548,12 +545,12 @@ function radarWidget()
         warnings['attackedBy'] = nil
     end
 
-    return rw
+    return table.concat(rw,'')
 end
 
 function identifiedWidget()
     local id = radar_1.getTargetId()
-    local iw = ''
+    local iw = {}
     if id ~= 0 then
         if targetID == 0 then warnings['cored'] = nil warnings['friendly'] = nil end
 
@@ -726,7 +723,7 @@ function identifiedWidget()
         y = 11.25
         x = 1.75
         s = 11.25
-        iw = iw .. [[
+        iw[#iw+1] = [[
             <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
                 ]]..owner..[[
                 <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
@@ -739,15 +736,15 @@ function identifiedWidget()
                 ]]..dmgSVG
 
         if targetIdentified then
-            iw = iw .. topSpeedSVG .. dataSVG
+            iw[#iw+1] = topSpeedSVG .. dataSVG
         end
 
-        iw = iw.. [[
+        iw[#iw+1] = [[
             </svg>
         ]]
 
         if targetIndicators or showAlerts then
-            iw = iw .. [[
+            iw[#iw+1] = [[
                 <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
                     <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.30 * screenWidth) ..[[" y="]].. tostring(.50 * screenHeight) ..[[" style="fill: ]]..speedCompareColor..[[;">
                         ]]..warningSymbols['svgTarget']..[[
@@ -760,11 +757,11 @@ function identifiedWidget()
             ]]
         end
     end
-    return iw
+    return table.concat(iw,'')
 end
 
 function dpsWidget()
-    local dw = ''
+    local dw = {}
 
     local x,y,s
     y = 28.25
@@ -780,7 +777,7 @@ function dpsWidget()
         table.remove(dpsChart,#dpsChart)
     end
     local cDPS = (dpsChart[1]+dpsChart[2])/20000
-    dw = dw .. [[
+    dw[#dw+1] = [[
         <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
             <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(0,0,0,0)" />
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
@@ -791,17 +788,18 @@ function dpsWidget()
             ]]
         
     for k,v in pairs(dpsChart) do
-        dw = dw .. [[<circle cx="]].. tostring(20 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(10, 250, 10, .9);stroke:rgba(10, 250, 10, .9);stroke-width:0;opacity:0.75;" />]]
+        dw[#dw+1] = [[<circle cx="]].. tostring(20 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(10, 250, 10, .9);stroke:rgba(10, 250, 10, .9);stroke-width:0;opacity:0.75;" />]]
     end
 
-    dw = dw.. [[
+    dw[#dw+1] = [[
         </svg>
     ]]
-    return dw
+    return table.concat(dw,'')
 end
 
 function warningsWidget()
-    local ww = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    local ww = {}
+    ww[#ww+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
     local warningText = {}
     warningText['attackedBy'] = string.format('%.0f ships attacking',attackedBy)
     warningText['cored'] = 'Target is Destroyed'
@@ -823,7 +821,7 @@ function warningsWidget()
     if minimalWidgets then y = .14 end
     for k,v in pairs(warnings) do
         if v ~= nil then
-            ww = ww .. string.format([[
+            ww[#ww+1] = string.format([[
                 <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.65 * screenWidth) ..[[" y="]].. tostring(y * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
                     ]]..warningSymbols[v]..[[
                 </svg>
@@ -832,24 +830,25 @@ function warningsWidget()
             count = count + 1
         end
     end
-    ww = ww .. '</svg>'
-    return ww
+    ww[#ww+1] = '</svg>'
+    return table.concat(ww,'')
 end
 
 function generateHTML()
     if write_db and write_db.hasKey('minimalWidgets') then
         minimalWidgets = write_db.getIntValue('minimalWidgets') == 1
     end 
-    html = [[ <html> <body style="font-family: Calibri;"> ]]
-    html = html .. ARWidget()
+    local htmlTable = {}
+    htmlTable[#htmlTable+1] = [[ <html> <body style="font-family: Calibri;"> ]]
+    htmlTable[#htmlTable+1] =  table.concat(ARSVG,'')
     if showScreen then
-        if weapon_1 then html = html .. weaponsWidget() end
-        if radar_1 then html = html .. radarWidget() end
-        if radar_1 then html = html .. identifiedWidget() end
-        if weapon_1 then html = html .. dpsWidget() end
+        if weapon_1 then htmlTable[#htmlTable+1] =  weaponsWidget() end
+        if radar_1 then htmlTable[#htmlTable+1] =  radarWidget() end
+        if radar_1 then htmlTable[#htmlTable+1] =  identifiedWidget() end
+        if weapon_1 then htmlTable[#htmlTable+1] =  dpsWidget() end
     end
     
-    html = html .. warningsWidget()
-    html = html .. [[ </body> </html> ]]
-    system.setScreen(html)
+    htmlTable[#htmlTable+1] =  warningsWidget()
+    htmlTable[#htmlTable+1] =  [[ </body> </html> ]]
+    system.setScreen(table.concat(htmlTable, ''))
 end

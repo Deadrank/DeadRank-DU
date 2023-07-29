@@ -1,4 +1,4 @@
-name: DeadGunner v4.2.2
+name: DeadGunner v4.2.3
 
 pvp: true
 
@@ -55,10 +55,6 @@ handlers:
       lua: |
 {{system.onActionStart.opt2.lua}}
     onActionStart:
-      args: ['option5']
-      lua: |
-{{system.onActionStart.opt5.lua}}
-    onActionStart:
       args: ['option7']
       lua: |
 {{system.onActionStart.opt7.lua}}
@@ -77,7 +73,7 @@ handlers:
   weapon_1:
     onHit(targetId,damage):
       lua: |
-{{weapon.onHit.lua}}
+{{weapon_1.onHit.lua}}
   weapon_1:
     onMissed(targetId):
       lua: |
@@ -89,7 +85,7 @@ handlers:
   weapon_2:
     onHit(targetId,damage):
       lua: |
-{{weapon.onHit.lua}}
+{{weapon_2.onHit.lua}}
   weapon_2:
     onMissed(targetId):
       lua: |
@@ -101,7 +97,7 @@ handlers:
   weapon_3:
     onHit(targetId,damage):
       lua: |
-{{weapon.onHit.lua}}
+{{weapon_3.onHit.lua}}
   weapon_3:
     onMissed(targetId):
       lua: |
@@ -113,7 +109,7 @@ handlers:
   weapon_4:
     onHit(targetId,damage):
       lua: |
-{{weapon.onHit.lua}}
+{{weapon_4.onHit.lua}}
   weapon_4:
     onMissed(targetId):
       lua: |
@@ -125,7 +121,7 @@ handlers:
   weapon_5:
     onHit(targetId,damage):
       lua: |
-{{weapon.onHit.lua}}
+{{weapon_5.onHit.lua}}
   weapon_5:
     onMissed(targetId):
       lua: |
@@ -137,7 +133,7 @@ handlers:
   weapon_6:
     onHit(targetId,damage):
       lua: |
-{{weapon.onHit.lua}}
+{{weapon_6.onHit.lua}}
   weapon_6:
     onMissed(targetId):
       lua: |

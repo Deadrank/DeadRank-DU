@@ -137,7 +137,8 @@ elseif AR_Mode == 'TRAJECTORY' then
         table.insert(AR_Generate,{[1]=string.format('Location [%s]',string.sub(tostring(id),-3)), [2] = v['p1'] + dist*(v['p2']-v['p1'] )/vec3(v['p2']-v['p1'] ):len()})
     end
 end
-ARSVG = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+ARSVG = {}
+ARSVG[#ARSVG+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
 for _,v in pairs(AR_Generate) do
     local name = v[1]
     local pos = v[2]
@@ -171,35 +172,35 @@ for _,v in pairs(AR_Generate) do
                 translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
             end
             if string.starts(name,'Squad Leader') or string.starts(name,'Fleet Commander') then
-                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                         <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:]]..AR_Outline..[[;stroke-width:1;opacity:0.75;" />
                         <line x1="0" y1="0" x2="]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                         <line x1="]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                         <text x="]]..tostring(depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                         </g>]]
             elseif string.starts(name,'T-') then
-                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                         <circle cx="0" cy="0" r="]].. depth*0.80 ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 130, 0, .5);stroke-width:2;" />
                         <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                         <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                         <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                         </g>]]
             elseif string.starts(name,'Location ') then
-                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                         <circle cx="0" cy="0" r="]].. depth*0.80 ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 255, 0, .5);stroke-width:2;" />
                         <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                         <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                         <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                         </g>]]
             elseif string.starts(name,'[') and not string.starts(name,'[CORED]') then
-                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                         <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 255, 255, .75);stroke-width:2;" />
                         <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                         <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                         <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(250, 250, 250, .90);" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s',name)..[[</text>
                         </g>]]
             else
-                ARSVG = ARSVG .. [[<g transform="translate]]..translate..[[">
+                ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                         <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                         <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                         <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
@@ -209,7 +210,7 @@ for _,v in pairs(AR_Generate) do
         end
     end
 end
-ARSVG = ARSVG .. '</svg>'
+ARSVG[#ARSVG+1] = '</svg>'
 -----------------------------------------------------------
 
 -- Radar Updates --
@@ -236,24 +237,3 @@ elseif cr ~= nil then
     end
 end
 ---- End Radar Updates ----
-
--- AutoFollow Updates --
-local target = tostring(radar_1.getTargetId())
-if auto_follow then
-    if not followID then followID = target end
-    if followID then
-        local identified = radar_1.isConstructIdentified(followID)
-        if identified then
-            local tSpeed = radar_1.getConstructSpeed(followID) * 3.6
-            local tDist = radar_1.getConstructDistance(followID)
-            write_db.setIntValue('targetID',tonumber(followID))
-            write_db.setFloatValue('targetSpeed',tSpeed)
-            write_db.setFloatValue('targetDistance',tDist)
-        else
-            write_db.clearValue('targetID')
-            write_db.clearValue('targetSpeed')
-            write_db.clearValue('targetDistance')
-        end
-    end
-end
--- End autofollow --
