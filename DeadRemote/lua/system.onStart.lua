@@ -144,7 +144,7 @@ function closestPipe()
                 pipes[string.format('%s - %s',name,name2)] = {}
                 table.insert(pipes[string.format('%s - %s',name,name2)],center)
                 table.insert(pipes[string.format('%s - %s',name,name2)],center2)
-                if i % 50 == 0 then
+                if i % 10 == 0 then
                     coroutine.yield()
                 end
                 i = i + 1

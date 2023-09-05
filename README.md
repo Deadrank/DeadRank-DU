@@ -1,4 +1,8 @@
 # Dead's PvP Script Suite (Current version 4.2.1 - Compatible with Dual Universe patch 1.4+)
+## 4.2.4 Updates
+ - Minor improvements (default HUD refresh rate lowered. Requires DB variable change)
+ - Set the default option to show weapon widgets rather than hide them
+ - Fixed a bug where all weapons were getting their own widgets
 ## 4.2.3 Updates
  - Minor updates/bug fixes
  - Added estimation of enemy shield resistance settings (lua print out on weapon hit).

@@ -202,7 +202,7 @@ local tolerancePercentToSkipOtherPriorities = 1 -- if we are within this toleran
 
 -- Rotation
 if not dampening then
-    constructAngularVelocity = vec3()
+    constructAngularVelocity = vec3(construct.getWorldAngularVelocity())*.1
 end
 
 local angularAcceleration = torqueFactor * (targetAngularVelocity - constructAngularVelocity)

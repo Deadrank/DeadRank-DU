@@ -18,7 +18,7 @@ printCombatLog = true --export Print weapon hits/misses to lua
 validatePilot = false --export
 pilotSeat = false --export
 targetRadar = false --export 2nd Radar widget with primary targets
-weaponWidgets = false --export Remove weapon widgets (except stasis)
+weaponWidgets = true --export Show weapon widgets (stasis always shown)
 abandonedCoreDist = 10 --export Distance in AR to show abandoned cores in SU
 dangerWarning = 4 --export
 bottomHUDLineColorSZ = 'rgba(150, 175, 185, .75)' --export
@@ -294,6 +294,7 @@ instructionHTML = ''
 
 unit.setTimer('booting',1)
 
+unit.setTimer('screen',screenRefreshRate)
 system.showScreen(1)
 
 showScreen = true

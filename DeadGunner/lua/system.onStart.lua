@@ -99,14 +99,21 @@ end
 function WeaponWidgetCreate()
     if type(weapon) == 'table' and #weapon > 0 then
         weaponDataList = {}
-        for i = 1, #weapon do
-            local weaponDataID = weapon[i].getWidgetDataId()
-            local widgetType = weapon[i].getWidgetType()
-            if weaponWidgets or string.starts(weapon[i].getName(),'Stasis') then
-                local _panel = system.createWidgetPanel("Weapons")
-                local _widget = system.createWidget(_panel, "weapon")
-                system.addDataToWidget(weaponDataID,system.createWidget(_panel, widgetType))
-                if i % maxWeaponsPerWidget == 0 and i < #weapon then _panel = system.createWidgetPanel("Weapons") end
+        if weaponWidgets then
+            local _panel = system.createWidgetPanel("Weapons")
+            for i = 1, #weapon do
+                local weaponDataID = weapon[i].getWidgetDataId()
+                local widgetType = weapon[i].getWidgetType()
+                local _widget = nil
+                if string.starts(weapon[i].getName(),'Stasis') then
+                    local stasisPanel = system.createWidgetPanel("Stasis")
+                    _widget = system.createWidget(stasisPanel, "weapon")
+                    system.addDataToWidget(weaponDataID,system.createWidget(stasisPanel, widgetType))
+                else
+                    _widget = system.createWidget(_panel, "weapon")
+                    system.addDataToWidget(weaponDataID,system.createWidget(_panel, widgetType))
+                    if i % maxWeaponsPerWidget == 0 and i < #weapon and not string.starts(weapon[i].getName(),'Stasis') then _panel = system.createWidgetPanel("Weapons") end
+                end
             end
         end
     end
@@ -283,7 +290,7 @@ function updateRadar(filter)
                     end
                 end
             end
-            if n % 50 == 0 then coroutine.yield() end
+            if n % 100 == 0 then coroutine.yield() end
         end
         n = n + 1
     end

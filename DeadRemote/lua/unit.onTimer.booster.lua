@@ -4,7 +4,6 @@ if boosterSpeedThreshold > speed then
     accelerating = true
 end
 if accelerating then
-    system.print('Accelerating')
     if boosterCount % 3 == 0 then
         if Nav.boosterState then 
             --system.print('Boosters off')

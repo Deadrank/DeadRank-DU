@@ -1,4 +1,4 @@
-name: DeadGunner v4.2.3
+name: DeadGunner v4.2.4
 
 pvp: true
 
@@ -40,6 +40,10 @@ handlers:
       args: ['booting']
       lua: |
 {{unit.onTimer.booting.lua}}
+    onTimer:
+      args: ['screen']
+      lua: |
+{{unit.onTimer.screen.lua}}
   system:
     onStart:
       lua: |
