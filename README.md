@@ -1,4 +1,6 @@
-# Dead's PvP Script Suite (Current version 4.2.1 - Compatible with Dual Universe patch 1.4+)
+# Dead's PvP Script Suite
+## 4.2.5 Updates
+ - Auto enable dampening when auto-pilot is enabled
 ## 4.2.4 Updates
  - Minor improvements (default HUD refresh rate lowered. Requires DB variable change)
  - Set the default option to show weapon widgets rather than hide them

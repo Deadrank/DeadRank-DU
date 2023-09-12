@@ -201,7 +201,7 @@ local dontKeepCollinearity = 0 -- for easier reading
 local tolerancePercentToSkipOtherPriorities = 1 -- if we are within this tolerance (in%), we do not go to the next priorities
 
 -- Rotation
-if not dampening then
+if not dampening and not autopilot then
     constructAngularVelocity = vec3(construct.getWorldAngularVelocity())*.1
 end
 
