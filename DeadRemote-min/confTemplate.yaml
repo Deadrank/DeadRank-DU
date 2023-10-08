@@ -1,0 +1,258 @@
+name: DeadRemote v5.0.0-minimal
+slots:
+    core:
+        class: CoreUnit
+    db:
+        class: DataBank
+        select: all
+    radar:
+        class: RadarPVPUnit
+        select: manual
+    shield:
+        class: ShieldGeneratorUnit
+        select: all
+    transponder:
+        class: TransponderUnit
+        select: all
+    spacefueltank:
+        class: SpaceFuelContainer
+        select: all
+    rocketfueltank:
+        class: RocketFuelContainer
+        select: all
+    antigrav:
+        class: AntiGravityGeneratorUnit
+    warpdrive:
+        class: WarpDriveUnit
+    atmofueltank:
+        class: AtmoFuelContainer
+        select: all
+    gyro:
+        class: GyroUnit
+
+handlers:
+  unit:
+    onTimer:
+      args: ['overlap']
+      lua: |
+{{unit.onTimer.overlap.lua}}
+    onTimer:
+      args: ['booster']
+      lua: |
+{{unit.onTimer.booster.lua}}
+    onStart:
+      lua: |
+{{unit.onStart.lua}}
+    onStop:
+      lua: |
+{{unit.onStop.lua}}
+    onTimer:
+      args: ['screen']
+      lua: |
+{{unit.onTimer.screen.lua}}
+  system:
+    onStart:
+      lua: |
+{{system.onStart.lua}}
+    onUpdate:
+      lua: |
+{{system.onUpdate.lua}}
+    onFlush:
+      lua: |
+{{system.onFlush.lua}}
+    onInputText(text):
+      lua: |
+{{system.onInputText.lua}}
+    onActionStart:
+      args: ['antigravity']
+      lua: |
+{{system.onActionStart.antigravity.lua}}
+    onActionLoop:
+      args: ['speeddown']
+      lua: |
+{{system.onActionLoop.speeddown.lua}}
+    onActionStart:
+      args: ['speeddown']
+      lua: |
+{{system.onActionStart.speeddown.lua}}
+    onActionLoop:
+      args: ['speedup']
+      lua: |
+{{system.onActionLoop.speedup.lua}}
+    onActionStart:
+      args: ['speedup']
+      lua: |
+{{system.onActionStart.speedup.lua}}
+    onActionStart:
+      args: ['stopengines']
+      lua: |
+{{system.onActionStart.stopengines.lua}}
+    onActionStart:
+      args: ['lshift']
+      lua: |
+{{system.onActionStart.lShift.lua}}
+    onActionStop:
+      args: ['lshift']
+      lua: |
+{{system.onActionStop.lShift.lua}}
+    onActionStart:
+      args: ['lalt']
+      lua: |
+{{system.onActionStart.lAlt.lua}}
+    onActionStop:
+      args: ['lalt']
+      lua: |
+{{system.onActionStop.lAlt.lua}}
+    onActionStart:
+      args: ['booster']
+      lua: |
+{{system.onActionStart.booster.lua}}
+    onActionStart:
+      args: ['brake']
+      lua: |
+{{system.onActionStart.brake.lua}}
+    onActionStop:
+      args: ['brake']
+      lua: |
+{{system.onActionStop.brake.lua}}
+    onActionStart:
+      args: ['yawleft']
+      lua: |
+{{system.onActionStart.yawleft.lua}}
+    onActionStop:
+      args: ['yawleft']
+      lua: |
+{{system.onActionStop.yawleft.lua}}
+    onActionStart:
+      args: ['yawright']
+      lua: |
+{{system.onActionStart.yawright.lua}}
+    onActionStop:
+      args: ['yawright']
+      lua: |
+{{system.onActionStop.yawright.lua}}
+    onActionLoop:
+      args: ['groundaltitudedown']
+      lua: |
+{{system.onActionLoop.groundaltitudedown.lua}}
+    onActionStart:
+      args: ['groundaltitudedown']
+      lua: |
+{{system.onActionStart.groundaltitudedown.lua}}
+    onActionLoop:
+      args: ['groundaltitudeup']
+      lua: |
+{{system.onActionLoop.groundaltitudeup.lua}}
+    onActionStart:
+      args: ['groundaltitudeup']
+      lua: |
+{{system.onActionStart.groundaltitudeup.lua}}
+    onActionStop:
+      args: ['down']
+      lua: |
+{{system.onActionStop.down.lua}}
+    onActionStart:
+      args: ['down']
+      lua: |
+{{system.onActionStart.down.lua}}
+    onActionStop:
+      args: ['up']
+      lua: |
+{{system.onActionStop.up.lua}}
+    onActionStart:
+      args: ['up']
+      lua: |
+{{system.onActionStart.up.lua}}
+    onActionStop:
+      args: ['strafeleft']
+      lua: |
+{{system.onActionStop.strafeleft.lua}}
+    onActionStart:
+      args: ['strafeleft']
+      lua: |
+{{system.onActionStart.strafeleft.lua}}
+    onActionStop:
+      args: ['straferight']
+      lua: |
+{{system.onActionStop.straferight.lua}}
+    onActionStart:
+      args: ['straferight']
+      lua: |
+{{system.onActionStart.straferight.lua}}
+    onActionStop:
+      args: ['right']
+      lua: |
+{{system.onActionStop.right.lua}}
+    onActionStart:
+      args: ['right']
+      lua: |
+{{system.onActionStart.right.lua}}
+    onActionStop:
+      args: ['left']
+      lua: |
+{{system.onActionStop.left.lua}}
+    onActionStart:
+      args: ['left']
+      lua: |
+{{system.onActionStart.left.lua}}
+    onActionStop:
+      args: ['backward']
+      lua: |
+{{system.onActionStop.backward.lua}}
+    onActionStart:
+      args: ['backward']
+      lua: |
+{{system.onActionStart.backward.lua}}
+    onActionStop:
+      args: ['forward']
+      lua: |
+{{system.onActionStop.forward.lua}}
+    onActionStart:
+      args: ['forward']
+      lua: |
+{{system.onActionStart.forward.lua}}
+    onActionStart:
+      args: ['light']
+      lua: |
+{{system.onActionStart.light.lua}}
+    onActionStart:
+      args: ['gear']
+      lua: |
+{{system.onActionStart.gear.lua}}
+
+    onActionStart:
+      args: ['option1']
+      lua: |
+{{system.onActionStart.opt1.lua}}
+    onActionStart:
+      args: ['option2']
+      lua: |
+{{system.onActionStart.opt2.lua}}
+    onActionStart:
+      args: ['option4']
+      lua: |
+{{system.onActionStart.opt4.lua}}
+    onActionStart:
+      args: ['option5']
+      lua: |
+{{system.onActionStart.opt5.lua}}
+    onActionStart:
+      args: ['option6']
+      lua: |
+{{system.onActionStart.opt6.lua}}
+    onActionStart:
+      args: ['option7']
+      lua: |
+{{system.onActionStart.opt7.lua}}
+    onActionStart:
+      args: ['option8']
+      lua: |
+{{system.onActionStart.opt8.lua}}
+    onActionStart:
+      args: ['option9']
+      lua: |
+{{system.onActionStart.opt9.lua}}
+  shield_1:
+    onAbsorbed(damage,rawDamage):
+      lua: |
+{{shield.onAbsorbed.lua}}

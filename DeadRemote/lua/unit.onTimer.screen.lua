@@ -1,5 +1,3 @@
-Nav:update()
-
 arkTime = system.getArkTime()
 
 -- Check player seated status --
@@ -253,7 +251,3 @@ if construct.isWarping() then
     brakesOn = true
 end
 -----------------------------------------
-
--- Generate Screen overlay --
-if speed ~= nil then generateScreen() end
------------------------------

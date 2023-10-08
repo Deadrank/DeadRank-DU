@@ -1,0 +1,1 @@
+Nav.axisCommandManager:updateTargetGroundAltitudeFromActionStart(1.0)
