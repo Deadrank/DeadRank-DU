@@ -1,6 +1,6 @@
 # Dead's PvP Script Suite
 ## 5.0.0 New release
- - Added new minimal version of HUD focused on performance (less lag), but has less features/info
+ - Created new minimal version of HUD focused on performance (less lag), but has less features/info
 ## 4.2.5 Updates
  - Auto enable dampening when auto-pilot is enabled
 ## 4.2.4 Updates
