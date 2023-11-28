@@ -52,8 +52,8 @@
 
 ## Downloads
 Simply right-click on the links below and select "Save Link As..." to download the configuration files:
- - DeadGunner_Min.conf(https://raw.githubusercontent.com/Deadrank/DeadRank-DU/UI_Update/DeadGunner_min.conf)
- - DeadRemote_Min.conf(https://raw.githubusercontent.com/Deadrank/DeadRank-DU/UI_Update/DeadGunner_min.conf)
+ - [DeadGunner_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/UI_Update/DeadGunner_min.conf)
+ - [DeadRemote_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/UI_Update/DeadGunner_min.conf)
  - 
  - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
  - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/UI_Update/DeadRemote_min.conf)
