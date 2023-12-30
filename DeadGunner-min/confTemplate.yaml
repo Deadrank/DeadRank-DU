@@ -1,0 +1,148 @@
+name: DeadGunner v5.0.0-minimal
+
+pvp: true
+
+slots:
+    core:
+        class: CoreUnit
+        select: all
+    weapon:
+        class: WeaponUnit
+        select: manual
+    radar:
+        class: RadarPVPUnit
+        select: manual
+    db:
+        class: DataBank
+        select: all
+
+handlers:
+  radar_1:
+    onEnter(id):
+      lua: |
+{{radar_1.onEnter.lua}}
+  radar_1:
+    onLeave(id):
+      lua: |
+{{radar_1.onLeave.lua}}
+  unit:
+    onStart:
+      lua: |
+{{unit.onStart.lua}}
+    onStop:
+      lua: |
+{{unit.onStop.lua}}
+    onTimer:
+      args: ['radar']
+      lua: |
+{{unit.onTimer.radar.lua}}
+    onTimer:
+      args: ['booting']
+      lua: |
+{{unit.onTimer.booting.lua}}
+    onTimer:
+      args: ['screen']
+      lua: |
+{{unit.onTimer.screen.lua}}
+  system:
+    onStart:
+      lua: |
+{{system.onStart.lua}}
+    onUpdate:
+      lua: |
+{{system.onUpdate.lua}}
+    onInputText(text):
+      lua: |
+{{system.onInputText.lua}}
+    onActionStart:
+      args: ['option2']
+      lua: |
+{{system.onActionStart.opt2.lua}}
+    onActionStart:
+      args: ['option7']
+      lua: |
+{{system.onActionStart.opt7.lua}}
+    onActionStart:
+      args: ['lshift']
+      lua: |
+{{system.onActionStart.lshift.lua}}
+    onActionStart:
+      args: ['up']
+      lua: |
+{{system.onActionStart.up.lua}}
+    onActionStop:
+      args: ['lshift']
+      lua: |
+{{system.onActionStop.lshift.lua}}
+  weapon_1:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_1.onHit.lua}}
+  weapon_1:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_1:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_2:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_2.onHit.lua}}
+  weapon_2:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_2:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_3:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_3.onHit.lua}}
+  weapon_3:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_3:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_4:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_4.onHit.lua}}
+  weapon_4:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_4:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_5:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_5.onHit.lua}}
+  weapon_5:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_5:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_6:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_6.onHit.lua}}
+  weapon_6:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_6:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}

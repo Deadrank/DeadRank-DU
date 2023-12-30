@@ -8,6 +8,8 @@ cwd = os.path.dirname(os.path.realpath(__file__))
 # Setup CLI argument requirements
 parser = argparse.ArgumentParser(description='Assemble LUA files into .conf structure')
 parser.add_argument('source',type=str,nargs=1,choices=[
+    'DeadGunner-min',
+    'DeadRemote-min',
     'DeadGunner',
     'DeadRemote',
     'DeadXS'
@@ -25,6 +27,8 @@ path = os.path.join(cwd,src)
 
 # Mapping of Folders to .conf files
 confMap = {
+    'DeadGunner-min':'DeadGunner_min.conf',
+    'DeadRemote-min':'DeadRemote_min.conf',
     'DeadGunner':'DeadGunner.conf',
     'DeadRemote':'DeadRemote.conf',
     'DeadXS':'DeadXS.conf'

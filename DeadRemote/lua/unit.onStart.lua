@@ -15,7 +15,7 @@ showAlerts = false
 
 ---------------------------------------
 
-hudVersion = 'v4.2.5'
+hudVersion = 'v5.0.0'
 system.print('-- '..hudVersion..' --')
 screenRefreshRate = 0.10 --export
 useDB = true --export
@@ -116,6 +116,7 @@ validWaypointFiles = {}
 boosterOn = false
 boosterPulseOn = false
 boosterCount = 0
+screenCount = 0
 
 
 userCode = {}

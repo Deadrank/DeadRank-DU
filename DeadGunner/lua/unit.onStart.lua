@@ -145,6 +145,7 @@ radarContactNumber = 0
 ------------------------------
 
 --- Screen Resolution/keys ---
+screenCount = 1
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 --------------------------

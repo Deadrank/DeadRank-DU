@@ -1,0 +1,41 @@
+if not lShift then
+    if legacyFile then
+        if AR_Mode == 'ALL' then AR_Mode = 'PLANETS' system.print('-- AR Mode: Planets --')
+        elseif AR_Mode == 'PLANETS' and AR_Temp then AR_Mode = 'TEMPORARY' system.print('-- AR Mode: TEMPORARY --')
+        elseif AR_Mode == 'PLANETS' and AR_Custom then AR_Mode = 'FROM_FILE' system.print('-- AR Mode: FROM_FILE --')
+        elseif AR_Mode == 'PLANETS' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'TEMPORARY' and AR_Custom then AR_Mode = 'FROM_FILE' system.print('-- AR Mode: FROM_FILE --')
+        elseif AR_Mode == 'TEMPORARY' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FROM_FILE' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'NONE' then AR_Mode = 'ALL' system.print('-- AR Mode: ALL --')
+        end
+    else
+        if AR_Mode == 'ALL' then AR_Mode = 'PLANETS' system.print('-- AR Mode: Planets --')
+        elseif AR_Mode == 'PLANETS' and AR_Temp then AR_Mode = 'TEMPORARY' system.print('-- AR Mode: TEMPORARY --')
+        elseif AR_Mode == 'PLANETS' and AR_Custom then AR_Mode = 'FILE1' system.print('-- AR Mode: FILE1: '..validWaypointFiles[1].DisplayName..' --')
+        elseif AR_Mode == 'PLANETS' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'TEMPORARY' and AR_Custom then AR_Mode = 'FILE1' system.print('-- AR Mode: FILE1: '..validWaypointFiles[1].DisplayName..' --')
+        elseif AR_Mode == 'TEMPORARY' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE1' and #validWaypointFiles > 1 then AR_Mode = 'FILE2' system.print('-- AR Mode: FILE2: '..validWaypointFiles[2].DisplayName..' --')
+        elseif AR_Mode == 'FILE1' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE2' and #validWaypointFiles > 2 then AR_Mode = 'FILE3' system.print('-- AR Mode: FILE3: '..validWaypointFiles[3].DisplayName..' --')
+        elseif AR_Mode == 'FILE2' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE3' and #validWaypointFiles > 3 then AR_Mode = 'FILE4' system.print('-- AR Mode: FILE4: '..validWaypointFiles[4].DisplayName..' --')
+        elseif AR_Mode == 'FILE3' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE4' and #validWaypointFiles > 4 then AR_Mode = 'FILE5' system.print('-- AR Mode: FILE5: '..validWaypointFiles[5].DisplayName..' --')
+        elseif AR_Mode == 'FILE4' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE5' and #validWaypointFiles > 5 then AR_Mode = 'FILE6' system.print('-- AR Mode: FILE6: '..validWaypointFiles[6].DisplayName..' --')
+        elseif AR_Mode == 'FILE5' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE6' and #validWaypointFiles > 6 then AR_Mode = 'FILE7' system.print('-- AR Mode: FILE7: '..validWaypointFiles[7].DisplayName..' --')
+        elseif AR_Mode == 'FILE6' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE7' and #validWaypointFiles > 7 then AR_Mode = 'FILE8' system.print('-- AR Mode: FILE8: '..validWaypointFiles[8].DisplayName..' --')
+        elseif AR_Mode == 'FILE7' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE8' and #validWaypointFiles > 8 then AR_Mode = 'FILE9' system.print('-- AR Mode: FILE9: '..validWaypointFiles[9].DisplayName..' --')
+        elseif AR_Mode == 'FILE8' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'FILE9' and #validWaypointFiles > 9 then AR_Mode = 'FILE10' system.print('-- AR Mode: FILE10: '..validWaypointFiles[10].DisplayName..' --')
+        elseif AR_Mode == 'FILE9' then AR_Mode = 'NONE' system.print('-- AR Mode: NONE --')
+        elseif AR_Mode == 'NONE' then AR_Mode = 'ALL' system.print('-- AR Mode: ALL --')
+        else AR_Mode = 'NONE' system.print('-- Invalid AR Mode, Try again --')
+        end
+    end
+end

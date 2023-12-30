@@ -1,4 +1,23 @@
 # Dead's PvP Script Suite
+
+## Downloads
+Simply right-click on the links below and select "Save Link As..." to download the configuration files:
+ - [DeadGunner_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner_min.conf)
+ - [DeadRemote_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote_min.conf)
+ - 
+ - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
+ - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote.conf)
+
+## Installation
+1) Download the .conf file(s) you would like to use
+2) Place them in your `custom` folder in the DU game path (defaults to here on installation: `C:\ProgramData\Dual Universe\Game\data\lua\autoconf\custom`
+3) Update custom scripts in-game or log in if the game is not running
+4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
+   
+## 5.0.0 New release
+ - Created new minimal version of HUD focused on performance (less screen lag), but has less features/info
+ - Fixed issues with certain characters in ship names causing regex errors when parsing data
+ - Known issues: DPS stats are not working, Shield resist information not accurately updating, possibly other small bugs. I do not currently play the game, so won't be updating the script soon. However, I did use the new minimal version in several fights before leaving the game and everything required for PvP functionally worked and it is safe to use.
 ## 4.2.5 Updates
  - Auto enable dampening when auto-pilot is enabled
 ## 4.2.4 Updates
@@ -47,17 +66,6 @@
  - Damage Chart: Chart showing your Outgoing DPS vs Incoming DPS. Chart shows totals, not DPS against a specific target and is avg'd into 10 second chunks
  - Revamped default color scheme to be a little more immersive
  - `alt`+`shift`+`4` now sets your auto-pilot destination to your home base location (if you have one set/saved to the databank)
-
-## Downloads
-Simply right-click on the links below and select "Save Link As..." to download the configuration files:
- - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
- - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote.conf)
-
-## Installation
-1) Download the .conf file(s) you would like to use
-2) Place them in your `custom` folder in the DU game path (defaults to here on installation: `C:\ProgramData\Dual Universe\Game\data\lua\autoconf\custom`
-3) Update custom scripts in-game or log in if the game is not running
-4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
 ## DeadGunner.conf (Gunner Seat Script)
 The gunner seat will control and/or read data from:
