@@ -14,6 +14,32 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
    
+## 5.0.1 Bug fixes/Updates
+ - Important note: I will no longer be updating the DeadRemote.conf and DeadGunner.conf any updates from here forward will very likely be only to the -min versions of the script. I am deprecating the originals, just because they are to laggy and I would rather move forward on the -min versions that have better performance.
+ - Fixed an issue where the shield resistance would be 100% set on Thermic if your shield profile was on "auto" and you had not taken any resent damage.
+ - Fixed an issue where the resistances and shield stress were not accurately reflecting thier appropriate values
+ - Fixed the DPS and Damage stat indicators. These numbers should now reflect an avg DPS and avg incoming damage over a short period (Lua export parameter: dmgAvgDuration)
+ - Changed: Controller requires manual link to databank. This needed to happen to make it so the controller didn't try to link to all databanks on the ship
+ - Added shield resistance reset cooldown timer
+ - Added dynamic transponder codes via imported file (added back in from the main version using the `transponder.lua` file)
+ - Added (but in testing)
+   - `hvt.lua` - If this file is found in your custom folder, it will read the contents and add any of the ship ID's to your primary radar widget (if enabled). Format of the file is as follows:<br>
+   ```
+      return {
+        [1] = '123456',
+        [2] = '234567',
+        [3] = '345678',
+      }
+    ```
+   - `scouting.lua` - If this file is found in your custom folder, it will read the contents and use any custom ship names that match the ship IDs in the file and display those in the radar widget instead of their actual name:<br>
+   ```
+      return {
+        ['123456'] = 'Johns Hauler',
+        ['234567'] = 'Sweet Corvette',
+      }
+    ```
+   - Lua Parameter `slave`: this sets the gunner chair up as a slave seat and it will connect to all databanks on the ship. When a non-slave seat selects a primary target in the lua channel (i.e. `123`), that selection is picked up by the slave seat and added to the primaries radar widget automatically
+  
 ## 5.0.0 New release
  - Created new minimal version of HUD focused on performance (less screen lag), but has less features/info
  - Fixed issues with certain characters in ship names causing regex errors when parsing data
@@ -177,7 +203,7 @@ Further, the HUD provides the ability to enter manual codes if needed without ac
  - `Alt`+`3`: Clears all engine tag filtering so that the throttle controls all engines again
  - `Alt`+`Shift`+`3`: Rotates through a list of predefined engine tags to control. List includes (`military`,`maneuver` and `freight`)
  - `Alt`+`4`: Starts auto-pilot towards the current auto-pilot destination *Auto-pilot feature is currently a work in progress, use with caution and only for in space travel`
- - `Alt`+`5`: Enables "auto follow" mode. This mode attempts to match the speed of the selected construct and maintain optimal weapon distance. *This feature does not steer the ship, but only controls throttle operations*
+ - `Alt`+`5`: Toggles tracking mode on and off. Tracking mode enabled means that position tags will be used to calculate trajectories rather than for autopiloting.
  - `Alt`+`6`: Sets current waypoint destination and auto-pilot destination to the center of the nearest safe zone (does not automatically engage auto-pilot however)
  - `Alt`+`9`: Toggles engine control mode between throttle and cruise
 

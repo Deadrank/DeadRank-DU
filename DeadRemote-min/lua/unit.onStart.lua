@@ -4,13 +4,15 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.0-minimal'
+hudVersion = 'v5.0.1-min'
 system.print('-- '..hudVersion..' --')
+offset_points = true --export Puts additional position markers around your ship
 screenRefreshRate = 0.25 --export
 useDB = true --export
 validatePilot = false --export
 toggleBrakes = true --export
 autoVent = true --export Autovent shield at 0 hp
+dmgAvgDuration = 30 --export Duration to avg incoming damage over
 trackerMode = false --export Use input position tags as location trackers instead of auto-pilot
 trackerList = {}
 homeBaseLocation = '' --export Location of home base (to turn off shield)
@@ -21,7 +23,6 @@ AP_Max_Rotation_Factor = 10 --export
 AR_Mode = 'NONE' --export
 AR_Exclude_Moons = true --export
 initialResistWait = 15
-autoVent = true
 dampening = true --inertial dampening
 
 -- HP (Shield/CCS) widget --
@@ -61,6 +62,24 @@ end
 
 -----------------
 
+-- Transponder --
+showCode = false
+codeTimer = 5
+codeCount = 0
+codeSeed = nil
+tags = {}
+transponderStatus = false
+tCode = nil
+cOverlap = false
+cOverlapTick = 0
+codeSeed = nil
+rollTimer = 120 --Roll code timer in seconds
+if pcall(require,'autoconf/custom/transponder') then 
+    codeSeed = tonumber(require('autoconf/custom/transponder'))
+end
+unit.setTimer('code',0.25)
+-----------------
+
 ---- Initialization ---
 ticker = 0
 arkTime = system.getArkTime()
@@ -71,6 +90,7 @@ shieldPercent = 0
 shieldHTML = ''
 shieldWarningHTML = ''
 ventHTML = ''
+shield_resist_cd = 0
 amS = 0
 emS = 0
 knS = 0
@@ -97,7 +117,6 @@ maxThrustTags = 'thrust'
 FPS = 0
 FPS_COUNTER = 0
 FPS_INTERVAL = arkTime
-instCount = 0
 
 AR_Custom_Points = {}
 AR_Custom = false
@@ -259,7 +278,11 @@ lAlt = false
 if validatePilot then
     local validPilot = false
     for k,v in pairs(userCode) do 
-        if k == tostring(player.getId()) then validPilot = true system.print(string.format('-- Welcome %s --',pilotName)) break end
+        if k == tostring(player.getId()) then 
+            validPilot = true 
+            system.print(string.format('-- Welcome %s --',pilotName)) 
+            break
+        end
     end
     if not validPilot then
         system.print(player.getId())

@@ -198,7 +198,7 @@ function contains(tablelist, val)
         end
     end
     return false
-    end
+end
 
 
     function WeaponWidgetCreate()

@@ -155,7 +155,6 @@ if pcall(require,'autoconf/custom/transponder') then
     codeSeed = tonumber(require('autoconf/custom/transponder'))
 end
 unit.setTimer('code',0.25)
-
 -----------------
 
 ---- Initialization ---

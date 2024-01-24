@@ -50,7 +50,7 @@ local finalBrakeInput = brakeInput
 local worldVertical = vec3(core.getWorldVertical()) -- along gravity
 local constructUp = vec3(construct.getWorldOrientationUp())
 constructForward = vec3(construct.getWorldOrientationForward())
-local constructRight = vec3(construct.getWorldOrientationRight())
+constructRight = vec3(construct.getWorldOrientationRight())
 constructVelocity = vec3(construct.getWorldVelocity())
 local constructVelocityDir = vec3(constructVelocity):normalize()
 local currentRollDeg = getRoll(worldVertical, constructForward, constructRight)
@@ -169,6 +169,7 @@ if not dampening and not autopilot then
 end
 
 local angularAcceleration = torqueFactor * (targetAngularVelocity - constructAngularVelocity)
+if not dampening then angularAcceleration = angularAcceleration*0.01 end
 local airAcceleration = vec3(construct.getWorldAirFrictionAngularAcceleration())
 angularAcceleration = angularAcceleration - airAcceleration -- Try to compensate air friction
 Nav:setEngineTorqueCommand('torque', angularAcceleration, keepCollinearity, 'airfoil', '', '', tolerancePercentToSkipOtherPriorities)

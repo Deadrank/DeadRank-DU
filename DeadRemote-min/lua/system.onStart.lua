@@ -55,6 +55,15 @@ function string.starts(String,Start)
     return string.sub(String,1,string.len(Start))==Start
 end
 
+function contains(tablelist, val)
+    for i=1,#tablelist do
+        if tablelist[i] == val then 
+            return true
+        end
+    end
+    return false
+end
+
 function formatNumber(val, numType)
     if numType == 'speed' then
         local speedString = ''
@@ -394,7 +403,17 @@ end
 
 function travelIndicatorWidget()
     local tiw = {}
-    tiw[#tiw+1] = arInfo(constructPosition + 2/.000005 * constructForward,'rgba(200, 225, 235, 1)',5,'lightgrey')
+    tiw[#tiw+1] = arInfo(constructPosition + 1.5/.000005 * constructForward,'rgba(200, 225, 235, 1)',5,'lightgrey')
+    if offset_points then
+        tiw[#tiw+1] = arInfo(constructPosition + 1.5/.000005 * constructRight,'rgba(200, 225, 235, 1)',5,'aqua')
+        tiw[#tiw+1] = arInfo(constructPosition + -1.5/.000005 * constructRight,'rgba(200, 225, 235, 1)',5,'aqua')
+        tiw[#tiw+1] = arInfo(constructPosition + -1.5/.000005 * constructForward,'rgba(200, 225, 235, 1)',5,'red')
+        tiw[#tiw+1] = arInfo(constructPosition + -1/.000005 * (constructForward+constructRight),'rgba(200, 225, 235, 1)',5,'yellow')
+        tiw[#tiw+1] = arInfo(constructPosition + -1/.000005 * (constructForward-constructRight),'rgba(200, 225, 235, 1)',5,'yellow')
+        tiw[#tiw+1] = arInfo(constructPosition + 1/.000005 * (constructForward+constructRight),'rgba(200, 225, 235, 1)',5,'green')
+        tiw[#tiw+1] = arInfo(constructPosition + 1/.000005 * (constructForward-constructRight),'rgba(200, 225, 235, 1)',5,'green')
+    end
+    
     if speed > 20 then
         tiw[#tiw+1] = arInfo(constructPosition + 2/.000005 * constructVelocity,'rgb(60, 255, 60)',7.5,'none')
         tiw[#tiw+1] = arInfo(constructPosition - 2/.000005 * constructVelocity,'rgb(255, 60, 60)',7.5,'none')
@@ -460,14 +479,14 @@ end
 
 function dpsWidget()
     local cDPS = 0
-    if dpsChart[arkTime] then cDPS = cDPS + dpsChart[arkTime] end
-    if dpsChart[arkTime - 1 ] then cDPS = cDPS + dpsChart[arkTime] end
-    if dpsChart[arkTime - 2 ] then cDPS = cDPS + dpsChart[arkTime] end
-    if dpsChart[arkTime - 3 ] then cDPS = cDPS + dpsChart[arkTime] end
-    cDPS = cDPS/4000
+    local dmgTime = tonumber(string.format('%.0f',arkTime/1000))
+    for k,v in pairs(dpsChart) do
+        cDPS = cDPS + dpsChart[k]
+    end
+    cDPS = cDPS/dmgAvgDuration
 
     for k,v in pairs(dpsChart) do
-        if k ~= arkTime or k ~= arkTime - 1 or k ~= arkTime - 2 or k ~= arkTime - 3 then dpsChart[k] = nil end
+        if k < dmgTime - dmgAvgDuration  then dpsChart[k] = nil end
     end
 
     local dw = string.format([[
@@ -476,7 +495,8 @@ function dpsWidget()
                 <text x="2.08" y="127" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">EM: %.0f%% | %.0f%%</text>
                 <text x="2.32" y="141" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">KN: %.0f%% | %.0f%%</text>
                 <text x="2.48" y="155" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">TH: %.0f%% | %.0f%%</text>
-    ]],cDPS,100*amR,100*amS,100*emR,100*emS,100*knR,100*knS,100*thR,100*thS)
+                <text x="2.48" y="169" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">Resist cooldown: %.0f seconds</text>
+    ]],cDPS,100*amR,100*amS,100*emR,100*emS,100*knR,100*knS,100*thR,100*thS,shield_resist_cd)
     return dw
 end
 
@@ -654,8 +674,8 @@ function ARWidget()
     if legacyFile then
         arw[#arw+1] = string.format([[
                 <text x="1.92" y="32.4" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: %s</text>
-                <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">FPS: %s | %s</text>
-            ]],AR_Mode,FPS,instCount)
+                <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">FPS: %s</text>
+            ]],AR_Mode,FPS)
     else
         if string.find(AR_Mode,"FILE") ~= nil then
             i, j = string.find(AR_Mode,"FILE")
@@ -664,13 +684,13 @@ function ARWidget()
             if fileNumber > #validWaypointFiles then AR_Mode = "NONE" end
             arw[#arw+1] = string.format([[
                     <text x="1.92" y="32.4" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: %s</text>
-                    <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">FPS: %s | %s</text>
-                ]],validWaypointFiles[fileNumber].DisplayName,FPS,instCount)
+                    <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">FPS: %s</text>
+                ]],validWaypointFiles[fileNumber].DisplayName,FPS)
         else
             arw[#arw+1] = string.format([[
                 <text x="1.92" y="32.4" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: %s</text>
-                <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">FPS: %s | %s</text>
-            ]],AR_Mode,FPS,instCount)
+                <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">FPS: %s</text>
+            ]],AR_Mode,FPS)
         end
     end
     return table.concat(arw,'')

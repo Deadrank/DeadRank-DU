@@ -159,6 +159,10 @@ function updateRadar(filter)
             end
         end
     end
+    if  slaveRadarPrimary ~= master_primary then
+        system.print('-- Master updated primary: '..master_primary)
+        slaveRadarPrimary = master_primary
+    end
 
     local inCombat = construct.getPvPTimer() > 0
 
@@ -166,9 +170,6 @@ function updateRadar(filter)
     local constructList = {}
     local primaryList = {}
     radarContactNumber = #radarList
-
-    local enemyLShips = 0
-    local friendlyLShips = 0
     
     local shipsBySize = {}
     shipsBySize['XS'] = {}
@@ -178,6 +179,9 @@ function updateRadar(filter)
 
     local localIdentifiedBy = 0
     local localAttackedBy = 0
+    local tempclosestEnemy = {}
+    tempclosestEnemy['id'] = '0'
+    tempclosestEnemy['dist'] = 0
     local tempRadarStats = {
         ['enemy'] = {
             ['L'] = 0,
@@ -273,12 +277,19 @@ function updateRadar(filter)
         else
             if constructData['kind'] == 5 and not abandonded then 
                 tempRadarStats['enemy'][constructData['size']] = tempRadarStats['enemy'][constructData['size']] + 1
+                if tempclosestEnemy['dist'] < constructData['distance']*.000005 then
+                    tempclosestEnemy['dist'] = constructData['distance']*.000005
+                    tempclosestEnemy['id'] = coreID
+                end
             end
             radarFriendlies[id] = nil
         end
         if not constructData['name'] then constructData['name'] = string.format('[%s] %s',uniqueCode,name) end
         local high_value = contains(primaries,tostring(id))
-        if not high_value and slave then high_value = coreID == tostring(master_primary) end
+        if not high_value and slave and master_primary == coreID then
+            high_value = coreID == tostring(master_primary)
+            constructData['name'] = string.format('[%s] %s',uniqueCode,'PRIMARY')
+        end
         if scout_info[tostring(id)] then
             constructData['name'] = string.format('[%s] %s',uniqueCode,scout_info[tostring(id)])
         end
@@ -286,7 +297,7 @@ function updateRadar(filter)
         radarTrackingData[tostring(id)] = constructData
 
         local shown = false
-        if (targetRadar or slave) and high_value and (inSZ or inCombat) then
+        if (targetRadar or slave) and high_value then
             if tostring(id) == radarSelected then
                 table.insert(primaryList,1,json.encode(constructData))
             else 
@@ -298,10 +309,10 @@ function updateRadar(filter)
         if not shown then
             if tostring(id) == radarSelected then
                 table.insert(constructList,1,json.encode(constructData))
-            elseif radarSelected == '0' and constructData['isIdentified'] then
-                table.insert(constructList,1,json.encode(constructData))
-            elseif radarSelected ~= '0' and constructData['isIdentified'] then
-                table.insert(constructList,2,json.encode(constructData))
+            --elseif radarSelected == '0' and constructData['isIdentified'] then
+            --    table.insert(constructList,1,json.encode(constructData))
+            --elseif radarSelected ~= '0' and constructData['isIdentified'] then
+            --    table.insert(constructList,2,json.encode(constructData))
             elseif radarFilter == 'All' and (not abandonded or not hideAbandonedCores) then
                 table.insert(constructList,json.encode(constructData))
             elseif radarFilter == 'enemy' and not transponder_match then
@@ -327,6 +338,7 @@ function updateRadar(filter)
     radarWidgetData = data
     identifiedBy = localIdentifiedBy
     attackedBy = localAttackedBy
+    closestEnemy = tempclosestEnemy
     return data
 end
 
@@ -538,6 +550,12 @@ function radarWidget()
         warnings['attackedBy'] = 'svgWarning'
     else
         warnings['attackedBy'] = nil
+    end
+
+    if closestEnemy['dist'] < 1.35 and closestEnemy['dist'] > 0 and not inSZ then
+        warnings['closestEnemy'] = 'svgWarning'
+    else
+        warnings['closestEnemy'] = nil
     end
 
     return table.concat(rw,'')
@@ -755,14 +773,14 @@ end
 
 function dpsWidget()
     local cDPS = 0
-    if dpsChart[arkTime] then cDPS = cDPS + dpsChart[arkTime] end
-    if dpsChart[arkTime - 1 ] then cDPS = cDPS + dpsChart[arkTime] end
-    if dpsChart[arkTime - 2 ] then cDPS = cDPS + dpsChart[arkTime] end
-    if dpsChart[arkTime - 3 ] then cDPS = cDPS + dpsChart[arkTime] end
-    cDPS = cDPS/4000
+    local dmgTime = tonumber(string.format('%.0f',arkTime/1000))
+    for k,v in pairs(dpsChart) do
+        cDPS = cDPS + dpsChart[k]
+    end
+    cDPS = cDPS/dmgAvgDuration
 
     for k,v in pairs(dpsChart) do
-        if k ~= arkTime or k ~= arkTime - 1 or k ~= arkTime - 2 or k ~= arkTime - 3 then dpsChart[k] = nil end
+        if k < dmgTime - dmgAvgDuration  then dpsChart[k] = nil end
     end
 
     local dw = string.format([[<svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;" viewBox="0 0 1920 1080">
@@ -781,6 +799,7 @@ function warningsWidget()
     warningText['noRadar'] = 'No Radar Linked'
     warningText['venting'] = 'Shield Venting'
     warningText['radar_delta'] = string.format('Radar Delay %.2fs',cr_delta)
+    warningText['closestEnemy'] = string.format('Enemy (%s) at %.2fsu',closestEnemy['id'],closestEnemy['dist'])
 
     local warningColor = {}
     warningColor['attackedBy'] = 'red'
@@ -789,19 +808,30 @@ function warningsWidget()
     warningColor['noRadar'] = 'red'
     warningColor['venting'] = shieldHPColor
     warningColor['radar_delta'] = 'orange'
+    warningColor['closestEnemy'] = 'orange'
 
     local count = 0
     local y = .06
     if minimalWidgets then y = .14 end
     for k,v in pairs(warnings) do
         if v ~= nil then
-            ww[#ww+1] = string.format([[
-                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.65 * screenWidth) ..[[" y="]].. tostring(y * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
-                    ]]..warningSymbols[v]..[[
-                </svg>
-                <text x="]].. tostring(.677 * screenWidth) ..[[" y="]].. tostring((y+.02) * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
-                ]])
-            count = count + 1
+            if k == 'closestEnemy' and closestEnemy['dist'] < 1.1 then
+                warningColor['closestEnemy'] = 'red'
+                ww[#ww+1] = string.format([[
+                    <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(0.45 * screenWidth) ..[[" y="]].. tostring(0.40 * screenHeight) ..[[" style="fill: ]]..warningColor[k]..[[;">
+                        ]]..warningSymbols[v]..[[
+                    </svg>
+                    <text x="]].. tostring(.477 * screenWidth) ..[[" y="]].. tostring(0.42 * screenHeight) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="2vh" font-weight="bold">]]..warningText[k]..[[</text>
+                    ]])
+            else
+                ww[#ww+1] = string.format([[
+                    <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.65 * screenWidth) ..[[" y="]].. tostring(y * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
+                        ]]..warningSymbols[v]..[[
+                    </svg>
+                    <text x="]].. tostring(.677 * screenWidth) ..[[" y="]].. tostring((y+.02) * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
+                    ]])
+                count = count + 1
+            end
         end
     end
     ww[#ww+1] = '</svg>'

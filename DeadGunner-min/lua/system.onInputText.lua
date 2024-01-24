@@ -253,6 +253,12 @@ if text:lower() == 'add' then
         system.print(t)
     end
 end
+if string.starts(text:lower(), 'a') and (#text == 4) and type(tonumber(string.sub(text,2))) then
+    if not contains(primaries,string.sub(text,2)) then
+        system.print(string.format('-- Adding %s to primary radar--',string.sub(text,2)))
+        table.insert(primaries,string.sub(text,2))
+    end
+end
 if string.starts(text:lower(), 'd') and (#text == 4 or #text == 2) and type(tonumber(string.sub(text,2))) then
     if string.sub(text,2) == '0' then
         system.print('-- Clearing Primary Radar --')
@@ -308,4 +314,8 @@ if text:lower() == 'hide weapons' then
         weapon['shown'] = false
     end
     WeaponWidgetCreate(false)
+end
+
+if text == 'slave' then
+    system.print('-- Slave Radar Primary: '..slaveRadarPrimary)
 end

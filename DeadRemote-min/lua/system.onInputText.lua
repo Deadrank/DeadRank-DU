@@ -1,3 +1,6 @@
+if text:lower() == 'offset markers' then
+    if offset_points then offset_points = false else offset_points = true end
+end
 if string.starts(text,'addWaypoint ') then
     matches = {}
     for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
@@ -105,4 +108,11 @@ if string.starts(text:lower(),'sp ') then
     if #matches ~= 2 then system.print('-- Invalid input --')
     elseif resistProfiles[matches[2]:lower()] then shieldProfile = matches[2]:lower() system.print('-- Shield profile set: '..matches[2]:lower())
     else system.print('-- Shield profile not found --') system.print('-- Current profile: '..shieldProfile) end
+end
+if string.starts(text:lower(),'show codes') then
+    system.print('--Transponder Codes visible--')
+    for _,t in pairs(tags) do
+        system.print('-- '..t)
+    end
+    system.print('-----------------------------')
 end

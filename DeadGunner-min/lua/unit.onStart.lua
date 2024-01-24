@@ -10,6 +10,7 @@ showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
+dmgAvgDuration = 30 --export Duration to avg incoming damage over
 slave = false --export Show slave radar widget
 szAlerts = false --export
 minimalWidgets = false --export
@@ -63,6 +64,7 @@ if useDB and write_db ~= nil then
 end
 
 --- Radar Initial Values ---
+slaveRadarPrimary = '0'
 radarSelected = '0'
 constructPosition = vec3(construct.getWorldPosition())
 manual_trajectory = {}
@@ -115,6 +117,7 @@ speedCompare = 0
 gapCompare = 0
 identifiedBy = 0
 attackedBy = 0
+closestEnemy = {}
 warpScan = {}
 unknownRadar = {}
 radarContactNumber = 0

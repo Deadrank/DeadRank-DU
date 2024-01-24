@@ -2,8 +2,6 @@ Nav:update()
 FPS_COUNTER = FPS_COUNTER + 1
 ticker = ticker + 1
 
-instCount = system.getInstructionCount()
-
 speedVec = vec3(constructVelocity)
 speed = speedVec:len() * 3.6
 if speed < 50 then speedVec = vec3(constructForward) end

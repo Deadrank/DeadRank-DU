@@ -47,7 +47,7 @@ if shield_1 then
             if (csr[1] == srp/4 and csr[2] == srp/4 and csr[3] == srp/4 and csr[4] == srp/4) or rcd ~= 0 then
                 --No change
             else
-                shield_1.setResistances(srp,srp,srp,srp)
+                shield_1.setResistances(srp/4,srp/4,srp/4,srp/4)
             end
         elseif dmgTick then
             if math.abs(arkTime - dmgTick) >= initialResistWait then
@@ -235,6 +235,7 @@ if shield_1 then
     emR = csr[2]/srp
     knR = csr[3]/srp
     thR = csr[4]/srp
+    shield_resist_cd = shield_1.getResistancesCooldown()
 end
 
 

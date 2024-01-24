@@ -71,9 +71,14 @@ if yamlTemplate:
 
 # Function to locate DU install folder
 def locate():
-    for item in os.listdir(os.path.join(os.environ['HOMEPATH'],'Desktop')):
-        if 'dual' in item.lower():
-            temp = open(os.path.join(os.environ['HOMEPATH'],'Desktop',item),'r', encoding = "ISO-8859-1").read()
+    try:
+        for item in os.listdir('C:'+os.path.join(os.environ['HOMEPATH'],'Desktop')):
+            if 'dual' in item.lower():
+                temp = open(os.path.join(os.environ['HOMEPATH'],'Desktop',item),'r', encoding = "ISO-8859-1").read()
+    except:
+        for item in os.listdir(os.path.join('C:\\Users\\Public','Desktop')):
+            if 'dual' in item.lower():
+                temp = open(os.path.join('C:\\Users\\Public','Desktop',item),'r', encoding = "ISO-8859-1").read()
     temp = temp.split('\\')
     build = []
     index = ''
