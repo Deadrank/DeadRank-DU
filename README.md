@@ -2,11 +2,11 @@
 
 ## Downloads
 Simply right-click on the links below and select "Save Link As..." to download the configuration files:
- - [DeadGunner_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner_min.conf)
- - [DeadRemote_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote_min.conf)
+ - [DeadGunner_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner_min.conf) (Use these)
+ - [DeadRemote_Min.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote_min.conf) (Use these)
  - 
- - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf)
- - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote.conf)
+ - [DeadGunner.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadGunner.conf) (works but deprecated)
+ - [DeadRemote.conf](https://raw.githubusercontent.com/Deadrank/DeadRank-DU/main/DeadRemote.conf) (works but deprecated)
 
 ## Installation
 1) Download the .conf file(s) you would like to use
