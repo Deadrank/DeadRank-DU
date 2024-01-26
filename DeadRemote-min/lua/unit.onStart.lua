@@ -4,15 +4,16 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.1-min'
+hudVersion = 'v5.0.2-min'
 system.print('-- '..hudVersion..' --')
-offset_points = true --export Puts additional position markers around your ship
+offset_points = false --export Puts additional position markers around your ship
+dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
 screenRefreshRate = 0.25 --export
 useDB = true --export
 validatePilot = false --export
 toggleBrakes = true --export
 autoVent = true --export Autovent shield at 0 hp
-dmgAvgDuration = 30 --export Duration to avg incoming damage over
+dmgAvgDuration = 10 --export Duration to avg incoming damage over
 trackerMode = false --export Use input position tags as location trackers instead of auto-pilot
 trackerList = {}
 homeBaseLocation = '' --export Location of home base (to turn off shield)

@@ -19,7 +19,7 @@ else
     dmgTracker[tostring(targetId)] = damage
 end
 
-local dmgTime = tonumber(string.format('%.0f',arkTime/1000))
+local dmgTime = tonumber(string.format('%.0f',arkTime))
 if not dpsChart[dmgTime] then
     dpsChart[dmgTime] = damage
 else

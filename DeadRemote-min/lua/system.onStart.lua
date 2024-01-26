@@ -479,24 +479,24 @@ end
 
 function dpsWidget()
     local cDPS = 0
-    local dmgTime = tonumber(string.format('%.0f',arkTime/1000))
+    local dmgTime = tonumber(string.format('%.0f',arkTime))
     for k,v in pairs(dpsChart) do
-        cDPS = cDPS + dpsChart[k]
+        if k < dmgTime - dmgAvgDuration then
+            dpsChart[k] = nil
+        else
+            cDPS = cDPS + dpsChart[k]
+        end
     end
     cDPS = cDPS/dmgAvgDuration
 
-    for k,v in pairs(dpsChart) do
-        if k < dmgTime - dmgAvgDuration  then dpsChart[k] = nil end
-    end
-
     local dw = string.format([[
-                <text x="1.92" y="99" style="fill: red;" font-size="1.42vh" font-weight="bold">Damage: %.0fk</text>
+                <text x="1.92" y="99" style="fill: red;" font-size="1.42vh" font-weight="bold">Damage: %.1fk</text>
                 <text x="1.92" y="113" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">AM: %.0f%% | %.0f%%</text>
                 <text x="2.08" y="127" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">EM: %.0f%% | %.0f%%</text>
                 <text x="2.32" y="141" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">KN: %.0f%% | %.0f%%</text>
                 <text x="2.48" y="155" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">TH: %.0f%% | %.0f%%</text>
                 <text x="2.48" y="169" style="fill: rgba(200, 225, 235, 1)" font-size="1.42vh" font-weight="bold">Resist cooldown: %.0f seconds</text>
-    ]],cDPS,100*amR,100*amS,100*emR,100*emS,100*knR,100*knS,100*thR,100*thS,shield_resist_cd)
+    ]],cDPS/1000,100*amR,100*amS,100*emR,100*emS,100*knR,100*knS,100*thR,100*thS,shield_resist_cd)
     return dw
 end
 
@@ -557,6 +557,9 @@ function globalDB(action)
             if db_1.hasKey('homeBaseDistance') then homeBaseDistance = db_1.getIntValue('homeBaseDistance') end
             if db_1.hasKey('autoVent') then autoVent = db_1.getIntValue('autoVent') == 1 end
             if db_1.hasKey('shieldProfile') then shieldProfile = db_1.getStringValue('shieldProfile') end
+            if db_1.hasKey('dampenerTorqueReduction') then dampenerTorqueReduction = db_1.getFloatValue('dampenerTorqueReduction') end
+            if db_1.hasKey('offset_points') then offset_points = db_1.getIntValue('offset_points') == 1 end
+            if db_1.hasKey('dmgAvgDuration') then dmgAvgDuration = write_db.getIntValue('dmgAvgDuration') end
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
@@ -569,6 +572,9 @@ function globalDB(action)
             db_1.setIntValue('homeBaseDistance',homeBaseDistance)
             if autoVent then db_1.setIntValue('autoVent',1) else db_1.setIntValue('autoVent',0) end
             db_1.setStringValue('shieldProfile',shieldProfile)
+            db_1.setFloatValue('dampenerTorqueReduction',dampenerTorqueReduction)
+            if offset_points then db_1.setIntValue('offset_points',1) else db_1.setIntValue('offset_points',0) end
+            db_1.setIntValue('dmgAvgDuration',dmgAvgDuration)
         end
     end
 end

@@ -10,7 +10,7 @@ showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
-dmgAvgDuration = 30 --export Duration to avg incoming damage over
+dmgAvgDuration = 10 --export Duration to avg incoming damage over
 slave = false --export Show slave radar widget
 szAlerts = false --export
 minimalWidgets = false --export

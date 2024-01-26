@@ -11,9 +11,13 @@ Simply right-click on the links below and select "Save Link As..." to download t
 ## Installation
 1) Download the .conf file(s) you would like to use
 2) Place them in your `custom` folder in the DU game path (defaults to here on installation: `C:\ProgramData\Dual Universe\Game\data\lua\autoconf\custom`
-3) Update custom scripts in-game or log in if the game is not running
+3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
    
+## 5.0.2 Minor updates
+ - Added variable for adjuster torque reduction when in dampening off mode `dampenerTorqueReduction`.
+ - Added lua export and databank variables for DPS indicators avg (`dmgAvgDuration`), Offset markers (`offset_points`) and adjustor torque reduction when dampening is turned off (`dampenerTorqueReduction`)
+ - Fixed issues with DPS indicators (incoming and outgoing)
 ## 5.0.1 Bug fixes/Updates
  - Important note: I will no longer be updating the DeadRemote.conf and DeadGunner.conf any updates from here forward will very likely be only to the -min versions of the script. I am deprecating the originals, just because they are to laggy and I would rather move forward on the -min versions that have better performance.
  - Fixed an issue where the shield resistance would be 100% set on Thermic if your shield profile was on "auto" and you had not taken any resent damage.

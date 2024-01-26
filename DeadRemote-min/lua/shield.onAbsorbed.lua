@@ -1,7 +1,7 @@
 -- Damage
 if not dmgTick then dmgTick = arkTime end
 
-local dmgTime = tonumber(string.format('%.0f',arkTime/1000))
+local dmgTime = tonumber(string.format('%.0f',arkTime))
 
 if not dpsChart[dmgTime] then
     dpsChart[dmgTime] = damage

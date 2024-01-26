@@ -277,7 +277,7 @@ function updateRadar(filter)
         else
             if constructData['kind'] == 5 and not abandonded then 
                 tempRadarStats['enemy'][constructData['size']] = tempRadarStats['enemy'][constructData['size']] + 1
-                if tempclosestEnemy['dist'] < constructData['distance']*.000005 then
+                if not friendlySIDs['sc-'..id] and tempclosestEnemy['dist'] < constructData['distance']*.000005 then
                     tempclosestEnemy['dist'] = constructData['distance']*.000005
                     tempclosestEnemy['id'] = coreID
                 end
@@ -366,6 +366,7 @@ function globalDB(action)
             if write_db.hasKey('minimalWidgets') then minimalWidgets = write_db.getIntValue('minimalWidgets') == 1 end
             if write_db.hasKey('weaponWidgets') then weaponWidgets = write_db.getIntValue('weaponWidgets') == 1 end
             if write_db.hasKey('pilotSeat') then pilotSeat = write_db.getIntValue('pilotSeat') == 1 end
+            if write_db.hasKey('dmgAvgDuration') then dmgAvgDuration = write_db.getIntValue('dmgAvgDuration') end
 
             for _,key in pairs(write_db.getKeyList()) do
                 if string.starts(key,'sc-') then
@@ -388,6 +389,7 @@ function globalDB(action)
             if minimalWidgets then write_db.setIntValue('minimalWidgets',1) else write_db.setIntValue('minimalWidgets',0) end
             if weaponWidgets then write_db.setIntValue('weaponWidgets',1) else write_db.setIntValue('weaponWidgets',0) end
             if pilotSeat then write_db.setIntValue('pilotSeat',1) else write_db.setIntValue('pilotSeat',0) end
+            write_db.setIntValue('dmgAvgDuration',dmgAvgDuration)
 
         end
     end
@@ -773,19 +775,19 @@ end
 
 function dpsWidget()
     local cDPS = 0
-    local dmgTime = tonumber(string.format('%.0f',arkTime/1000))
+    local dmgTime = tonumber(string.format('%.0f',arkTime))
     for k,v in pairs(dpsChart) do
-        cDPS = cDPS + dpsChart[k]
+        if k < dmgTime - dmgAvgDuration then
+            dpsChart[k] = nil
+        else
+            cDPS = cDPS + dpsChart[k]
+        end
     end
     cDPS = cDPS/dmgAvgDuration
 
-    for k,v in pairs(dpsChart) do
-        if k < dmgTime - dmgAvgDuration  then dpsChart[k] = nil end
-    end
-
     local dw = string.format([[<svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;" viewBox="0 0 1920 1080">
-                <text x="1.92" y="85" style="fill: lightgreen;" font-size="1.42vh" font-weight="bold">DPS: %.0fk</text></svg>
-    ]],cDPS)
+                <text x="1.92" y="85" style="fill: lightgreen;" font-size="1.42vh" font-weight="bold">DPS: %.1fk</text></svg>
+    ]],cDPS/1000)
     return dw
 end
 
