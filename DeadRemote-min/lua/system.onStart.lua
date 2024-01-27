@@ -559,7 +559,7 @@ function globalDB(action)
             if db_1.hasKey('shieldProfile') then shieldProfile = db_1.getStringValue('shieldProfile') end
             if db_1.hasKey('dampenerTorqueReduction') then dampenerTorqueReduction = db_1.getFloatValue('dampenerTorqueReduction') end
             if db_1.hasKey('offset_points') then offset_points = db_1.getIntValue('offset_points') == 1 end
-            if db_1.hasKey('dmgAvgDuration') then dmgAvgDuration = write_db.getIntValue('dmgAvgDuration') end
+            if db_1.hasKey('dmgAvgDuration') then dmgAvgDuration = db_1.getIntValue('dmgAvgDuration') end
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end

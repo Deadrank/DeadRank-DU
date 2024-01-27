@@ -4,7 +4,7 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.2-min'
+hudVersion = 'v5.0.3-min'
 system.print('-- '..hudVersion..' --')
 offset_points = false --export Puts additional position markers around your ship
 dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
