@@ -13,6 +13,9 @@ Simply right-click on the links below and select "Save Link As..." to download t
 2) Place them in your `custom` folder in the DU game path (defaults to here on installation: `C:\ProgramData\Dual Universe\Game\data\lua\autoconf\custom`
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
+
+## 5.0.3 Minor updates
+ - Added DPS indicators avg (`dmgAvgDuration`) variable to the list of those saved to the databank so that it does not have to be reset after updating the script
    
 ## 5.0.2 Minor updates
  - Added variable for adjuster torque reduction when in dampening off mode `dampenerTorqueReduction`.
