@@ -1,3 +1,46 @@
+if text:lower() == 'clear route' then
+    db_1.clearValue('route')
+    db_1.clearValue('route_pos')
+    route = nil
+    route_pos = nil
+end
+if text:lower() == 'print route' then
+    system.print(string.format('Route: %s',route))
+    system.print(string.format('Current Point: %s',route_pos))
+    system.print(string.format('Current Destination: %s',routes[route][route_pos]))
+end
+if text:lower() == 'restart route' then
+    if db_1.hasKey('route') and routes[db_1.getStringValue('route')] ~= nil and routes[db_1.getStringValue('route')][db_1.getIntValue('route_pos')] then
+        system.print('-- Restarting DB route --')
+        route = db_1.getStringValue('route')
+        route_pos = db_1.getIntValue('route_pos')
+        autopilot_dest = vec3(convertWaypoint(routes[route][route_pos]))
+        autopilot_dest_pos = routes[route][route_pos]
+    else
+        system.print('-- No route found in DB --')
+    end
+end
+if string.starts(text,'route ') then
+    matches = {}
+    for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+    if #matches < 2 then
+        system.print('-- Requires a route name --')
+    else
+        if routes[matches[2]] == nil then
+            system.print('-- Route not found --')
+        else
+            system.print('-- Starting route --')
+            autopilot_dest = vec3(convertWaypoint(routes[matches[2]][1]))
+            autopilot_dest_pos = routes[matches[2]][1]
+            system.print('-- Route pilot destination set --')
+            system.print(routes[matches[2]][1])
+            route = matches[2]
+            route_pos = 1
+            db_1.setStringValue('route',matches[2])
+            db_1.setIntValue('route_pos',1)
+        end
+    end
+end
 if text:lower() == 'offset markers' then
     if offset_points then offset_points = false else offset_points = true end
 end

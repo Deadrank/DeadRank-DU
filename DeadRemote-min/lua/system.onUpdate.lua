@@ -44,9 +44,10 @@ if autopilot_dest and speed > 1000 then
 end
 
 apBG = bgColor
-if autopilot then apBG = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' end
-if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' end
+if autopilot then apBG = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' if route and routes[route][route_pos] == autopilot_dest_pos then apStatus = route end end
+if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' if route and routes[route][route_pos] == autopilot_dest_pos then apStatus = route end end
 
+if route_pos and route_pos ~= db_1.getIntValue('route_pos',route_pos) then db_1.setIntValue('route_pos',route_pos) end
 -- END SCREEN UPDATES --
 
 -- Generate Screen overlay --

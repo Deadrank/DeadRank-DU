@@ -64,6 +64,7 @@ if useDB and write_db ~= nil then
 end
 
 --- Radar Initial Values ---
+recordAll = false
 slaveRadarPrimary = '0'
 radarSelected = '0'
 constructPosition = vec3(construct.getWorldPosition())
@@ -94,6 +95,15 @@ table.insert(validSizes,'L')
 table.insert(validSizes,'M')
 table.insert(validSizes,'S')
 table.insert(validSizes,'XS')
+radarKind = {}
+table.insert(radarKind,'Universe')
+table.insert(radarKind,'Planet')
+table.insert(radarKind,'Asteroid')
+table.insert(radarKind,'Static')
+table.insert(radarKind,'Dynamic')
+table.insert(radarKind,'Space')
+table.insert(radarKind,'Alien')
+table.insert(radarKind,'Beacon')
 radarStats = {
     ['enemy'] = {
         ['L'] = 0,

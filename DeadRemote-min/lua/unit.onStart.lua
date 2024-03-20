@@ -164,6 +164,15 @@ else
     end
 end
 
+-- Import routes file --
+routes = {}
+route = nil
+route_pos = nil
+db_1.setIntValue('record',0)
+if pcall(require,'autoconf/custom/routes') then
+    routes = require('autoconf/custom/routes')
+end
+
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 maxFuel = 0

@@ -226,6 +226,8 @@ function fuelWidget()
 end
 
 function apStatusWidget()
+    local ap_type = 'Autopilot'
+    if route and routes[route][route_pos] == autopilot_dest_pos then ap_type = 'Routepilot' end
     local apw = string.format([[
         <path d="
             M 646.08 30.24
@@ -236,9 +238,9 @@ function apStatusWidget()
             L 646.08 30.24"
             stroke="%s" stroke-width="1" fill="%s" />
         
-        <text x="480" y="12.96" style="fill: %s" font-size="1.42vh" font-weight="bold" transform="rotate(10,480,12.96)">AutoPilot: %s</text>
+        <text x="480" y="12.96" style="fill: %s" font-size="1.42vh" font-weight="bold" transform="rotate(10,480,12.96)">%s: %s</text>
         %s
-    ]],lineColor,apBG,fontColor,apStatus,apHTML)
+    ]],lineColor,apBG,fontColor,ap_type,apStatus,apHTML)
 
     return apw
 end
@@ -583,6 +585,11 @@ function ARWidget()
     -- Generate on screen planets for Augmented Reality view --
     AR_Generate = {}
     if autopilot_dest_pos ~= nil then AR_Generate['AutoPilot'] = convertWaypoint(autopilot_dest_pos) end
+    if route and routes[route][route_pos] == autopilot_dest_pos then
+        for k,v in pairs(routes[route]) do
+            AR_Generate[string.format('RP_%s',k)] = convertWaypoint(routes[route][k])
+        end
+    end
 
     --Correcting cases where the user was using the legacy FROM_FILE mode
     if AR_Mode == 'FROM_FILE' and not legacyFile then AR_Mode = "ALL" end
@@ -631,8 +638,9 @@ function ARWidget()
                     if pInfo[1] < .01 then pInfo[1] = .01 end
                     if pInfo[2] < .01 then pInfo[2] = .01 end
                     local fill = 'rgb(29, 63, 255)'
-                    if planets[name] == nil  and name ~= 'AutoPilot' then fill = 'rgb(49, 182, 60)'
+                    if planets[name] == nil  and name ~= 'AutoPilot' and not string.starts(name,'RP_') then fill = 'rgb(49, 182, 60)'
                     elseif name == 'AutoPilot' then fill = 'red'
+                    elseif string.starts(name,'RP_') then fill = 'rgb(138, 43, 226)'
                     end
                     local translate = '(0,0)'
                     local depth = 15 * 1/( 0.02*pDist*0.000005)
@@ -657,6 +665,14 @@ function ARWidget()
                                 <line x1="0" y1="0" x2="]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
                                 <line x1="]].. depth*1.2 ..[[" y1="]].. depth*1.2 ..[[" x2="]]..tostring(depth*1.2 + 30)..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
                                 <text x="]]..tostring(depth*1.2)..[[" y="]].. depth*1.2+screenHeight*0.008 ..[[" style="fill: rgba(125, 150, 160, 1)" font-size="]]..tostring(.04*15)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                                </g>]]
+                    elseif string.starts(name,'RP_') then
+                        local tDepth = depth*.5
+                        planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">
+                                <circle cx="0" cy="0" r="]].. tDepth ..[[px" style="fill:]]..fill..[[;stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.75;" />
+                                <line x1="0" y1="0" x2="-]].. tDepth*1.2 ..[[" y2="-]].. tDepth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <line x1="-]].. tDepth*1.2 ..[[" y1="-]].. tDepth*1.2 ..[[" x2="-]]..tostring(tDepth*1.2 + 30)..[[" y2="-]].. tDepth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <text x="-]]..tostring(6*#name+tDepth*1.2)..[[" y="-]].. tDepth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(125, 150, 160, 1)" font-size="]]..tostring(.04*15)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                                 </g>]]
                     else
                         planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">

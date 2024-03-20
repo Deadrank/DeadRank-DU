@@ -7,9 +7,9 @@ local function signedRotationAngle(normal, vecA, vecB)
 end
 
 if (pitchPID == nil) then
-    pitchPID = pid.new(0.1, 0, 10)
-    rollPID = pid.new(0.1, 0, 10)
-    yawPID = pid.new(0.1, 0, 10)
+    pitchPID = pid.new(0.1, 0, 11)
+    rollPID = pid.new(0.1, 0, 11)
+    yawPID = pid.new(0.1, 0, 11)
 end
 ------------------------------------
 
@@ -69,6 +69,7 @@ local targetYaw = 0
 local targetPitch = 0
 local yawChange = 0
 local pitchChange = 0
+local total_align = 0
 --local totalAngularChange = nil
 if autopilot_dest then
     destVec = vec3(autopilot_dest - constructPosition):normalize()
@@ -91,6 +92,7 @@ if autopilot_dest then
         if math.abs(yawDiff) > 30 then yawChange = dirYaw end
         if math.abs(pitchDiff) > 30 then pitchChange = dirPitch end
     end
+    total_align = math.abs(yawChange) + math.abs(pitchChange)
 end
 
 if autopilot and autopilot_dest ~= nil and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
@@ -180,7 +182,7 @@ Nav:setEngineTorqueCommand('torque', angularAcceleration, keepCollinearity, 'air
 -- Brakes
 local brakeAcceleration = vec3()
 if autopilot then
-    if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer or brakesOn then
+    if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer or brakesOn or (total_align > 5 and speed < 40) then
         brakeAcceleration = -maxBrake * constructVelocityDir
         brakeInput = 1
     elseif autopilot_dest ~= nil and not brakesOn then
@@ -208,7 +210,7 @@ end
 local longitudinalCommandType = Nav.axisCommandManager:getAxisCommandType(axisCommandId.longitudinal)
 local longitudinalAcceleration = vec3()
 
-if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer then
+if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer + speed then
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
     longitudinalAcceleration = vec3()
     Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
@@ -276,11 +278,30 @@ Nav:setBoosterCommand('rocket_engine')
 
 -- Disable Auto-Pilot when destination is reached --
 if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + 1000 + AP_Brake_Buffer and speed < 1000 then
-    system.print('-- Autopilot complete --')
-    autopilot_dest_pos = nil
-    autopilot = false
     brakeInput = brakeInput + 1
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
     Nav:setEngineForceCommand(longitudinalEngineTags, vec3(), keepCollinearity)
+    if not route then
+        system.print('-- Autopilot complete --')
+        autopilot_dest_pos = nil
+        autopilot = false
+    elseif route and speed < 15 and routes[route][route_pos+1] ~= nil and vec3(constructPosition - autopilot_dest):len() <= 1000+AP_Brake_Buffer then
+        system.print('-- Route pilot point complete --')
+        system.print('-- Starting next point --')
+        route_pos = route_pos+1
+        autopilot_dest = vec3(convertWaypoint(routes[route][route_pos]))
+        autopilot_dest_pos = routes[route][route_pos]
+        system.print('-- Route pilot destination set --')
+        system.print(routes[route][route_pos])        
+    elseif route and route_pos == #routes[route] then
+        system.print('-- Route pilot complete --')
+        autopilot_dest_pos = nil
+        autopilot = false
+        route = nil
+        route_pos = nil
+        db_1.clearValue('route')
+        db_1.clearValue('route_pos')
+        db_1.setIntValue('record',0)
+    end
 end
 ---------------------------------------------------

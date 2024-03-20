@@ -315,7 +315,10 @@ if text:lower() == 'hide weapons' then
     end
     WeaponWidgetCreate(false)
 end
-
+if text:lower() == 'record' then
+    recordAll = not recordAll
+    system.print(string.format('-- Contact recording: %s --',recordAll))
+end
 if text == 'slave' then
     system.print('-- Slave Radar Primary: '..slaveRadarPrimary)
 end

@@ -2,6 +2,12 @@ constructPosition = vec3(construct.getWorldPosition())
 arkTime = system.getArkTime()
 
 -- Radar Updates --
+
+if write_db then
+    --system.print(string.format('%s',write_db.hasKey('record')))
+    if write_db.hasKey('record') and write_db.getIntValue('record') == 1 then recordAll = true else recordAll = false end
+end
+
 if radar_1 and cr == nil then
     cr = coroutine.create(updateRadar)
 elseif cr ~= nil then

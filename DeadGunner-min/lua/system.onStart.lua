@@ -367,6 +367,7 @@ function globalDB(action)
             if write_db.hasKey('weaponWidgets') then weaponWidgets = write_db.getIntValue('weaponWidgets') == 1 end
             if write_db.hasKey('pilotSeat') then pilotSeat = write_db.getIntValue('pilotSeat') == 1 end
             if write_db.hasKey('dmgAvgDuration') then dmgAvgDuration = write_db.getIntValue('dmgAvgDuration') end
+            if write_db.hasKey('slave') then slave = write_db.getIntValue('slave') == 1 end
 
             for _,key in pairs(write_db.getKeyList()) do
                 if string.starts(key,'sc-') then
@@ -385,6 +386,7 @@ function globalDB(action)
             write_db.setIntValue('S_Shield_HP',S_Shield_HP)
             write_db.setIntValue('XS_Shield_HP',XS_Shield_HP)
             write_db.setIntValue('max_radar_load',max_radar_load)
+            if slave then write_db.setIntValue('slave',1) else write_db.setIntValue('slave',0) end
 
             if minimalWidgets then write_db.setIntValue('minimalWidgets',1) else write_db.setIntValue('minimalWidgets',0) end
             if weaponWidgets then write_db.setIntValue('weaponWidgets',1) else write_db.setIntValue('weaponWidgets',0) end
