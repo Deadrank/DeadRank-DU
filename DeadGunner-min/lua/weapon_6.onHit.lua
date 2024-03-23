@@ -8,9 +8,7 @@ elseif string.find(AT,'thermic') then AT = 'Thermic'
 end
 
 if printCombatLog then 
-    system.print(string.format('Hit %s for %.0f damage',radar_1.getConstructName(targetId),damage))
-    system.print(string.format('%.0f%% resist against %s',(1-damage/baseDamage)*100,AT))
-    system.print()
+    system.print(string.format('Hit %s for %.0f damage (%.0f%% %s)',radar_1.getConstructName(targetId),damage,(1-damage/baseDamage)*100,AT))
 end
 
 if dmgTracker[tostring(targetId)] then 

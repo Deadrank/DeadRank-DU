@@ -46,7 +46,11 @@ if screen_update % 4 == 0 then
                     local dist = vec3(abndVec - constructPosition):len()*0.000005
                     if radar_1 and dist < 1.95 then
                         if radar_1.getConstructDistance(string.sub(key,6)) ~= 0 then
-                            table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
+                            if write_db.hasKey(string.gsub(key,'abnd-','kill-')) then
+                                table.insert(AR_Generate,{[1]='[KILL] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
+                            else
+                                table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
+                            end
                         elseif not inSZ then
                             system.print('-- Removing '.. write_db.getStringValue(string.gsub(key,'-','-name-')) ..' ('.. write_db.getStringValue(key) ..')')
                             write_db.clearValue(string.gsub(key,'-','-name-'))
@@ -167,6 +171,7 @@ if screen_update % 4 == 0 then
                 if string.starts(name,'[CORED]') then fill = 'rgb(144,144,144)'
                 elseif string.starts(name,'Fleet Commander') then fill = 'rgb(186,85,211)'
                 elseif string.starts(name,'Squad Leader') then fill = 'rgb(30, 144, 255)'
+                elseif string.starts(name,'[KILL]') then fill = 'rgb(139, 0, 0)'
                 end
                 local translate = '(0,0)'
                 local depth = AR_Size * 1/(0.02*pDist*0.000005)
