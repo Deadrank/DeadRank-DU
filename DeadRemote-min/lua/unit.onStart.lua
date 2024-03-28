@@ -4,7 +4,7 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.5-min'
+hudVersion = 'v5.0.6-min'
 system.print('-- '..hudVersion..' --')
 offset_points = false --export Puts additional position markers around your ship
 dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
@@ -168,7 +168,9 @@ end
 routes = {}
 route = nil
 route_pos = nil
-db_1.setIntValue('record',0)
+if db_1 then
+    db_1.setIntValue('record',0)
+end
 if pcall(require,'autoconf/custom/routes') then
     routes = require('autoconf/custom/routes')
 end

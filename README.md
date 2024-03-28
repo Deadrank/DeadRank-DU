@@ -14,6 +14,11 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
+## 5.0.6 Minor updates
+ - Re-added command to calculate closest warp pipe to a destination `warp ::pos{0,0,1,2,3}`
+ - Fixed several bugs in widgets
+ - Fixed another construct name injection vulnerability that could potentially jam the gunner seat script
+
 ## 5.0.5 Minor updates
  - Added kill recording. When a weapon destroys the core unit of another ship, a kill will be recorded in the databank
  - Cleaned/consolidated the combat log printing in lua channel

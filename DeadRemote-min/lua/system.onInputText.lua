@@ -159,3 +159,68 @@ if string.starts(text:lower(),'show codes') then
     end
     system.print('-----------------------------')
 end
+if string.starts(text,'warp') then
+    if string.starts(text,'warpFrom') then
+        matches = {}
+        for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+        if #matches == 3 then
+            dest = convertWaypoint(matches[3])
+            start = convertWaypoint(matches[2])
+        else
+            system.print('Invalid entry')
+        end
+    elseif string.starts(text,'warp ') then
+        start = nil
+        matches = {}
+        for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+        dest = convertWaypoint(matches[2])
+    end
+
+
+    -- Print out a designator to more easily tell
+    -- multiple entries apart
+    system.print('---------------------')
+
+    -- Set initial minimum distance parameter to nil/empty
+    local minDist = nil
+    local pipeName = 'None'
+
+    -- If we are entered both a start point and destination
+    -- we will print out slightly different output
+    if not start then
+        curPos = vec3(construct.getWorldPosition())
+        system.print('Selected Destination: ' .. text)
+    else
+        curPos = start
+        system.print('Selected start position: ' .. matches[2])
+        system.print('Selected Destination: ' .. matches[3])
+    end
+
+    -- Loop through all possible warp destinations.
+    -- Determine each ones min distance from their
+    -- line segment. If that distance is less than
+    -- the global minimum, then we have found a new
+    -- global minimum
+    distType = ''
+    for k,v in pairs(warp_beacons) do
+        dist,tempType = pipeDist(curPos,v,dest,true)
+        if dist ~= nil then
+            -- Once we know which one is the smallest, compare
+            -- it to our current smallest distance and see who
+            -- wins! If this one is smaller, we have a new
+            -- winner! Lets record the name and distance of the
+            -- new winner.
+            if not minDist or dist < minDist then
+                minDist = dist
+                pipeName = k
+                distType = tempType
+            end
+        end
+    end
+
+    -- After we have checked all possible options, print out the final name
+    -- and distance.
+    system.print(string.format('Closest Warp %s: ',distType) .. pipeName)
+    system.print(string.format('Closest Distance: %.2f SU',minDist*0.000005))
+    system.print('---------------------')
+end
