@@ -292,7 +292,7 @@ if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_de
         autopilot_dest = vec3(convertWaypoint(routes[route][route_pos]))
         autopilot_dest_pos = routes[route][route_pos]
         system.print('-- Route pilot destination set --')
-        system.print(routes[route][route_pos])        
+        system.print(routes[route][route_pos])
     elseif route and route_pos == #routes[route] then
         system.print('-- Route pilot complete --')
         autopilot_dest_pos = nil

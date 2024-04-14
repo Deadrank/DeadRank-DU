@@ -4,7 +4,7 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.6-min'
+hudVersion = 'v5.0.7-min'
 system.print('-- '..hudVersion..' --')
 offset_points = false --export Puts additional position markers around your ship
 dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
@@ -253,7 +253,7 @@ unit.hideWidget()
 core.hideWidget()
 
 placeRadar = true
---_autoconf.displayCategoryPanel(rocketfueltank, rocketfueltank_size, "Rocket Fuel", "fuel_container")
+_autoconf.displayCategoryPanel(rocketfueltank, rocketfueltank_size, "Rocket Fuel", "fuel_container")
 if placeRadar then -- We either have only rockets or no fuel tanks at all, uncommon for usual vessels
     _autoconf.displayCategoryPanel(radar, radar_size, "Radar", "radar")
     placeRadar = false

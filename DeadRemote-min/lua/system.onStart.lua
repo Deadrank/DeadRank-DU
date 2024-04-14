@@ -153,6 +153,11 @@ function flightWidget()
             fontColor,formatNumber(brakeDist,'distance'),fontColor,formatNumber(maxSpeed,'speed'),fontColor,maxSpaceThrust/mass/9.81,
             fontColor,maxBrake/mass/9.81,
             fontColor,mode)
+
+            sw = sw.. [[
+                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Mass </text>
+                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">]]..formatNumber(mass,'mass')..[[</text>
+            ]]
     return sw
 end
 
@@ -462,7 +467,7 @@ function hpWidget()
     local hw = string.format([[
 
             %s
-        <svg x="633.6" y="950.4" viewBox="0 0 1920 1080" width="17vw">
+        <svg x="633.6" y="950.4" viewBox="0 0 1920 1080">
             <polyline style="fill-opacity: 0; stroke-linejoin: round; stroke-linecap: round; stroke-width: 2px; stroke: lightgrey; fill: none;" points="2 78.902 250 78.902 276 50" bx:origin="0.564202 0.377551"/>
             <polyline style="stroke-width: 2px; stroke: lightgrey; fill: none;" points="225 85.853 253.049 85.853 271 67.902" bx:origin="-1.23913 -1.086291"/>
             %s

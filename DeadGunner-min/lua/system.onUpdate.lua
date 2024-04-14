@@ -46,7 +46,7 @@ if screen_update % 4 == 0 then
                     local dist = vec3(abndVec - constructPosition):len()*0.000005
                     if radar_1 and dist < 1.95 then
                         if radar_1.getConstructDistance(string.sub(key,6)) ~= 0 then
-                            if write_db.hasKey(string.gsub(key,'abnd-','kill-')) then
+                            if write_db.hasKey(string.gsub(key,'abnd','kill')) then
                                 table.insert(AR_Generate,{[1]='[KILL] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
                             else
                                 table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
@@ -161,7 +161,7 @@ if screen_update % 4 == 0 then
         local name = v[1]
         local pos = v[2]
         local pDist = vec3(pos - constructPosition):len()
-        if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ) ) or (string.starts(name,'[') and not string.starts(name,'[CORED]')) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
+        if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ or string.starts(name,'[KILL]')) ) or (string.starts(name,'[') and not string.starts(name,'[CORED]')) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
             local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
 
             if pInfo[3] ~= 0 then
@@ -171,7 +171,6 @@ if screen_update % 4 == 0 then
                 if string.starts(name,'[CORED]') then fill = 'rgb(144,144,144)'
                 elseif string.starts(name,'Fleet Commander') then fill = 'rgb(186,85,211)'
                 elseif string.starts(name,'Squad Leader') then fill = 'rgb(30, 144, 255)'
-                elseif string.starts(name,'[KILL]') then fill = 'rgb(139, 0, 0)'
                 end
                 local translate = '(0,0)'
                 local depth = AR_Size * 1/(0.02*pDist*0.000005)
@@ -211,12 +210,18 @@ if screen_update % 4 == 0 then
                             <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                             </g>]]
-                elseif string.starts(name,'[') and not string.starts(name,'[CORED]') then
+                elseif string.starts(name,'[') and not string.starts(name,'[CORED]') and not string.starts(name,'[KILL]') then
                     ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                             <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 255, 255, .75);stroke-width:2;" />
                             <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                             <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                             <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(250, 250, 250, .90);" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s',name)..[[</text>
+                            </g>]]
+                elseif string.starts(name,'[KILL]') then
+                    ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
+                            <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 0, 0, 1);stroke-width:3;opacity:1;" />
+                            <line x1="]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 0, 0, 1);stroke-width:3;opacity:1;" />
+                            <text x="-]]..tostring(2*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(250, 250, 250, .90);" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s',name)..[[</text>
                             </g>]]
                 else
                     ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">

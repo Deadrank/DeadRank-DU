@@ -14,6 +14,11 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
+## 5.0.7 Minor updates
+ - Fixed kill tracking (now properly records kills to databank and displays them in the HUD)
+ - Added rocket fuel default widget if one is on the construct
+ - Added construct mass to top information bar
+
 ## 5.0.6 Minor updates
  - Re-added command to calculate closest warp pipe to a destination `warp ::pos{0,0,1,2,3}`
  - Fixed several bugs in widgets
