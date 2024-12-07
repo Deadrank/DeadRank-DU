@@ -284,3 +284,12 @@ if string.starts(text:lower(),'sp ') then
     elseif resistProfiles[matches[2]:lower()] then shieldProfile = matches[2]:lower() system.print('-- Shield profile set: '..matches[2]:lower())
     else system.print('-- Shield profile not found --') system.print('-- Current profile: '..shieldProfile) end
 end
+if string.starts(text,'trajectory ') then
+    local matches = {}
+    for w in text:gmatch('([^ ]+) ?') do table.insert(matches,w) end
+    if (#matches ~= 2 or not tonumber(matches[2])) then
+        system.print('-- Invalid trajectory command --')
+    else
+        system.print('TODO')
+    end
+end

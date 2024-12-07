@@ -21,6 +21,7 @@ validatePilot = false --export
 pilotSeat = false --export
 targetRadar = false --export 2nd Radar widget with primary targets
 weaponWidgets = true --export Show weapon widgets (stasis always shown)
+excludeXS = true --export
 abandonedCoreDist = 10 --export Distance in AR to show abandoned cores in SU
 dangerWarning = 4 --export
 L_Shield_HP = 11500000 --export
@@ -83,6 +84,7 @@ primaryRadarPanelID = nil
 primaryData = nil
 radarStart = false
 filterSize = {}
+table.insert(filterSize,'XL')
 table.insert(filterSize,'L')
 table.insert(filterSize,'M')
 table.insert(filterSize,'S')

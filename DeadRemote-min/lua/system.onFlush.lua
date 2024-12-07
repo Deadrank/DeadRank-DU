@@ -214,7 +214,7 @@ if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_de
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
     longitudinalAcceleration = vec3()
     Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
-elseif autopilot and autopilot_dest ~= nil and speed < maxSpeed - 10 and enginesOn then
+elseif autopilot and autopilot_dest ~= nil and speed < maxSpeed and enginesOn then
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,1)
     longitudinalAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromThrottle(longitudinalEngineTags,axisCommandId.longitudinal)
     Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
@@ -277,7 +277,7 @@ end
 Nav:setBoosterCommand('rocket_engine')
 
 -- Disable Auto-Pilot when destination is reached --
-if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + 1000 + AP_Brake_Buffer and speed < 1000 then
+if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + 1200 + AP_Brake_Buffer and speed < 1000 then
     brakeInput = brakeInput + 1
     Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
     Nav:setEngineForceCommand(longitudinalEngineTags, vec3(), keepCollinearity)
@@ -285,13 +285,15 @@ if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_de
         system.print('-- Autopilot complete --')
         autopilot_dest_pos = nil
         autopilot = false
-    elseif route and speed < 15 and routes[route][route_pos+1] ~= nil and vec3(constructPosition - autopilot_dest):len() <= 1000+AP_Brake_Buffer then
+    elseif route and speed < 40 and routes[route][route_pos+1] ~= nil and vec3(constructPosition - autopilot_dest):len() <= 1200+AP_Brake_Buffer then
         system.print('-- Route pilot point complete --')
         system.print('-- Starting next point --')
         route_pos = route_pos+1
         autopilot_dest = vec3(convertWaypoint(routes[route][route_pos]))
         autopilot_dest_pos = routes[route][route_pos]
         system.print('-- Route pilot destination set --')
+        brakesOn = false
+        enginesOn = true
         system.print(routes[route][route_pos])
     elseif route and route_pos == #routes[route] then
         system.print('-- Route pilot complete --')

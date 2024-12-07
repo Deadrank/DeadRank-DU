@@ -1,6 +1,14 @@
 json = require("dkjson")
 Atlas = require('atlas')
 
+function commas(number)
+    return tostring(number) -- Make sure the "number" is a string
+       :reverse() -- Reverse the string
+       :gsub('%d%d%d', '%0,') -- insert one comma after every 3 numbers
+       :gsub(',$', '') -- Remove a trailing comma if present
+       :reverse() -- Reverse the string again
+       :sub(1) -- a little hack to get rid of the second return value 😜
+end
 
 function convertWaypoint(wp)
     local clamp  = utils.clamp
@@ -521,6 +529,10 @@ function generateScreen()
     i = i + 1
     
     if showScreen then 
+        if showHelp then
+            htmlTable[i+1] = systemCheckHTML
+            i = i + 1
+        end
         htmlTable[i+1] = flightWidget()
         i = i + 1
         htmlTable[i+1] = fuelHTML
@@ -721,6 +733,51 @@ function ARWidget()
         end
     end
     return table.concat(arw,'')
+end
+
+function systemCheckWidget()
+    local dw = {}
+    local y_offset = 300
+    local x_offset = 450
+    local r_width = 800
+    if #brokenDisplay['Weapons'] + #brokenDisplay['Engine'] + #brokenDisplay['Control'] then
+        r_width = 300
+    end
+
+    dw[#dw+1] = string.format([[
+        <rect width="%s" height="100" x="%s" y="%s" rx="20" ry="20" style="fill: rgba(100,100,100,0.75); stroke-width: 3; stroke: rgba(200,200,200,0.80);" />
+    ]],r_width,x_offset-20,y_offset+175)
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">Engines:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,197+y_offset,x_offset+120,197+y_offset,100*DamageGroupMap['Engine']['Current']/DamageGroupMap['Engine']['Total'],.000001*DamageGroupMap['Engine']['Current'])
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(20, 20, 20, 1)" font-size="1.5vh" >%s</text>
+    ]],x_offset+240,197+y_offset,brokenDisplay['Engine'])
+
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">System Controls:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,217+y_offset,x_offset+120,217+y_offset,100*DamageGroupMap['Control']['Current']/DamageGroupMap['Control']['Total'],.000001*DamageGroupMap['Control']['Current'])
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(20, 20, 20, 1)" font-size="1.5vh" >%s</text>
+    ]],x_offset+240,217+y_offset,brokenDisplay['Control'])
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">Weapons:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,237+y_offset,x_offset+120,237+y_offset,100*DamageGroupMap['Weapons']['Current']/DamageGroupMap['Weapons']['Total'],.000001*DamageGroupMap['Weapons']['Current'])
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(20, 20, 20, 1)" font-size="1.5vh" >%s</text>
+    ]],x_offset+240,237+y_offset,brokenDisplay['Weapons'])
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">Other:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,257+y_offset,x_offset+120,257+y_offset,100*DamageGroupMap['Misc']['Current']/DamageGroupMap['Misc']['Total'],.000001*DamageGroupMap['Misc']['Current'])
+    return table.concat(dw,'')
 end
 
 Kinematic = {} -- just a namespace

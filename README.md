@@ -14,6 +14,10 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
+## 5.0.8 Minor updates
+ - Added incoming DPS calculations for when shield is down
+ - Added rudamentary system status report when build helper is open (`alt+1`)
+
 ## 5.0.7 Minor updates
  - Fixed kill tracking (now properly records kills to databank and displays them in the HUD)
  - Added rocket fuel default widget if one is on the construct

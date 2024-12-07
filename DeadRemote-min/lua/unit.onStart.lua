@@ -25,6 +25,7 @@ AR_Mode = 'NONE' --export
 AR_Exclude_Moons = true --export
 initialResistWait = 15
 dampening = true --inertial dampening
+route_speed = 20000 --export max speed to fly routes
 
 -- HP (Shield/CCS) widget --
 shieldProfile = 'auto'
@@ -38,6 +39,36 @@ resistProfiles['am'] = {['am']=1, ['em']=0, ['kn']=0, ['th']=0}
 resistProfiles['em'] = {['am']=0, ['em']=1, ['kn']=0, ['th']=0}
 resistProfiles['kn'] = {['am']=0, ['em']=0, ['kn']=1, ['th']=0}
 resistProfiles['th'] = {['am']=0, ['em']=0, ['kn']=0, ['th']=1}
+
+-- Element Damage Groups --
+DamageGroupMap = {}
+DamageGroupMap['Engine'] = {}
+DamageGroupMap['Engine']['Total'] = 0
+DamageGroupMap['Engine']['Current'] = 0
+
+DamageGroupMap['Control'] = {}
+DamageGroupMap['Control']['Total'] = 0
+DamageGroupMap['Control']['Current'] = 0
+
+DamageGroupMap['Weapons'] = {}
+DamageGroupMap['Weapons']['Total'] = 0
+DamageGroupMap['Weapons']['Current'] = 0
+
+DamageGroupMap['Misc'] = {}
+DamageGroupMap['Misc']['Total'] = 0
+DamageGroupMap['Misc']['Current'] = 0
+
+brokenElements = {}
+brokenElements['Engine'] = {}
+brokenElements['Control'] = {}
+brokenElements['Weapons'] = {}
+
+brokenDisplay = {}
+brokenDisplay['Engine'] = ''
+brokenDisplay['Control'] = ''
+brokenDisplay['Weapons'] = ''
+
+fontColor = 'Red;'
 
 -- WayPoint File Info
 validWaypointFiles = {}
@@ -127,6 +158,7 @@ AR_Array = {}
 dpsHTML = ''
 fuelHTML = ''
 shipNameHTML = shipNameWidget()
+systemCheckHTML = ''
 
 legacyFile = false
 if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then

@@ -87,7 +87,7 @@ def locate():
     index = ''
     capture = False
     for item in temp:
-        if 'Dual Universe' in item:
+        if 'My Dual Universe' in item:
             index = temp.index(item)
     for x in range(index,0,-1):
         if temp[x][-1] == ':':

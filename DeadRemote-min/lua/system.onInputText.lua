@@ -224,3 +224,21 @@ if string.starts(text,'warp') then
     system.print(string.format('Closest Distance: %.2f SU',minDist*0.000005))
     system.print('---------------------')
 end
+if string.starts(text,'distance') then
+    system.print('-- Distances to AR Points --')
+    local distTable = {}
+    local nameTable = {}
+    local posTable = {}
+    for name,pos in pairs(AR_Generate) do
+        local pDist = vec3(pos - constructPosition):len()
+        table.insert(distTable,pDist)
+        nameTable[tostring(pDist)] = name
+        posTable[tostring(pDist)] = string.format('::pos{0,0,%.1f,%.1f,%.1f}',pos['x'],pos['y'],pos['z'])
+    end
+    table.sort(distTable,function(a, b) return a > b end)
+    for _,dist in ipairs(distTable) do
+        system.print(string.format('%s -> %s',nameTable[tostring(dist)],formatNumber(dist,'distance')))
+        system.print('   ' .. posTable[tostring(dist)])
+    end
+    system.print('----------------------------')
+end

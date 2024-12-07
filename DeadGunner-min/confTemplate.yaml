@@ -1,4 +1,4 @@
-name: DeadGunner v5.0.7-minimal
+name: DeadGunner v5.0.8-minimal
 
 pvp: true
 
@@ -167,6 +167,38 @@ handlers:
       lua: |
 {{weapon.onElementDestroyed.lua}}
   weapon_6:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
+  weapon_7:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_7.onHit.lua}}
+  weapon_7:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_7:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_7:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
+  weapon_8:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_8.onHit.lua}}
+  weapon_8:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_8:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_8:
     onDestroyed(targetId):
       lua: |
 {{weapon.onDestroyed.lua}}

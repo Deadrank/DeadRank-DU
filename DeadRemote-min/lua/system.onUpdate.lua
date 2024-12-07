@@ -5,7 +5,11 @@ ticker = ticker + 1
 speedVec = vec3(constructVelocity)
 speed = speedVec:len() * 3.6
 if speed < 50 then speedVec = vec3(constructForward) end
-maxSpeed = construct.getMaxSpeed() * 3.6
+if route and routes[route][route_pos] == autopilot_dest_pos then
+    maxSpeed = route_speed
+else
+    maxSpeed = construct.getMaxSpeed() * 3.6
+end
 gravity = core.getGravityIntensity()
 mass = construct.getMass()
 constructPosition = vec3(construct.getWorldPosition())

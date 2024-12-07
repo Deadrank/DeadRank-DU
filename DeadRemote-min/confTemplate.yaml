@@ -1,4 +1,4 @@
-name: DeadRemote v5.0.7-minimal
+name: DeadRemote v5.0.8-minimal
 slots:
     core:
         class: CoreUnit
@@ -260,3 +260,7 @@ handlers:
     onAbsorbed(damage,rawDamage):
       lua: |
 {{shield.onAbsorbed.lua}}
+  core:
+    onStressChanged(stress):
+      lua: |
+{{core.onStressChanged.lua}}

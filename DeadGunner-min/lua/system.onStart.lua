@@ -93,6 +93,12 @@ function formatNumber(val, numType)
             massStr = string.format('%skg',val)
         end
         return massStr
+    elseif numType == 'angVel' then
+        local angString = ''
+        if type(val) == 'number' then
+            angString = string.format('%.2fdeg/s',val*180/math.pi)
+            return angString
+        end
     end
 end
 
@@ -287,6 +293,7 @@ function updateRadar(filter)
             end
             radarFriendlies[id] = nil
         end
+
         if not constructData['name'] then constructData['name'] = string.format('[%s] %s',uniqueCode,name) end
         local high_value = contains(primaries,tostring(id))
         if not high_value and slave and master_primary == coreID then
@@ -336,6 +343,7 @@ function updateRadar(filter)
     data = data:gsub('"constructsList":%[%]','"constructsList":['..table.concat(constructList,',')..']')
 
     primaryData = pData:gsub('"constructsList":%[%]','"constructsList":['..table.concat(primaryList,',')..']')
+    
 
     radarStats = tempRadarStats
     radarWidgetData = data
@@ -632,7 +640,11 @@ function identifiedWidget()
         local myMass = construct.getMass()
 
         local targetSpeedString = 'Not Identified'
-        if targetIdentified then targetSpeed = radar_1.getConstructSpeed(id) * 3.6 targetSpeedString = formatNumber(targetSpeed,'speed') end
+        local angularSpeedString = 'Not Identified'
+        if targetIdentified then
+            targetSpeed = radar_1.getConstructSpeed(id) * 3.6 targetSpeedString = formatNumber(targetSpeed,'speed')
+            angularSpeedString = formatNumber(radar_1.getConstructAngularSpeed(id),'angVel')
+        end
         local speedDiff = 0
         if targetIdentified then speedDiff = mySpeed-targetSpeed end
         
@@ -776,6 +788,8 @@ function identifiedWidget()
                     <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..speedCompare..[[</text>
                     <text x="]].. tostring(.359 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) .. [[" style="fill: white;" font-size="1.7vh" font-weight="bold">Speed: </text>
                     <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..targetSpeedString..[[</text>
+                    <text x="]].. tostring(.3525 * screenWidth) ..[[" y="]].. tostring(.55 * screenHeight) .. [[" style="fill: white;" font-size="1.7vh" font-weight="bold">Angular: </text>
+                    <text x="]].. tostring(.390 * screenWidth) ..[[" y="]].. tostring(.55 * screenHeight) .. [[" style="fill: ]]..speedCompareColor..[[;" font-size="1.7vh" font-weight="bold">]]..angularSpeedString..[[</text>
                 </svg>
             ]]
         end

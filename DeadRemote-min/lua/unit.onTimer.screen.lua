@@ -238,8 +238,86 @@ if shield_1 then
     shield_resist_cd = shield_1.getResistancesCooldown()
 end
 
+if showHelp then
+    DamageGroupMap = {}
+    DamageGroupMap['Engine'] = {}
+    DamageGroupMap['Engine']['Total'] = 0
+    DamageGroupMap['Engine']['Current'] = 0
 
+    DamageGroupMap['Control'] = {}
+    DamageGroupMap['Control']['Total'] = 0
+    DamageGroupMap['Control']['Current'] = 0
+
+    DamageGroupMap['Weapons'] = {}
+    DamageGroupMap['Weapons']['Total'] = 0
+    DamageGroupMap['Weapons']['Current'] = 0
+
+    DamageGroupMap['Misc'] = {}
+    DamageGroupMap['Misc']['Total'] = 0
+    DamageGroupMap['Misc']['Current'] = 0
+
+    brokenElements = {}
+    brokenElements['Engine'] = {}
+    brokenElements['Control'] = {}
+    brokenElements['Weapons'] = {}
+
+    brokenDisplay = {}
+    brokenDisplay['Engine'] = ''
+    brokenDisplay['Control'] = ''
+    brokenDisplay['Weapons'] = ''
+
+    local itemClasses = {}
+    for _,id in pairs(core.getElementIdList()) do
+        local itemClass = core.getElementClassById(id)
+        local itemDisplay = core.getElementDisplayNameById(id)
+        if string.find(string.lower(itemClass),'engine')
+            or string.find(string.lower(itemClass),'brake') then
+            DamageGroupMap['Engine']['Total'] = DamageGroupMap['Engine']['Total'] + core.getElementMaxHitPointsById(id)
+            DamageGroupMap['Engine']['Current'] = DamageGroupMap['Engine']['Current'] + core.getElementHitPointsById(id)
+            if not (core.getElementHitPointsById(id) > 0) then
+                if brokenElements['Engine'][itemDisplay] == nil then
+                    brokenElements['Engine'][itemDisplay] = 1
+                else
+                    brokenElements['Engine'][itemDisplay] = brokenElements['Engine'][itemDisplay] + 1
+                end
+            end
+        elseif string.find(string.lower(itemClass),'control')
+            or string.find(string.lower(itemClass),'pvpseat')
+            or string.find(string.lower(itemClass),'fuel') then
+            DamageGroupMap['Control']['Total'] = DamageGroupMap['Control']['Total'] + core.getElementMaxHitPointsById(id)
+            DamageGroupMap['Control']['Current'] = DamageGroupMap['Control']['Current'] + core.getElementHitPointsById(id)
+            if not (core.getElementHitPointsById(id) > 0) then
+                if brokenElements['Control'][itemDisplay] == nil then
+                    brokenElements['Control'][itemDisplay] = 1
+                else
+                    brokenElements['Control'][itemDisplay] = brokenElements['Control'][itemDisplay] + 1
+                end
+            end
+        elseif string.find(string.lower(itemClass),'ammocontainer')
+            or string.find(string.lower(itemClass),'radar')
+            or string.find(string.lower(itemClass),'weapon') then
+            DamageGroupMap['Weapons']['Total'] = DamageGroupMap['Weapons']['Total'] + core.getElementMaxHitPointsById(id)
+            DamageGroupMap['Weapons']['Current'] = DamageGroupMap['Weapons']['Current'] + core.getElementHitPointsById(id)
+            if not (core.getElementHitPointsById(id) > 0 ) then
+                if brokenElements['Weapons'][itemDisplay] == nil then
+                    brokenElements['Weapons'][itemDisplay] = 1
+                else
+                    brokenElements['Weapons'][itemDisplay] = brokenElements['Weapons'][itemDisplay] + 1
+                end
+            end
+        else
+            DamageGroupMap['Misc']['Total'] = DamageGroupMap['Misc']['Total'] + core.getElementMaxHitPointsById(id)
+            DamageGroupMap['Misc']['Current'] = DamageGroupMap['Misc']['Current'] + core.getElementHitPointsById(id)
+        end
+    end
+    for k,v in pairs(brokenElements) do
+        for dk,dv in pairs(v) do
+            brokenDisplay[k] = brokenDisplay[k] .. string.format('%s %s | ',dv,dk)
+        end
+    end
+end
 
 fuelHTML = fuelWidget()
 shipNameHTML = shipNameWidget()
 dpsHTML = dpsWidget()
+systemCheckHTML = systemCheckWidget()
