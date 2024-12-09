@@ -737,15 +737,15 @@ end
 
 function systemCheckWidget()
     local dw = {}
-    local y_offset = 300
-    local x_offset = 450
-    local r_width = 800
-    if #brokenDisplay['Weapons'] + #brokenDisplay['Engine'] + #brokenDisplay['Control'] then
-        r_width = 300
+    local y_offset = 175
+    local x_offset = 50
+    local r_width = 300
+    if brokenDisplay['Weapons'] ~= "" or brokenDisplay['Engine'] ~= "" or brokenDisplay['Control'] ~= "" then
+        r_width = 800
     end
 
     dw[#dw+1] = string.format([[
-        <rect width="%s" height="100" x="%s" y="%s" rx="20" ry="20" style="fill: rgba(100,100,100,0.75); stroke-width: 3; stroke: rgba(200,200,200,0.80);" />
+        <rect width="%s" height="100" x="%s" y="%s" rx="5" ry="5" style="fill: rgba(25,25,25,0.65); stroke-width: 1.5; stroke: rgba(175,25,25,0.80);" />
     ]],r_width,x_offset-20,y_offset+175)
 
     dw[#dw+1] = string.format([[
@@ -753,8 +753,8 @@ function systemCheckWidget()
         <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
     ]],x_offset,197+y_offset,x_offset+120,197+y_offset,100*DamageGroupMap['Engine']['Current']/DamageGroupMap['Engine']['Total'],.000001*DamageGroupMap['Engine']['Current'])
     dw[#dw+1] = string.format([[
-        <text x="%s" y="%s" style="fill: rgba(20, 20, 20, 1)" font-size="1.5vh" >%s</text>
-    ]],x_offset+240,197+y_offset,brokenDisplay['Engine'])
+        <text x="%s" y="%s" style="fill: rgba(250, 150, 150, 1)" font-size="1.5vh" >%s</text>
+    ]],x_offset+240,197+y_offset,string.sub(brokenDisplay['Engine'],1,-2))
 
 
     dw[#dw+1] = string.format([[
@@ -762,16 +762,16 @@ function systemCheckWidget()
         <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
     ]],x_offset,217+y_offset,x_offset+120,217+y_offset,100*DamageGroupMap['Control']['Current']/DamageGroupMap['Control']['Total'],.000001*DamageGroupMap['Control']['Current'])
     dw[#dw+1] = string.format([[
-        <text x="%s" y="%s" style="fill: rgba(20, 20, 20, 1)" font-size="1.5vh" >%s</text>
-    ]],x_offset+240,217+y_offset,brokenDisplay['Control'])
+        <text x="%s" y="%s" style="fill: rgba(250, 150, 150, 1)" font-size="1.5vh" >%s</text>
+    ]],x_offset+240,217+y_offset,string.sub(brokenDisplay['Control'],1,-2))
 
     dw[#dw+1] = string.format([[
         <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">Weapons:</text>
         <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">%.1f%% (%.1fM)</text>
     ]],x_offset,237+y_offset,x_offset+120,237+y_offset,100*DamageGroupMap['Weapons']['Current']/DamageGroupMap['Weapons']['Total'],.000001*DamageGroupMap['Weapons']['Current'])
     dw[#dw+1] = string.format([[
-        <text x="%s" y="%s" style="fill: rgba(20, 20, 20, 1)" font-size="1.5vh" >%s</text>
-    ]],x_offset+240,237+y_offset,brokenDisplay['Weapons'])
+        <text x="%s" y="%s" style="fill: rgba(250, 150, 150, 1)" font-size="1.5vh" >%s</text>
+    ]],x_offset+240,237+y_offset,string.sub(brokenDisplay['Weapons'],1,-2))
 
     dw[#dw+1] = string.format([[
         <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="1.5vh" font-weight="bold">Other:</text>

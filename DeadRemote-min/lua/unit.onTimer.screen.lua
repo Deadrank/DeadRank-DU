@@ -312,7 +312,10 @@ if showHelp then
     end
     for k,v in pairs(brokenElements) do
         for dk,dv in pairs(v) do
-            brokenDisplay[k] = brokenDisplay[k] .. string.format('%s %s | ',dv,dk)
+            if brokenDisplay[k] == nil then
+                brokenDisplay[k] = 'Broken: '
+            end
+            brokenDisplay[k] = brokenDisplay[k] .. string.format(' %sx %s,',dv,dk)
         end
     end
 end
