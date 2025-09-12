@@ -385,14 +385,14 @@ function positionInfoWidget()
             L 1920 1.08
             L 1920 16.74"
             stroke="%s" stroke-width="1" fill="%s" />
-        <text class="text" x="1.92" y="14" style="fill: %s" font-size="]].. font_size_ratio-0.4 ..[[vw">Remote Version: %s</text>
-        <text class="text" x="1728" y="15" style="fill: %s" font-size="]].. font_size_ratio-0.3 ..[[vw" font-weight="bold">Safe Zone Distance: %s</text>
+        <text class="text" x="1.92" y="14" style="fill: %s" font-size="]].. font_size_ratio ..[[vh">Remote Version: %s</text>
+        <text class="text" x="1728" y="15" style="fill: %s" font-size="]].. font_size_ratio ..[[vh" font-weight="bold">Safe Zone Distance: %s</text>
         
-        <text class="text" x="240" y="15" style="fill: %s" font-size="1.42vh" font-weight="bold">Nearest Planet</text>
-        <text class="text" x="288" y="26" style="fill: %s" font-size="]].. font_size_ratio-0.3 ..[[vw" >%s</text>
+        <text class="text" x="240" y="15" style="fill: %s" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Nearest Planet</text>
+        <text class="text" x="288" y="26" style="fill: %s" font-size="]].. font_size_ratio ..[[vh" >%s</text>
 
         <text class="text" x="1574.4" y="15" style="fill: %s" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Nearest Pipe</text>
-        <text class="text" x="1497.6" y="26" style="fill: %s" font-size="]].. font_size_ratio-0.3 ..[[vw" >%s</text>
+        <text class="text" x="1497.6" y="26" style="fill: %s" font-size="]].. font_size_ratio ..[[vh" >%s</text>
         ]],
         lineColor,bgColor,lineColor,bgColor,fontColor,hudVersion,fontColor,SZDStr,fontColor,fontColor,closestPlanetStr,fontColor,fontColor,closestPipeStr
     )
@@ -1316,7 +1316,7 @@ function runTimerScreen()
     for i,tag in pairs(enabledEngineTags) do
         if i % 2 == 0 then 
             engTable[#engTable+1] = [[
-                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio-0.2 ..[[vw">]]..tag.. ',' ..tempTag..[[</text>    
+                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tag.. ',' ..tempTag..[[</text>    
             ]]
             tempTag = nil
             offset = offset + 1
@@ -1325,10 +1325,10 @@ function runTimerScreen()
         end
     end
     if tempTag ~= nil then 
-        engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio-0.2 ..[[vw">]]..tempTag..[[</text>]]
+        engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tempTag..[[</text>]]
     end
     if #engTable == 0 then
-        engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio-0.2 ..[[vw">ALL</text>]]
+        engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio ..[[vh">ALL</text>]]
     end
     enabledEngineTagsStr = table.concat(engTable,'')
     ----------------------------

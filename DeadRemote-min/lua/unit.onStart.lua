@@ -4,7 +4,7 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.11-min'
+hudVersion = 'v5.0.12-min'
 system.print('-- '..hudVersion..' --')
 offset_points = false --export Puts additional position markers around your ship
 dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
@@ -27,6 +27,7 @@ initialResistWait = 15
 dampening = true --inertial dampening
 route_speed = 20000 --export max speed to fly routes
 font_size_ratio = 1.0 --export Font size scaling
+if font_size_ratio == 0 then font_size_ratio = 0.1 end
 debug = false --export collect and print debug data
 
 -- HP (Shield/CCS) widget --

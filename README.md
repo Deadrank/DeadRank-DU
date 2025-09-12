@@ -14,8 +14,9 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
-## 5.0.11 Minor Changes
+## 5.0.11-12 Minor Changes
  - Bug fix for occasions where maxBrake is nil
+ - Fix UI scaling issues
 
 ## 5.0.10 Minor Changes
  - Updated ship data when identified to show ship mass instead of calculated top speed
