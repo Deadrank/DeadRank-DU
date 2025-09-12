@@ -1556,6 +1556,7 @@ function runUpdate()
     mass = construct.getMass()
     constructPosition = vec3(construct.getWorldPosition())
     maxBrake = json.decode(unit.getWidgetData()).maxBrake
+    if maxBrake == nil then maxBrake = 0 end
     maxThrustTags = 'thrust'
     if #enabledEngineTags > 0 then
         maxThrustTags = maxThrustTags .. ' disengaged'

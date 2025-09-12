@@ -1,4 +1,4 @@
-name: DeadRemote v5.0.10-minimal
+name: DeadRemote v5.0.11-minimal
 slots:
     core:
         class: CoreUnit
