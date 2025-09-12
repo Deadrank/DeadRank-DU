@@ -231,16 +231,21 @@ function updateRadar(filter)
         constructData['isIdentified'] = radar_1.isConstructIdentified(id)
         constructData['hasWeapons'] = nil
         constructData['topSpeed'] = 0
+        constructData['mass'] = 0
         if constructData['isIdentified'] then
             local info = radar_1.getConstructInfos(id)
             if info['weapons'] ~= 0 then constructData['hasWeapons'] = true else constructData['hasWeapons'] = false end
             
             local mass = radar_1.getConstructMass(id)
-            local topSpeed = (50000/3.6-10713*(mass-10000)/(853926+(mass-10000)))*3.6
+            local topSpeed = (50000/3.6-10713*(mass-10000)/(853926+(mass-10000)))*3.6 --Mass now instead of top speed
             constructData['topSpeed'] = clamp(topSpeed,20000,50000)
+            constructData['mass'] = mass
         elseif radarTrackingData[tostring(id)] then
             if radarTrackingData[tostring(id)]['topSpeed'] > 0 then
                 constructData['topSpeed'] = radarTrackingData[tostring(id)]['topSpeed']
+            end
+            if radarTrackingData[tostring(id)]['mass'] > 0 then
+                constructData['mass'] = radarTrackingData[tostring(id)]['mass']
             end
         end
 
@@ -501,7 +506,7 @@ function radarWidget()
         x = 67.5
         s = 10
     else
-        y = 67
+        y = 78
         x = 29
         s = 11.25
     end
@@ -518,7 +523,7 @@ function radarWidget()
 
     rw[#rw+1] = [[
         <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 240" width="200">
-            <rect x="6%" y="6%" width="87%" height="60%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
+            <rect x="6%" y="6%" width="87%" height="60%" rx="1%" ry="1%" fill="rgba(100,100,100,.5)" />
             <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
             <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 154 18 157"/>
             <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Radar Information (]]..tostring(radarContactNumber)..[[)</text>
@@ -720,8 +725,8 @@ function identifiedWidget()
             if radarTrackingData[tostring(id)]['topSpeed'] > 0 then
                 topSpeedSVG = [[
                     <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: lightgrey;" x1="22" y1="162" x2="22" y2="185"/>
-                    <text style="fill: white; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="181">Top Speed:</text>
-                    <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="110" y="181">]]..formatNumber(radarTrackingData[tostring(id)]['topSpeed'],'speed')..[[</text>
+                    <text style="fill: white; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="181">Mass:</text>
+                    <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="110" y="181">]]..formatNumber(radarTrackingData[tostring(id)]['mass'],'mass')..[[</text>
                 ]]
             end
         end
@@ -755,8 +760,8 @@ function identifiedWidget()
         end
 
         local x,y,s
-        y = 15
-        x = 1.75
+        y = 3.5
+        x = 11
         s = 11.25
         iw[#iw+1] = [[
             <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="200">
@@ -809,7 +814,7 @@ function dpsWidget()
     end
     cDPS = cDPS/dmgAvgDuration
 
-    local dw = string.format([[<svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;" viewBox="0 0 1920 1080">
+    local dw = string.format([[<svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;viewBox="0 0 1920 1080">
                 <text x="1.92" y="85" style="fill: lightgreen;" font-size="1.42vh" font-weight="bold">DPS: %.1fk</text></svg>
     ]],cDPS/1000)
     return dw
@@ -866,7 +871,26 @@ end
 
 function generateHTML()
     local htmlTable = {}
-    htmlTable[#htmlTable+1] = [[<html> <body style="font-family: Calibri;">]]
+    htmlTable[#htmlTable+1] = [[
+    <html>
+        <style>
+            body {
+                font-family: 'Roboto', sans-serif;
+                color: #e6e6e6;
+                margin: 0;
+                overflow: hidden;
+            }
+            svg {
+                filter: drop-shadow(0px 0px 5px rgba(0, 255, 255, 0.5));
+            }
+            .widget {
+                stroke-width: 2;
+            }
+            .text {
+                fill: #e6e6e6;
+            }
+        </style>
+        <body>]]
     htmlTable[#htmlTable+1] =  arHTML
     if showScreen then
         if weapon_1 then htmlTable[#htmlTable+1] = weaponHTML end

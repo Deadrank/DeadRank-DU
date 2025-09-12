@@ -14,6 +14,10 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
+## 5.0.10 Minor Changes
+ - Updated ship data when identified to show ship mass instead of calculated top speed
+ - Added variable for HUD Text scale size for manual adjusting (lua variable export)
+
 ## 5.0.9 Bug fix
  - Updating damage report UI look and fixed a bug with the system check
 

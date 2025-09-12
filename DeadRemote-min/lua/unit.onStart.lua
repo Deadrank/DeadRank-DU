@@ -4,7 +4,7 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.9-min'
+hudVersion = 'v5.0.10-min'
 system.print('-- '..hudVersion..' --')
 offset_points = false --export Puts additional position markers around your ship
 dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
@@ -26,6 +26,8 @@ AR_Exclude_Moons = true --export
 initialResistWait = 15
 dampening = true --inertial dampening
 route_speed = 20000 --export max speed to fly routes
+font_size_ratio = 1.0 --export Font size scaling
+debug = false --export collect and print debug data
 
 -- HP (Shield/CCS) widget --
 shieldProfile = 'auto'
@@ -159,6 +161,14 @@ dpsHTML = ''
 fuelHTML = ''
 shipNameHTML = shipNameWidget()
 systemCheckHTML = ''
+
+profiling_data = {}
+fps_data = {}
+fps_data['min'] = 999
+fps_data['max'] = 0
+fps_data['count'] = 0
+fps_data['sum'] = 0
+
 
 legacyFile = false
 if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
