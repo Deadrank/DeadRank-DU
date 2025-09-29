@@ -4,11 +4,12 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-hudVersion = 'v5.0.12-min'
+hudVersion = 'v5.0.13-min'
 system.print('-- '..hudVersion..' --')
 offset_points = false --export Puts additional position markers around your ship
 dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
 screenRefreshRate = 0.25 --export
+dataUpdateRatio = 3 --export Rate to update data whole number (shields, fuel, etc)
 useDB = true --export
 validatePilot = false --export
 toggleBrakes = true --export
@@ -169,6 +170,7 @@ fps_data['min'] = 999
 fps_data['max'] = 0
 fps_data['count'] = 0
 fps_data['sum'] = 0
+dataUpdateCounter = 0
 
 
 legacyFile = false
@@ -221,9 +223,15 @@ end
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 maxFuel = 0
+maxAtmoFuel = 0
 sFuelPercent = 0
+aFuelPercent = 0
 maxBrake = 0
+maxAtmoSpeed = construct.getFrictionBurnSpeed()*3.6
+inAtmo = unit.getAtmosphereDensity() > 0
+cAltitude = core.getAltitude()
 for i,v in pairs(spacefueltank) do maxFuel = maxFuel + v.getMaxVolume() end
+for i,v in pairs(atmofueltank) do maxAtmoFuel = maxAtmoFuel + v.getMaxVolume() end
 currentSystem = Atlas[0]
 planets = {}
 constructPosition = vec3(construct.getWorldPosition())

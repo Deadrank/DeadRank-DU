@@ -310,7 +310,9 @@ showScreen = true
 lShift = false
 
 radarRange = 0
+radar = nil
 if radar_1 ~= nil then
+    radar = radar_1
     radarRange = radar_1.getIdentifyRanges()
     if #radarRange > 0 then
         radarRange = radarRange[1]

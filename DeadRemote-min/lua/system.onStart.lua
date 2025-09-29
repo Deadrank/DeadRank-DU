@@ -128,6 +128,10 @@ function brakeWidget()
 end
 
 function flightWidget()
+    local maxSpeedString = formatNumber(maxSpeed,'speed')
+    if cAltitude ~= 0 or inAtmo then 
+        maxSpeedString = formatNumber(maxAtmoSpeed,'speed') 
+    end
     local sw = string.format([[
             <path class="widget" d="
             M 595.2 1.08
@@ -173,7 +177,7 @@ function flightWidget()
             fontColor,font_size_ratio+0.42,formatNumber(speed,'speed'),
             fontColor,font_size_ratio+0.42,accel/9.81,
             fontColor,font_size_ratio+0.42,formatNumber(brakeDist,'distance'),
-            fontColor,font_size_ratio+0.42,formatNumber(maxSpeed,'speed'),
+            fontColor,font_size_ratio+0.42,maxSpeedString,
             fontColor,font_size_ratio+0.42,maxSpaceThrust/mass/9.81,
             fontColor,font_size_ratio+0.42,maxBrake/mass/9.81,
             fontColor,font_size_ratio+0.42,mode)
@@ -187,15 +191,26 @@ end
 
 function fuelWidget()
     curFuel = 0
+    curAtmoFuel = 0
     local fuelWarning = false
     local fuelTankWarning = false
     for i,v in pairs(spacefueltank) do 
         curFuel = curFuel + v.getItemsVolume()
         if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
     end
+
+    for i,v in pairs(atmofueltank) do 
+        curAtmoFuel = curAtmoFuel + v.getItemsVolume()
+        if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
+    end
+
     sFuelPercent = curFuel/maxFuel * 100
     if sFuelPercent < 20 then fuelWarning = true end
     curFuelStr = string.format('%.2f%%',sFuelPercent)
+
+    aFuelPercent = curAtmoFuel/maxAtmoFuel * 100
+    if aFuelPercent < 20 then fuelWarning = true end
+    curAtmoFuelStr = string.format('%.2f%%',aFuelPercent)
 
     --Center bottom ribbon
     local fw = string.format([[
@@ -238,10 +253,63 @@ function fuelWidget()
         M 854.4 59.4 
         L 854.4 75.6"
     stroke="black" stroke-width="1.5" fill="none" />
+    ]],sFuelPercent,sFuelPercent,lineColor,bgColor,lineColor)
 
-    <text class="text" x="748.8" y="86.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Fuel: %s</text>
+    if maxAtmoFuel > 0 then
+        fw = fw .. string.format([[
+            <linearGradient id="aFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
+            <stop offset="%.1f%%" style="stop-color:rgba(47, 154, 255, 0.95);stop-opacity:.95" />
+            <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
+            </linearGradient>
 
-    ]],sFuelPercent,sFuelPercent,lineColor,bgColor,lineColor,curFuelStr)
+            <path d="
+            M 645.12 19.98 
+            L 748.8 59.4
+            L 1171.2 59.4
+            L 1273.92 19.98
+            L 1273.92 30.24
+            L 1171.2 69.66
+            L 748.8 69.66
+            L 646.08 30.24
+            L 645.12 19.98"
+        stroke="%s" stroke-width="2" fill="%s" />
+
+        <path d="
+            M 748.8 75.6
+            L 1171.2 75.6
+            L 1171.2 85.86
+            L 748.8 85.86
+            L 748.8 75.6"
+        stroke="%s" stroke-width="1" fill="url(#aFuel)" />
+
+        <path d="
+            M 960 75.6 
+            L 960 91.8"
+        stroke="black" stroke-width="1.5" fill="none" />
+
+        <path d="
+            M 1065.6 75.6 
+            L 1065.6 91.8"
+        stroke="black" stroke-width="1.5" fill="none" />
+
+        <path d="
+            M 854.4 75.6 
+            L 854.4 91.8"
+        stroke="black" stroke-width="1.5" fill="none" />
+
+        ]],aFuelPercent,aFuelPercent,lineColor,bgColor,lineColor)
+    end
+
+    if maxAtmoFuel > 0 then
+        fw = fw .. string.format([[ 
+        <text class="text" x="748.8" y="102.6" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Fuel: %s</text>
+        <text class="text" x="850" y="102.6" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Atmo Fuel: %s</text>
+        ]],curFuelStr,curAtmoFuelStr)
+    else
+        fw = fw .. string.format([[ 
+        <text class="text" x="748.8" y="86.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Fuel: %s</text>
+        ]],curFuelStr)
+    end
 
     if fuelTankWarning or fuelWarning or showAlerts then
         fuelWarningText = 'Fuel level &lt; 20%'
@@ -1082,6 +1150,13 @@ function runFlush()
     else
         brakeAcceleration = -finalBrakeInput * (brakeSpeedFactor * constructVelocity + brakeFlatFactor * constructVelocityDir)
     end
+    if inAtmo and speed >= .98*maxAtmoSpeed then
+        brakeAcceleration = -maxBrake * constructVelocityDir
+        brakeInput = 1
+    elseif inAtmo and not brakesOn and not autopilot then
+        brakeAcceleration = vec3()
+        brakeInput = 0
+    end
     Nav:setEngineForceCommand('brake', brakeAcceleration)
 
     -- AutoNavigation regroups all the axis command by 'TargetSpeed'
@@ -1201,6 +1276,13 @@ end
 
 function runTimerScreen()
     arkTime = system.getArkTime()
+    local dataUpdate = false
+    if dataUpdateCounter % dataUpdateRatio == 0 then
+        dataUpdateCounter = 0
+        dataUpdate = true
+    else
+        dataUpdateCounter = dataUpdateCounter + 1
+    end
 
     local cFPS = FPS_COUNTER/(arkTime - FPS_INTERVAL)
     if fps_data['avg'] == nil then fps_data['avg'] = cFPS end
@@ -1238,8 +1320,9 @@ function runTimerScreen()
         player.freeze(0)
     end
     ----------------------------------
-    
-    cName = construct.getName()
+    if dataUpdate then
+        cName = construct.getName()
+    end
     if transponder_1 then tags = transponder_1.getTags() end
     
     ----------------------------------
@@ -1310,53 +1393,59 @@ function runTimerScreen()
     
     
     -- Engine Tag Filtering --
-    local engTable = {}
-    local tempTag = nil
-    local offset = 0
-    for i,tag in pairs(enabledEngineTags) do
-        if i % 2 == 0 then 
-            engTable[#engTable+1] = [[
-                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tag.. ',' ..tempTag..[[</text>    
-            ]]
-            tempTag = nil
-            offset = offset + 1
-        else
-            tempTag = tag
+    if dataUpdate then
+        local engTable = {}
+        local tempTag = nil
+        local offset = 0
+        for i,tag in pairs(enabledEngineTags) do
+            if i % 2 == 0 then 
+                engTable[#engTable+1] = [[
+                    <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tag.. ',' ..tempTag..[[</text>    
+                ]]
+                tempTag = nil
+                offset = offset + 1
+            else
+                tempTag = tag
+            end
         end
+        if tempTag ~= nil then 
+            engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tempTag..[[</text>]]
+        end
+        if #engTable == 0 then
+            engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio ..[[vh">ALL</text>]]
+        end
+        enabledEngineTagsStr = table.concat(engTable,'')
     end
-    if tempTag ~= nil then 
-        engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tempTag..[[</text>]]
-    end
-    if #engTable == 0 then
-        engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio ..[[vh">ALL</text>]]
-    end
-    enabledEngineTagsStr = table.concat(engTable,'')
     ----------------------------
     
     -- Safe Zone Distance --
-    inSZ = not construct.isInPvPZone()
-    SZD = math.abs(construct.getDistanceToSafeZone())
-    
-    SZDStr = ''
-    if SZD < 1000 then SZDStr = string.format('%.2f m',SZD)
-    elseif SZD < 100000 then SZDStr = string.format('%.2f km',SZD/1000)
-    else SZDStr = string.format('%.2f su',SZD*.000005)
+    if dataUpdate then
+        inSZ = not construct.isInPvPZone()
+        SZD = math.abs(construct.getDistanceToSafeZone())
+        
+        SZDStr = ''
+        if SZD < 1000 then SZDStr = string.format('%.2f m',SZD)
+        elseif SZD < 100000 then SZDStr = string.format('%.2f km',SZD/1000)
+        else SZDStr = string.format('%.2f su',SZD*.000005)
+        end
     end
     ---------------------------
     
     -- Planet Location Updates --
-    closestPlanetName,closestPlanetDist = closestPlanet()
-    if cr == nil then
-        cr = coroutine.create(closestPipe)
-    elseif cr ~= nil then
-        if coroutine.status(cr) == "suspended" then
-            coroutine.resume(cr)
-        elseif coroutine.status(cr) == "dead" then
-            cr = nil
+    if dataUpdate then
+        closestPlanetName,closestPlanetDist = closestPlanet()
+        if cr == nil then
+            cr = coroutine.create(closestPipe)
+        elseif cr ~= nil then
+            if coroutine.status(cr) == "suspended" then
+                coroutine.resume(cr)
+            elseif coroutine.status(cr) == "dead" then
+                cr = nil
+            end
         end
+        closestPipeStr = string.format('%s (%s)',closestPipeName,formatNumber(closestPipeDistance,'distance'))
+        closestPlanetStr = string.format('%s (%s)',closestPlanetName,formatNumber(closestPlanetDist,'distance'))
     end
-    closestPipeStr = string.format('%s (%s)',closestPipeName,formatNumber(closestPipeDistance,'distance'))
-    closestPlanetStr = string.format('%s (%s)',closestPlanetName,formatNumber(closestPlanetDist,'distance'))
     ---- End Planet Updates ----
     
     ------- Warp Drive Brake activation ------
@@ -1452,97 +1541,105 @@ function runTimerScreen()
     end
     
     if showHelp then
-        DamageGroupMap = {}
-        DamageGroupMap['Engine'] = {}
-        DamageGroupMap['Engine']['Total'] = 0
-        DamageGroupMap['Engine']['Current'] = 0
-    
-        DamageGroupMap['Control'] = {}
-        DamageGroupMap['Control']['Total'] = 0
-        DamageGroupMap['Control']['Current'] = 0
-    
-        DamageGroupMap['Weapons'] = {}
-        DamageGroupMap['Weapons']['Total'] = 0
-        DamageGroupMap['Weapons']['Current'] = 0
-    
-        DamageGroupMap['Misc'] = {}
-        DamageGroupMap['Misc']['Total'] = 0
-        DamageGroupMap['Misc']['Current'] = 0
-    
-        brokenElements = {}
-        brokenElements['Engine'] = {}
-        brokenElements['Control'] = {}
-        brokenElements['Weapons'] = {}
-    
-        brokenDisplay = {}
-        brokenDisplay['Engine'] = ''
-        brokenDisplay['Control'] = ''
-        brokenDisplay['Weapons'] = ''
-    
-        local itemClasses = {}
-        for _,id in pairs(core.getElementIdList()) do
-            local itemClass = core.getElementClassById(id)
-            local itemDisplay = core.getElementDisplayNameById(id)
-            if string.find(string.lower(itemClass),'engine')
-                or string.find(string.lower(itemClass),'brake') then
-                DamageGroupMap['Engine']['Total'] = DamageGroupMap['Engine']['Total'] + core.getElementMaxHitPointsById(id)
-                DamageGroupMap['Engine']['Current'] = DamageGroupMap['Engine']['Current'] + core.getElementHitPointsById(id)
-                if not (core.getElementHitPointsById(id) > 0) then
-                    if brokenElements['Engine'][itemDisplay] == nil then
-                        brokenElements['Engine'][itemDisplay] = 1
-                    else
-                        brokenElements['Engine'][itemDisplay] = brokenElements['Engine'][itemDisplay] + 1
+        if dataUpdate then
+            DamageGroupMap = {}
+            DamageGroupMap['Engine'] = {}
+            DamageGroupMap['Engine']['Total'] = 0
+            DamageGroupMap['Engine']['Current'] = 0
+        
+            DamageGroupMap['Control'] = {}
+            DamageGroupMap['Control']['Total'] = 0
+            DamageGroupMap['Control']['Current'] = 0
+        
+            DamageGroupMap['Weapons'] = {}
+            DamageGroupMap['Weapons']['Total'] = 0
+            DamageGroupMap['Weapons']['Current'] = 0
+        
+            DamageGroupMap['Misc'] = {}
+            DamageGroupMap['Misc']['Total'] = 0
+            DamageGroupMap['Misc']['Current'] = 0
+        
+            brokenElements = {}
+            brokenElements['Engine'] = {}
+            brokenElements['Control'] = {}
+            brokenElements['Weapons'] = {}
+        
+            brokenDisplay = {}
+            brokenDisplay['Engine'] = ''
+            brokenDisplay['Control'] = ''
+            brokenDisplay['Weapons'] = ''
+        
+            local itemClasses = {}
+            for _,id in pairs(core.getElementIdList()) do
+                local itemClass = core.getElementClassById(id)
+                local itemDisplay = core.getElementDisplayNameById(id)
+                if string.find(string.lower(itemClass),'engine')
+                    or string.find(string.lower(itemClass),'brake') then
+                    DamageGroupMap['Engine']['Total'] = DamageGroupMap['Engine']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Engine']['Current'] = DamageGroupMap['Engine']['Current'] + core.getElementHitPointsById(id)
+                    if not (core.getElementHitPointsById(id) > 0) then
+                        if brokenElements['Engine'][itemDisplay] == nil then
+                            brokenElements['Engine'][itemDisplay] = 1
+                        else
+                            brokenElements['Engine'][itemDisplay] = brokenElements['Engine'][itemDisplay] + 1
+                        end
                     end
-                end
-            elseif string.find(string.lower(itemClass),'control')
-                or string.find(string.lower(itemClass),'pvpseat')
-                or string.find(string.lower(itemClass),'fuel') then
-                DamageGroupMap['Control']['Total'] = DamageGroupMap['Control']['Total'] + core.getElementMaxHitPointsById(id)
-                DamageGroupMap['Control']['Current'] = DamageGroupMap['Control']['Current'] + core.getElementHitPointsById(id)
-                if not (core.getElementHitPointsById(id) > 0) then
-                    if brokenElements['Control'][itemDisplay] == nil then
-                        brokenElements['Control'][itemDisplay] = 1
-                    else
-                        brokenElements['Control'][itemDisplay] = brokenElements['Control'][itemDisplay] + 1
+                elseif string.find(string.lower(itemClass),'control')
+                    or string.find(string.lower(itemClass),'pvpseat')
+                    or string.find(string.lower(itemClass),'fuel') then
+                    DamageGroupMap['Control']['Total'] = DamageGroupMap['Control']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Control']['Current'] = DamageGroupMap['Control']['Current'] + core.getElementHitPointsById(id)
+                    if not (core.getElementHitPointsById(id) > 0) then
+                        if brokenElements['Control'][itemDisplay] == nil then
+                            brokenElements['Control'][itemDisplay] = 1
+                        else
+                            brokenElements['Control'][itemDisplay] = brokenElements['Control'][itemDisplay] + 1
+                        end
                     end
-                end
-            elseif string.find(string.lower(itemClass),'ammocontainer')
-                or string.find(string.lower(itemClass),'radar')
-                or string.find(string.lower(itemClass),'weapon') then
-                DamageGroupMap['Weapons']['Total'] = DamageGroupMap['Weapons']['Total'] + core.getElementMaxHitPointsById(id)
-                DamageGroupMap['Weapons']['Current'] = DamageGroupMap['Weapons']['Current'] + core.getElementHitPointsById(id)
-                if not (core.getElementHitPointsById(id) > 0 ) then
-                    if brokenElements['Weapons'][itemDisplay] == nil then
-                        brokenElements['Weapons'][itemDisplay] = 1
-                    else
-                        brokenElements['Weapons'][itemDisplay] = brokenElements['Weapons'][itemDisplay] + 1
+                elseif string.find(string.lower(itemClass),'ammocontainer')
+                    or string.find(string.lower(itemClass),'radar')
+                    or string.find(string.lower(itemClass),'weapon') then
+                    DamageGroupMap['Weapons']['Total'] = DamageGroupMap['Weapons']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Weapons']['Current'] = DamageGroupMap['Weapons']['Current'] + core.getElementHitPointsById(id)
+                    if not (core.getElementHitPointsById(id) > 0 ) then
+                        if brokenElements['Weapons'][itemDisplay] == nil then
+                            brokenElements['Weapons'][itemDisplay] = 1
+                        else
+                            brokenElements['Weapons'][itemDisplay] = brokenElements['Weapons'][itemDisplay] + 1
+                        end
                     end
+                else
+                    DamageGroupMap['Misc']['Total'] = DamageGroupMap['Misc']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Misc']['Current'] = DamageGroupMap['Misc']['Current'] + core.getElementHitPointsById(id)
                 end
-            else
-                DamageGroupMap['Misc']['Total'] = DamageGroupMap['Misc']['Total'] + core.getElementMaxHitPointsById(id)
-                DamageGroupMap['Misc']['Current'] = DamageGroupMap['Misc']['Current'] + core.getElementHitPointsById(id)
             end
-        end
-        for k,v in pairs(brokenElements) do
-            for dk,dv in pairs(v) do
-                if brokenDisplay[k] == nil then
-                    brokenDisplay[k] = 'Broken: '
+            for k,v in pairs(brokenElements) do
+                for dk,dv in pairs(v) do
+                    if brokenDisplay[k] == nil then
+                        brokenDisplay[k] = 'Broken: '
+                    end
+                    brokenDisplay[k] = brokenDisplay[k] .. string.format(' %sx %s,',dv,dk)
                 end
-                brokenDisplay[k] = brokenDisplay[k] .. string.format(' %sx %s,',dv,dk)
             end
         end
     end
     
-    fuelHTML = profile(fuelWidget,'fuelWidget')
-    shipNameHTML = profile(shipNameWidget,'shipNameWidget')
-    dpsHTML = profile(dpsWidget,'dpsWidget')
-    systemCheckHTML = profile(systemCheckWidget,'systemCheckWidget')
+    if dataUpdate then
+        fuelHTML = profile(fuelWidget,'fuelWidget')
+        shipNameHTML = profile(shipNameWidget,'shipNameWidget')
+        dpsHTML = profile(dpsWidget,'dpsWidget')
+        systemCheckHTML = profile(systemCheckWidget,'systemCheckWidget')
+    end
 end
 
 function runUpdate()
     Nav:update()
     FPS_COUNTER = FPS_COUNTER + 1
     ticker = ticker + 1
+
+    cAltitude = core.getAltitude()
+    maxAtmoSpeed = construct.getFrictionBurnSpeed()*3.6
+    inAtmo = unit.getAtmosphereDensity() > 0
 
     speedVec = vec3(constructVelocity)
     speed = speedVec:len() * 3.6

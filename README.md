@@ -14,6 +14,12 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
+## 5.0.13 Minor Changes
+ - Adding additional atmo support
+   - Atmo fuel tank gauge
+   - Atmo speed limiter (98% of burn speed)
+   - Display max atmo speed in UI if in atmosphere
+
 ## 5.0.11-12 Minor Changes
  - Bug fix for occasions where maxBrake is nil
  - Fix UI scaling issues

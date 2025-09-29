@@ -152,7 +152,17 @@ function WeaponWidgetCreate(start)
 end
 
 function updateRadar(filter)
-    local data = radar_1.getWidgetData()
+    if radar_1.getOperationalState() == 1 then
+        radar = radar_1
+    elseif radar_2 then
+        if radar_2.getOperationalState() == 1 then
+            radar = radar_2
+        else
+            radar = radar_1
+        end
+    end
+
+    local data = radar.getWidgetData()
     data = data:gsub('{"constructsList":.*%],"currentTargetId":"', '{"constructsList":[],"currentTargetId":"')
     local pData = data
 
@@ -172,7 +182,7 @@ function updateRadar(filter)
 
     local inCombat = construct.getPvPTimer() > 0
 
-    local radarList = radar_1.getConstructIds()
+    local radarList = radar.getConstructIds()
     local constructList = {}
     local primaryList = {}
     radarContactNumber = #radarList
@@ -203,18 +213,18 @@ function updateRadar(filter)
         }
     }
     
-    radarSelected = tostring(radar_1.getTargetId())
+    radarSelected = tostring(radar.getTargetId())
     local n = 0 -- Iterator for coroutine
     
     for _,id in pairs(radarList) do
         local constructData = {}
         constructData['constructId'] = tostring(id)
-        constructData['distance'] = radar_1.getConstructDistance(id)
-        constructData['size'] = radar_1.getConstructCoreSize(id)
+        constructData['distance'] = radar.getConstructDistance(id)
+        constructData['size'] = radar.getConstructCoreSize(id)
         constructData['inIdentifyRange'] = radarRange > constructData['distance']
         constructData['info'] = {}
-        constructData['myThreatStateToTarget'] = radar_1.getThreatRateTo(id)
-        constructData['targetThreatState'] = radar_1.getThreatRateFrom(id)
+        constructData['myThreatStateToTarget'] = radar.getThreatRateTo(id)
+        constructData['targetThreatState'] = radar.getThreatRateFrom(id)
         if constructData['targetThreatState'] == 1 then 
             constructData['targetThreatState'] = 0
         elseif constructData['targetThreatState'] > 2 and constructData['targetThreatState'] ~= 5 then
@@ -226,17 +236,17 @@ function updateRadar(filter)
         elseif constructData['targetThreatState'] == 2 then localAttackedBy = localAttackedBy + 1
         end
 
-        constructData['kind'] = radar_1.getConstructKind(id)
+        constructData['kind'] = radar.getConstructKind(id)
         
-        constructData['isIdentified'] = radar_1.isConstructIdentified(id)
+        constructData['isIdentified'] = radar.isConstructIdentified(id)
         constructData['hasWeapons'] = nil
         constructData['topSpeed'] = 0
         constructData['mass'] = 0
         if constructData['isIdentified'] then
-            local info = radar_1.getConstructInfos(id)
+            local info = radar.getConstructInfos(id)
             if info['weapons'] ~= 0 then constructData['hasWeapons'] = true else constructData['hasWeapons'] = false end
             
-            local mass = radar_1.getConstructMass(id)
+            local mass = radar.getConstructMass(id)
             local topSpeed = (50000/3.6-10713*(mass-10000)/(853926+(mass-10000)))*3.6 --Mass now instead of top speed
             constructData['topSpeed'] = clamp(topSpeed,20000,50000)
             constructData['mass'] = mass
@@ -249,16 +259,16 @@ function updateRadar(filter)
             end
         end
 
-        local abandonded = radar_1.isConstructAbandoned(id)
+        local abandonded = radar.isConstructAbandoned(id)
         local uniqueCode = string.sub(tostring(id),-3)
         local coreID = uniqueCode
-        local name = radar_1.getConstructName(id)
+        local name = radar.getConstructName(id)
         name = name:gsub("%%","")
         name = name:gsub("<","")
         name = name:gsub(">","")
         if abandonded then
             uniqueCode = 'CORED'
-            local core_pos = radar_1.getConstructWorldPos(id)
+            local core_pos = radar.getConstructWorldPos(id)
             if write_db then
                 if write_db.hasKey('abnd-'..tostring(id)) then
                     if write_db.getStringValue('abnd-'..tostring(id)) ~= string.format('::pos{0,0,%.2f,%.2f,%.2f}',core_pos[1],core_pos[2],core_pos[3]) then
@@ -273,12 +283,12 @@ function updateRadar(filter)
         end
 
         
-        local transponder_match = radar_1.hasMatchingTransponder(id)
+        local transponder_match = radar.hasMatchingTransponder(id)
         if transponder_match and not abandonded then 
             if constructData['kind'] == 5 then 
                 tempRadarStats['friendly'][constructData['size']] = tempRadarStats['friendly'][constructData['size']] + 1
             end
-            local owner = radar_1.getConstructOwnerEntity(id)
+            local owner = radar.getConstructOwnerEntity(id)
             if owner['isOrganization'] then
                 owner = system.getOrganization(owner['id'])
                 owner = string.format('%s',owner['tag'])
@@ -287,7 +297,7 @@ function updateRadar(filter)
                 owner = string.format('%s',owner)
             end
             constructData['name'] = string.format('[%s] %s',uniqueCode,owner)
-            radarFriendlies[id] = {[1] = constructData['name'], [2] = radar_1.getConstructWorldPos(id)}
+            radarFriendlies[id] = {[1] = constructData['name'], [2] = radar.getConstructWorldPos(id)}
         else
             if constructData['kind'] == 5 and not abandonded then 
                 tempRadarStats['enemy'][constructData['size']] = tempRadarStats['enemy'][constructData['size']] + 1
@@ -359,7 +369,7 @@ function updateRadar(filter)
 end
 
 function RadarWidgetCreate(title)
-    local _data = radar_1.getWidgetData()--updateRadar(radarFilter)
+    local _data = radar.getWidgetData()--updateRadar(radarFilter)
     local _panel = system.createWidgetPanel(title)
     local _widget = system.createWidget(_panel, "radar")
     local ID = system.createData(_data)
@@ -491,7 +501,7 @@ function weaponsWidget()
 end
 
 function radarWidget()
-    local temp_range = radar_1.getIdentifyRanges()
+    local temp_range = radar.getIdentifyRanges()
     if #temp_range > 0 then
         radarRange = temp_range[1]
     end
@@ -583,14 +593,14 @@ function radarWidget()
 end
 
 function identifiedWidget()
-    local id = radar_1.getTargetId()
+    local id = radar.getTargetId()
     local iw = {}
     if id ~= 0 then
         if targetID == 0 then warnings['cored'] = nil warnings['friendly'] = nil end
 
         local targetSpeedSVG = ''
 
-        local size = radar_1.getConstructCoreSize(id)
+        local size = radar.getConstructCoreSize(id)
         local dmg = 0
         if write_db and dmgTracker[tostring(id)] then write_db.setFloatValue('damage - ' .. tostring(id) .. ' - ' .. pilotName,dmgTracker[tostring(id)]) end
         if #db > 0 then
@@ -609,22 +619,22 @@ function identifiedWidget()
         else dmg = string.format('%.2fm',dmg/1000000)
         end
 
-        local tMatch = radar_1.hasMatchingTransponder(id)
+        local tMatch = radar.hasMatchingTransponder(id)
         local shipIDMatch = false
         if useShipID then for k,v in pairs(friendlySIDs) do if id == k then shipIDMatch = true end end end
         local friendly = tMatch or shipIDMatch
 
-        local abandonded = radar_1.isConstructAbandoned(id)
+        local abandonded = radar.isConstructAbandoned(id)
         local cardFill = 'rgba(175, 75, 75, 0.30)'
         local cardText = 'rgba(225, 250, 265, 1)'
         if friendly then cardFill = 'rgba(25, 25, 50, 0.35)' cardText = 'rgba(225, 250, 265, 1)'
         elseif abandonded then cardFill = '	rgba(169, 169, 169,.35)' cardText = 'black'
         end
 
-        local distance = radar_1.getConstructDistance(id)
+        local distance = radar.getConstructDistance(id)
         local distString = formatNumber(distance,'distance')
 
-        local name = radar_1.getConstructName(id)
+        local name = radar.getConstructName(id)
         name = name:gsub("%%","")
         name = name:gsub("%%","")
         name = name:gsub("<","")
@@ -634,7 +644,7 @@ function identifiedWidget()
         shortName = shortName:gsub('!','|')
 
         local lineColor = 'lightgrey'
-        local targetIdentified = radar_1.isConstructIdentified(id)
+        local targetIdentified = radar.isConstructIdentified(id)
 
 
         if abandonded or showAlerts then warnings['cored'] = 'svgTarget' else warnings['cored'] = nil end
@@ -647,8 +657,8 @@ function identifiedWidget()
         local targetSpeedString = 'Not Identified'
         local angularSpeedString = 'Not Identified'
         if targetIdentified then
-            targetSpeed = radar_1.getConstructSpeed(id) * 3.6 targetSpeedString = formatNumber(targetSpeed,'speed')
-            angularSpeedString = formatNumber(radar_1.getConstructAngularSpeed(id),'angVel')
+            targetSpeed = radar.getConstructSpeed(id) * 3.6 targetSpeedString = formatNumber(targetSpeed,'speed')
+            angularSpeedString = formatNumber(radar.getConstructAngularSpeed(id),'angVel')
         end
         local speedDiff = 0
         if targetIdentified then speedDiff = mySpeed-targetSpeed end
@@ -718,7 +728,7 @@ function identifiedWidget()
             <text style="fill: orange; font-size: 19px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="99" y="154">]]..string.format('%s (%.2f%%)',dmg,(1-dmgRatio)*100)..[[</text>
         ]]
 
-        --local mass = radar_1.getConstructMass(id)
+        --local mass = radar.getConstructMass(id)
         local topSpeed = radarTrackingData[tostring(id)] ~= nil
         local topSpeedSVG = ''
         if topSpeed then
@@ -731,7 +741,7 @@ function identifiedWidget()
             end
         end
 
-        local info = radar_1.getConstructInfos(id)
+        local info = radar.getConstructInfos(id)
         local weapons = 'False'
         if info['weapons'] ~= 0 then weapons = 'True' end
         local dataSVG = ''
@@ -744,8 +754,8 @@ function identifiedWidget()
         end
 
         local owner = ''
-        if radar_1.hasMatchingTransponder(id) then
-            owner = radar_1.getConstructOwnerEntity(id)
+        if radar.hasMatchingTransponder(id) then
+            owner = radar.getConstructOwnerEntity(id)
             if owner['isOrganization'] then
                 owner = system.getOrganization(owner['id'])
                 owner = owner['tag']
@@ -894,8 +904,8 @@ function generateHTML()
     htmlTable[#htmlTable+1] =  arHTML
     if showScreen then
         if weapon_1 then htmlTable[#htmlTable+1] = weaponHTML end
-        if radar_1 then htmlTable[#htmlTable+1] = radarHTML end
-        if radar_1 then htmlTable[#htmlTable+1] = identHTML end
+        if radar then htmlTable[#htmlTable+1] = radarHTML end
+        if radar then htmlTable[#htmlTable+1] = identHTML end
         if weapon_1 then htmlTable[#htmlTable+1] = dpsHTML end
     end
     htmlTable[#htmlTable+1] = warningsHTML
