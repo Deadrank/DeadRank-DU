@@ -317,6 +317,11 @@ if text:lower() == 'hide weapons' then
 end
 if text:lower() == 'record' then
     recordAll = not recordAll
+    if recordAll then
+        db_1.setIntValue('record',1)
+    else
+        db_1.setIntValue('record',0)
+    end
     system.print(string.format('-- Contact recording: %s --',recordAll))
 end
 if text == 'slave' then

@@ -214,10 +214,16 @@ function fuelWidget()
 
     --Center bottom ribbon
     local fw = string.format([[
-            <linearGradient id="sFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
-            <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
-            <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
-            </linearGradient>
+
+        <linearGradient id="spaceFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
+            <stop offset="%s" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
+            <stop offset="%s" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
+        </linearGradient>
+
+        <linearGradient id="atmoFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
+            <stop offset="%s" style="stop-color:rgba(47, 154, 255, 0.95);stop-opacity:.95" />
+            <stop offset="%s" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
+        </linearGradient>
 
         <path d="
         M 645.12 19.98 
@@ -237,7 +243,7 @@ function fuelWidget()
         L 1171.2 69.66
         L 748.8 69.66
         L 748.8 59.4"
-    stroke="%s" stroke-width="1" fill="url(#sFuel)" />
+    stroke-width="1" fill="url(#spaceFuel)" />
 
     <path d="
         M 960 59.4 
@@ -253,14 +259,10 @@ function fuelWidget()
         M 854.4 59.4 
         L 854.4 75.6"
     stroke="black" stroke-width="1.5" fill="none" />
-    ]],sFuelPercent,sFuelPercent,lineColor,bgColor,lineColor)
+    ]],curFuelStr,curFuelStr,curAtmoFuelStr,curAtmoFuelStr,lineColor,bgColor,lineColor)
 
     if maxAtmoFuel > 0 then
         fw = fw .. string.format([[
-            <linearGradient id="aFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
-            <stop offset="%.1f%%" style="stop-color:rgba(47, 154, 255, 0.95);stop-opacity:.95" />
-            <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
-            </linearGradient>
 
             <path d="
             M 645.12 19.98 
@@ -280,7 +282,7 @@ function fuelWidget()
             L 1171.2 85.86
             L 748.8 85.86
             L 748.8 75.6"
-        stroke="%s" stroke-width="1" fill="url(#aFuel)" />
+        stroke-width="1" fill="url(#atmoFuel)" />
 
         <path d="
             M 960 75.6 
@@ -297,7 +299,7 @@ function fuelWidget()
             L 854.4 91.8"
         stroke="black" stroke-width="1.5" fill="none" />
 
-        ]],aFuelPercent,aFuelPercent,lineColor,bgColor,lineColor)
+        ]],lineColor,bgColor,lineColor)
     end
 
     if maxAtmoFuel > 0 then
@@ -678,6 +680,7 @@ function globalDB(action)
             if db_1.hasKey('offset_points') then offset_points = db_1.getIntValue('offset_points') == 1 end
             if db_1.hasKey('dmgAvgDuration') then dmgAvgDuration = db_1.getIntValue('dmgAvgDuration') end
             if db_1.hasKey('font_size_ratio') then font_size_ratio = db_1.getFloatValue('font_size_ratio') end
+            if db_1.hasKey('atmoManualLimit') then atmoManualLimit = db_1.getFloatValue('atmoManualLimit') end
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
@@ -694,6 +697,7 @@ function globalDB(action)
             if offset_points then db_1.setIntValue('offset_points',1) else db_1.setIntValue('offset_points',0) end
             db_1.setIntValue('dmgAvgDuration',dmgAvgDuration)
             db_1.setFloatValue('font_size_ratio',font_size_ratio)
+            db_1.setFloatValue('atmoManualLimit',atmoManualLimit)
         end
     end
 end
@@ -1150,10 +1154,10 @@ function runFlush()
     else
         brakeAcceleration = -finalBrakeInput * (brakeSpeedFactor * constructVelocity + brakeFlatFactor * constructVelocityDir)
     end
-    if inAtmo and speed >= .98*maxAtmoSpeed then
+    if atmoSpeedLimit and inAtmo and speed >= .98*maxAtmoSpeed then
         brakeAcceleration = -maxBrake * constructVelocityDir
         brakeInput = 1
-    elseif inAtmo and not brakesOn and not autopilot then
+    elseif atmoSpeedLimit and inAtmo and not brakesOn and not autopilot then
         brakeAcceleration = vec3()
         brakeInput = 0
     end
@@ -1638,7 +1642,11 @@ function runUpdate()
     ticker = ticker + 1
 
     cAltitude = core.getAltitude()
-    maxAtmoSpeed = construct.getFrictionBurnSpeed()*3.6
+    if atmoManualLimit == 0 then
+        maxAtmoSpeed = construct.getFrictionBurnSpeed()*3.6
+    else
+        maxAtmoSpeed = atmoManualLimit
+    end
     inAtmo = unit.getAtmosphereDensity() > 0
 
     speedVec = vec3(constructVelocity)

@@ -1,4 +1,4 @@
-name: DeadGunner v5.0.13-minimal
+name: DeadGunner v5.0.14-minimal
 
 pvp: true
 
@@ -25,6 +25,14 @@ handlers:
     onLeave(id):
       lua: |
 {{radar_1.onLeave.lua}}
+  radar_2:
+    onEnter(id):
+      lua: |
+{{radar_2.onEnter.lua}}
+  radar_2:
+    onLeave(id):
+      lua: |
+{{radar_2.onLeave.lua}}
   unit:
     onStart:
       lua: |

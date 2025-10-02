@@ -242,3 +242,21 @@ if string.starts(text,'distance') then
     end
     system.print('----------------------------')
 end
+if string.starts(text:lower(),'setatmolimit ') then
+    matches = {}
+    for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+    if #matches == 2 then
+        if type(tonumber(matches[2])) == 'number' then
+            if matches[2] % 1 == 0 then
+                atmoManualLimit = tonumber(matches[2])
+                system.print("-- Atmo Speed limit set: " .. matches[2] .. " km/h --")
+            else
+                system.print("-- Atmo Speed limit must be a whole number --")
+            end
+        else
+            system.print("-- Atmo Speed limit must be a number (".. type(tonumber(matches[2])) ..")--")
+        end
+    else
+        system.print('-- Invalid input --')
+    end
+end
