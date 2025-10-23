@@ -122,7 +122,7 @@ if string.starts(text,'::pos{') then
         autopilot_dest = vec3(convertWaypoint(matches[1]))
         autopilot_dest_pos = matches[1]
         system.print('-- Autopilot destination set --')
-        system.print(matches[1])
+        system.print(string.format('::pos{0,0,%.2f,%.2f,%.2f}',autopilot_dest['x'],autopilot_dest['y'],autopilot_dest['z']))
     end
 end
 if string.starts(text:lower(),'code') then
@@ -259,4 +259,58 @@ if string.starts(text:lower(),'setatmolimit ') then
     else
         system.print('-- Invalid input --')
     end
+end
+if string.starts(text:lower(),'dtr ') then
+    matches = {}
+    for w in text:gmatch("([^ ]+) ?") do table.insert(matches,w) end
+    if #matches == 2 then
+        if type(tonumber(matches[2])) == 'number' then
+            dampenerTorqueReduction = tonumber(matches[2])
+            system.print("-- Dampener Torque Reduction set: " .. matches[2]*100 .. " % --")
+        end
+    else
+        system.print('-- Invalid input --')
+    end
+end
+if string.starts(text, 'orbit ') then
+    local words = {}
+    for word in text:gmatch("%S+") do table.insert(words, word) end
+    if #words ~= 2 then
+        system.print('Usage: orbit <position string>')
+        return
+    end
+
+    local pos_str = words[2]
+    local system_id, planet_id, latitude, longitude, altitude = pos_str:match("::pos{(%d+),(%d+),([%d.-]+),([%d.-]+),([%d.-]+)}")
+    if not (system_id and planet_id and latitude and longitude and altitude) then
+        system.print("Invalid position format. Use ::pos{0,<planet>,<latitude>,<longitude>,<altitude>}")
+        return
+    end
+    
+    local target_pos = convertWaypoint("::pos{0," .. planet_id .. "," .. latitude .. "," .. longitude .. "," .. core.getAltitude() .. "}")  -- Reuses your existing convertWaypoint function
+    if not target_pos then
+        system.print('Invalid position format. Use ::pos{...}')
+        return
+    end
+    
+    local pos = vec3(construct.getWorldPosition())
+    local dist = (pos - target_pos):len()
+    if dist < 500 or dist > 10000 then
+        system.print('Must be between 500m and 10km from orbit center')
+        return
+    end
+    if unit.getAtmosphereDensity() == 0 then
+        system.print('Orbit only available in atmosphere')
+        return
+    end
+    if autopilot then
+        system.print('Disable autopilot first')
+        return
+    end
+    orbit_center = target_pos
+    orbit_radius = dist
+    orbit_agl = core.getAltitude()
+    orbit_active = true
+    autopilot = true  -- Engage autopilot in orbit mode
+    system.print('Orbit engaged around ' .. pos_str .. ' (radius: ' .. math.floor(dist) .. 'm, AGL: ' .. math.floor(orbit_agl) .. 'm)')
 end

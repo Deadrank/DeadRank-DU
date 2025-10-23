@@ -236,6 +236,10 @@ handlers:
       lua: |
 {{system.onActionStart.opt2.lua}}
     onActionStart:
+      args: ['option3']
+      lua: |
+{{system.onActionStart.opt3.lua}}
+    onActionStart:
       args: ['option4']
       lua: |
 {{system.onActionStart.opt4.lua}}

@@ -1,6 +1,16 @@
 json = require("dkjson")
 Atlas = require('atlas')
 
+function getPitch(gravityDirection, forward, right)
+    local horizontalForward = gravityDirection:cross(right):normalize_inplace()
+    local pitch = math.acos(utils.clamp(horizontalForward:dot(-forward), -1, 1)) * constants.rad2deg
+  
+    if horizontalForward:cross(-forward):dot(right) < 0 then
+      pitch = -pitch
+    end -- Cross right dot forward?
+    return pitch
+end
+
 function profile(func, name, ...)
     local start_time = system.getArkTime()
     local result = {func(...)}
@@ -1026,7 +1036,8 @@ function runFlush()
 
     local destVec = vec3()
     local currentYaw = 0
-    local currentPitch = 0
+    local currentPitch = getPitch(worldVertical, constructForward, constructRight)
+    local currentRoll = getRoll(worldVertical, constructForward, constructRight)
     local targetYaw = 0
     local targetPitch = 0
     local yawChange = 0
@@ -1057,7 +1068,55 @@ function runFlush()
         total_align = math.abs(yawChange) + math.abs(pitchChange)
     end
 
-    if autopilot and autopilot_dest ~= nil and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
+    local apRollInput = 0
+    if orbit_active then
+        if speed > 50 or true then
+            -- Orbit mode: Tangential steering with radius, altitude, and roll corrections
+            local to_center = orbit_center - constructPosition
+            local radial = to_center:normalize()
+            local dist = to_center:len()
+            local up = worldVertical:normalize()
+            local tangential = radial:cross(up):normalize()
+            local proj1 = constructVelocityDir:dot(tangential)
+            local proj2 = constructVelocityDir:dot(-tangential)
+            if proj2 > proj1 then tangential = -tangential end  -- Match current velocity direction
+
+            -- Radius correction
+            local radius_error = (dist - orbit_radius)/orbit_radius  -- Positive if too far
+            local radial_correction = -radial * radius_error
+
+            -- Target direction for steering
+            local target_dir = (tangential):normalize()
+
+            -- Rotation injections (yaw)
+            dirYaw = -math.deg(signedRotationAngle(constructUp:normalize(), target_dir, constructVelocity))/360
+            yawChange = clamp(radius_error * 20 + dirYaw * 10 , -1, 1)
+            if math.abs(yawChange) < 0.2 then
+                yawChange = clamp(radius_error * 10 + dirYaw * 20 , -1, 1)
+            end
+
+            -- Roll correction to level with planet
+            rollPID:inject(-currentRoll)
+            apRollInput = rollPID:get()
+            if apRollInput > AP_Max_Rotation_Factor then apRollInput = AP_Max_Rotation_Factor
+            elseif apRollInput < -AP_Max_Rotation_Factor then apRollInput = -AP_Max_Rotation_Factor
+            end
+
+            -- Altitude hold with PID using pitch
+            local speedPitch = math.deg(signedRotationAngle(constructRight:normalize(), constructVelocity:normalize(), constructForward:normalize())) --USE THIS TO Ensure we don't over pitch maybe
+
+            local current_agl = core.getAltitude()
+            local height_error = orbit_agl - current_agl  -- Positive if too low
+            pitchChange = clamp(height_error-currentPitch, -100, 100) * 0.75
+            if pitchChange > 1 then pitchChange = 1
+            elseif pitchChange < -1 then pitchChange = -1
+            end
+
+            system.print(string.format("AP Yaw: %.2f, Pitch: %.2f, Roll: %.2f, speedPitch: %.2f", yawChange, pitchChange, apRollInput, speedPitch ))
+        end
+    end
+
+    if autopilot and (autopilot_dest ~= nil or orbit_active) and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
         yawPID:inject(yawChange)
         local apYawInput = yawPID:get()
         if apYawInput > AP_Max_Rotation_Factor then apYawInput = AP_Max_Rotation_Factor
@@ -1066,6 +1125,9 @@ function runFlush()
 
         pitchPID:inject(pitchChange)
         local apPitchInput = -pitchPID:get()
+        if orbit_active then
+            apPitchInput = pitchPID:get()
+        end
         if apPitchInput > AP_Max_Rotation_Factor then apPitchInput = AP_Max_Rotation_Factor
         elseif apPitchInput < -AP_Max_Rotation_Factor then apPitchInput = -AP_Max_Rotation_Factor
         end
@@ -1074,6 +1136,9 @@ function runFlush()
                                 + finalPitchInput * pitchSpeedFactor * constructRight
                                 + finalRollInput * rollSpeedFactor * constructForward
                                 + finalYawInput * yawSpeedFactor * constructUp
+        if orbit_active then
+            targetAngularVelocity = targetAngularVelocity + apRollInput * constructForward
+        end
     else
         targetAngularVelocity = finalPitchInput * pitchSpeedFactor * constructRight
             + finalRollInput * rollSpeedFactor * constructForward
@@ -1083,7 +1148,7 @@ function runFlush()
     ---------------------------------
 
     -- In atmosphere?
-    if worldVertical:len() > 0.01 and unit.getAtmosphereDensity() > 0.0 then
+    if worldVertical:len() > 0.01 and unit.getAtmosphereDensity() > 0.0 and false then
         local autoRollRollThreshold = 1.0
         -- autoRoll on AND currentRollDeg is big enough AND player is not rolling
         if autoRoll == true and currentRollDegAbs > autoRollRollThreshold and finalRollInput == 0 then

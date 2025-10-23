@@ -14,6 +14,9 @@ Simply right-click on the links below and select "Save Link As..." to download t
 3) Update custom scripts in-game or log in if the game is not running 
 4) Run the custom script autoconfiguration on the correct device (gunner chair or remote)
 
+## 5.0.14 Atmo Additions
+ - Added atmo orbiting first iteration
+
 ## 5.0.13 Minor Changes
  - Adding additional atmo support
    - Atmo fuel tank gauge

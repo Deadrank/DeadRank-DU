@@ -148,6 +148,24 @@ cName = construct.getName()
 cID = construct.getId()
 cr = nil
 cr_ar = nil
+hoverLocked = false
+
+-- Orbit globals
+orbit_active = false
+orbit_center = vec3(0,0,0)
+orbit_radius = 0
+orbit_agl = 0    -- meters above ground
+
+-- Optional: Height hold PID (simple P for now; expand if oscillation occurs)
+height_kp = 0.05  -- Proportional: Tune for response (e.g., 0.01-0.1)
+height_ki = 0.01  -- Integral: Tune for steady-state (e.g., 0.005-0.02)
+height_kd = 0.1   -- Derivative: Tune for damping (e.g., 0.05-0.2)
+height_integral = 0
+height_last_error = 0
+height_i_max = 100  -- Anti-windup limit (adjust based on error units in meters)
+radius_kp = 0.5  -- Tune: for radial correction
+roll_kp = 0.1  -- New: For roll correction
+-------
 
 dockedMass = 0
 maxThrustTags = 'thrust'
