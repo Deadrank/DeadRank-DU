@@ -1,6 +1,36 @@
 json = require("dkjson")
 Atlas = require('atlas')
 
+function getPitch(gravityDirection, forward, right)
+    local horizontalForward = gravityDirection:cross(right):normalize_inplace()
+    local pitch = math.acos(utils.clamp(horizontalForward:dot(-forward), -1, 1)) * constants.rad2deg
+  
+    if horizontalForward:cross(-forward):dot(right) < 0 then
+      pitch = -pitch
+    end -- Cross right dot forward?
+    return pitch
+end
+
+function profile(func, name, ...)
+    local start_time = system.getArkTime()
+    local result = {func(...)}
+    local end_time = system.getArkTime()
+    if debug then
+        if profiling_data[name] == nil or profiling_data[name] < end_time - start_time then
+            profiling_data[name] = end_time - start_time
+        end
+    end
+    return table.unpack(result)
+end
+
+function commas(number)
+    return tostring(number) -- Make sure the "number" is a string
+       :reverse() -- Reverse the string
+       :gsub('%d%d%d', '%0,') -- insert one comma after every 3 numbers
+       :gsub(',$', '') -- Remove a trailing comma if present
+       :reverse() -- Reverse the string again
+       :sub(1) -- a little hack to get rid of the second return value
+end
 
 function convertWaypoint(wp)
     local clamp  = utils.clamp
@@ -55,6 +85,15 @@ function string.starts(String,Start)
     return string.sub(String,1,string.len(Start))==Start
 end
 
+function contains(tablelist, val)
+    for i=1,#tablelist do
+        if tablelist[i] == val then 
+            return true
+        end
+    end
+    return false
+end
+
 function formatNumber(val, numType)
     if numType == 'speed' then
         local speedString = ''
@@ -85,6 +124,247 @@ function formatNumber(val, numType)
         end
         return massStr
     end
+end
+
+function brakeWidget()
+    local brakeON = brakeInput > 0
+    local bw = ''
+    if brakeON then
+        warnings['brakes'] = 'svgBrakes'
+    else
+        warnings['brakes'] = nil
+    end
+    return bw
+end
+
+function flightWidget()
+    local maxSpeedString = formatNumber(maxSpeed,'speed')
+    if cAltitude ~= 0 or inAtmo then 
+        maxSpeedString = formatNumber(maxAtmoSpeed,'speed') 
+    end
+    local sw = string.format([[
+            <path class="widget" d="
+            M 595.2 1.08
+            L  1324.8 1.08
+            L 1171.2 59.4
+            L 748.8 59.4
+            L 595.2 1.08"
+            stroke="%s" stroke-width="2" fill="%s" />
+            <path class="widget" d="
+            M 1273.92 30.24
+            L 1326.72 41.796
+            L 1536 1.08
+            L 1324.8 1.08
+            L 1273.92 19.98
+            L 1273.92 30.24"
+            stroke="%s" stroke-width="1" fill="%s" />
+            <path class="widget" d="
+            M 960 1.08
+            L 960 69.66"
+            stroke="%s" stroke-width="1" fill="none" />
+
+            <path class="widget" d="
+            M 1171.2 1.08
+            L 1171.2 69.66"
+            stroke="%s" stroke-width="1" fill="none" />
+
+            <path class="widget" d="
+            M 748.8 1.08 
+            L 748.8 69.66"
+            stroke="%s" stroke-width="1" fill="none" />
+
+            <text class="text" x="768" y="16.2" style="fill: %s" font-size="%svh" font-weight="bold">Speed: %s</text>
+            <text class="text" x="768" y="35.1" style="fill: %s" font-size="%svh" font-weight="bold">Current Accel: %.2f G</text>
+            <text class="text" x="768" y="54" style="fill: %s" font-size="%svh" font-weight="bold">Brake Dist: %s</text>
+            
+            <text class="text" x="963.84" y="16.2" style="fill: %s" font-size="%svh" font-weight="bold">Max Speed: %s</text>
+            <text class="text" x="963.84" y="35.1" style="fill: %s" font-size="%svh" font-weight="bold">Max Accel: %.2f G</text>
+            <text class="text" x="963.84" y="54" style="fill: %s" font-size="%svh" font-weight="bold">Max Brake: %.2f G</text>
+
+            <text class="text" x="1313.28" y="30.24" style="fill: %s" font-size="%svh" font-weight="bold" transform="rotate(-10,1313.28,30.24)">%s</text>
+
+            ]],lineColor,bgColor,lineColor,modeBG,lineColor,lineColor,lineColor,
+            fontColor,font_size_ratio+0.42,formatNumber(speed,'speed'),
+            fontColor,font_size_ratio+0.42,accel/9.81,
+            fontColor,font_size_ratio+0.42,formatNumber(brakeDist,'distance'),
+            fontColor,font_size_ratio+0.42,maxSpeedString,
+            fontColor,font_size_ratio+0.42,maxSpaceThrust/mass/9.81,
+            fontColor,font_size_ratio+0.42,maxBrake/mass/9.81,
+            fontColor,font_size_ratio+0.42,mode)
+
+            sw = sw.. [[
+                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Mass </text>
+                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">]]..formatNumber(mass,'mass')..[[</text>
+            ]]
+    return sw
+end
+
+function fuelWidget()
+    curFuel = 0
+    curAtmoFuel = 0
+    local fuelWarning = false
+    local fuelTankWarning = false
+    for i,v in pairs(spacefueltank) do 
+        curFuel = curFuel + v.getItemsVolume()
+        if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
+    end
+
+    for i,v in pairs(atmofueltank) do 
+        curAtmoFuel = curAtmoFuel + v.getItemsVolume()
+        if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
+    end
+
+    sFuelPercent = curFuel/maxFuel * 100
+    if sFuelPercent < 20 then fuelWarning = true end
+    curFuelStr = string.format('%.2f%%',sFuelPercent)
+
+    aFuelPercent = curAtmoFuel/maxAtmoFuel * 100
+    if aFuelPercent < 20 then fuelWarning = true end
+    curAtmoFuelStr = string.format('%.2f%%',aFuelPercent)
+
+    --Center bottom ribbon
+    local fw = string.format([[
+
+        <linearGradient id="spaceFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
+            <stop offset="%s" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
+            <stop offset="%s" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
+        </linearGradient>
+
+        <linearGradient id="atmoFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
+            <stop offset="%s" style="stop-color:rgba(47, 154, 255, 0.95);stop-opacity:.95" />
+            <stop offset="%s" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
+        </linearGradient>
+
+        <path d="
+        M 645.12 19.98 
+        L 748.8 59.4
+        L 1171.2 59.4
+        L 1273.92 19.98
+        L 1273.92 30.24
+        L 1171.2 69.66
+        L 748.8 69.66
+        L 646.08 30.24
+        L 645.12 19.98"
+    stroke="%s" stroke-width="2" fill="%s" />
+
+    <path d="
+        M 748.8 59.4
+        L 1171.2 59.4
+        L 1171.2 69.66
+        L 748.8 69.66
+        L 748.8 59.4"
+    stroke-width="1" fill="url(#spaceFuel)" />
+
+    <path d="
+        M 960 59.4 
+        L 960 75.6"
+    stroke="black" stroke-width="1.5" fill="none" />
+
+    <path d="
+        M 1065.6 59.4 
+        L 1065.6 75.6"
+    stroke="black" stroke-width="1.5" fill="none" />
+
+    <path d="
+        M 854.4 59.4 
+        L 854.4 75.6"
+    stroke="black" stroke-width="1.5" fill="none" />
+    ]],curFuelStr,curFuelStr,curAtmoFuelStr,curAtmoFuelStr,lineColor,bgColor,lineColor)
+
+    if maxAtmoFuel > 0 then
+        fw = fw .. string.format([[
+
+            <path d="
+            M 645.12 19.98 
+            L 748.8 59.4
+            L 1171.2 59.4
+            L 1273.92 19.98
+            L 1273.92 30.24
+            L 1171.2 69.66
+            L 748.8 69.66
+            L 646.08 30.24
+            L 645.12 19.98"
+        stroke="%s" stroke-width="2" fill="%s" />
+
+        <path d="
+            M 748.8 75.6
+            L 1171.2 75.6
+            L 1171.2 85.86
+            L 748.8 85.86
+            L 748.8 75.6"
+        stroke-width="1" fill="url(#atmoFuel)" />
+
+        <path d="
+            M 960 75.6 
+            L 960 91.8"
+        stroke="black" stroke-width="1.5" fill="none" />
+
+        <path d="
+            M 1065.6 75.6 
+            L 1065.6 91.8"
+        stroke="black" stroke-width="1.5" fill="none" />
+
+        <path d="
+            M 854.4 75.6 
+            L 854.4 91.8"
+        stroke="black" stroke-width="1.5" fill="none" />
+
+        ]],lineColor,bgColor,lineColor)
+    end
+
+    if maxAtmoFuel > 0 then
+        fw = fw .. string.format([[ 
+        <text class="text" x="748.8" y="102.6" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Fuel: %s</text>
+        <text class="text" x="850" y="102.6" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Atmo Fuel: %s</text>
+        ]],curFuelStr,curAtmoFuelStr)
+    else
+        fw = fw .. string.format([[ 
+        <text class="text" x="748.8" y="86.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Fuel: %s</text>
+        ]],curFuelStr)
+    end
+
+    if fuelTankWarning or fuelWarning or showAlerts then
+        fuelWarningText = 'Fuel level &lt; 20%'
+        if not fuelWarning then fuelWarningText = 'A Fuel tank &lt; 20%%' end
+        warnings['lowFuel'] = 'svgWarning'
+    else
+        warnings['lowFuel'] = nil
+    end
+
+    return fw
+end
+
+function apStatusWidget()
+    local ap_type = 'Autopilot'
+    if route and routes[route][route_pos] == autopilot_dest_pos then ap_type = 'Routepilot' end
+    local apw = string.format([[
+        <path class="widget" d="
+            M 646.08 30.24
+            L 593.28 41.796
+            L 384 1.08
+            L 595.2 1.08
+            L 646.08 19.98
+            L 646.08 30.24"
+            stroke="%s" stroke-width="1" fill="%s" />
+        
+        <text class="text" x="480" y="12.96" style="fill: %s" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold" transform="rotate(10,480,12.96)">%s: %s</text>
+        %s
+    ]],lineColor,apBG,fontColor,ap_type,apStatus,apHTML)
+
+    return apw
+end
+
+function closestPlanet()
+    local cName = nil
+    local cDist = nil
+    for pname,pvec in pairs(planets) do
+        local tempDist = vec3(constructPosition-pvec):len()
+        if cDist == nil or cDist > tempDist then
+            cDist = tempDist
+            cName = pname
+        end
+    end
+    return cName,cDist
 end
 
 function pipeDist(A,B,loc,reachable)
@@ -122,45 +402,17 @@ function pipeDist(A,B,loc,reachable)
     return nil,nil
 end
 
-function closestPlanet()
-    local cName = nil
-    local cDist = nil
-    for pname,pvec in pairs(planets) do
-        local tempDist = vec3(constructPosition-pvec):len()
-        if cDist == nil or cDist > tempDist then
-            cDist = tempDist
-            cName = pname
-        end
-    end
-    return cName,cDist
-end
-
 function closestPipe()
     pipes = {}
     local i = 0
     for name,center in pairs(planets) do
-        for name2,center2 in pairs(planets) do
-            if name ~= name2 and pipes[string.format('%s - %s',name2,name)] == nil then
-                pipes[string.format('%s - %s',name,name2)] = {}
-                table.insert(pipes[string.format('%s - %s',name,name2)],center)
-                table.insert(pipes[string.format('%s - %s',name,name2)],center2)
-                if i % 10 == 0 then
-                    coroutine.yield()
-                end
-                i = i + 1
-            end
-        end
-    end
-
-    if asteroidPipes then
-        for name,center in pairs(asteroidPipeList) do
+        if not string.starts(name,'Thades A') then
             for name2,center2 in pairs(planets) do
-                if name ~= name2 and pipes[string.format('%s - %s',name2,name)] == nil then
+                if name ~= name2 and pipes[string.format('%s - %s',name2,name)] == nil and not string.starts(name,'Thades A') then
                     pipes[string.format('%s - %s',name,name2)] = {}
-                    local c1 = convertWaypoint(center)
-                    table.insert(pipes[string.format('%s - %s',name,name2)],vec3(c1['x'],c1['y'],c1['z']))
+                    table.insert(pipes[string.format('%s - %s',name,name2)],center)
                     table.insert(pipes[string.format('%s - %s',name,name2)],center2)
-                    if i % 50 == 0 then
+                    if i % 100 == 0 then
                         coroutine.yield()
                     end
                     i = i + 1
@@ -181,7 +433,7 @@ function closestPipe()
                 cPipe = pName
             end
         end
-        if i % 50 == 0 then
+        if i % 200 == 0 then
             coroutine.yield()
         end
         i = i + 1
@@ -191,462 +443,96 @@ function closestPipe()
     return cPipe,cDist
 end
 
-function contains(tablelist, val)
-    for i=1,#tablelist do
-        if tablelist[i] == val then 
-            return true
-        end
-    end
-    return false
-end
-
-
-    function WeaponWidgetCreate()
-    if type(weapon) == 'table' and #weapon > 0 then
-        local WeaponPanaelIdList = {}
-        for i = 1, #weapon do
-            if i%2 ~= 0 then
-            table.insert(WeaponPanaelIdList, system.createWidgetPanel(''))
-            end
-                local WeaponWidgetDataId = weapon[i].getDataId()
-                local WeaponWidgetType = weapon[i].getWidgetType()
-                system.addDataToWidget(WeaponWidgetDataId, system.createWidget(WeaponPanaelIdList[#WeaponPanaelIdList], WeaponWidgetType))
-        end
-    end
-end
-
-function brakeWidget()
-    local brakeON = brakeInput > 0
-    local bw = ''
-    if brakeON then
-        warnings['brakes'] = 'svgBrakes'
-    else
-        warnings['brakes'] = nil
-    end
-    return bw
-end
-
-function flightWidget()
-    if Nav.axisCommandManager:getMasterMode() == controlMasterModeId.travel then mode = 'Throttle ' .. tostring(Nav.axisCommandManager:getThrottleCommand(0) * 100) .. '%' modeBG = bgColor
-    else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
-    end
-    local sw = {}
-    if speed ~= nil then
-        --Center Top
-        sw[#sw+1] = [[
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                <path d="
-                M ]] .. tostring(.31*screenWidth) .. ' ' .. tostring(.001*screenHeight) ..[[ 
-                L ]] .. tostring(.69*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-                L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
-                L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
-                L ]] .. tostring(.31*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [["
-                stroke="]]..lineColor..[[" stroke-width="2" fill="]]..bgColor..[[" />]]
-        
-
-        -- Right Side
-        sw[#sw+1] = [[<path d="
-                M ]] .. tostring(.6635*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [[ 
-                L ]] .. tostring(.691*screenWidth) .. ' ' .. tostring(.0387*screenHeight) .. [[
-                L ]] .. tostring(.80*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-                L ]] .. tostring(.69*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-                L ]] .. tostring(.6635*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [[
-                L ]] .. tostring(.6635*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [["
-                stroke="]]..lineColor..[[" stroke-width="1" fill="]].. modeBG ..[[" />]]
-                
-        if not maxBrake then maxBrake = 0 end
-        sw[#sw+1] = [[<path d="
-                M ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[ 
-                L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
-                stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
-
-                <path d="
-                M ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[ 
-                L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
-                stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
-
-                <path d="
-                M ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[ 
-                L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [["
-                stroke="]]..lineColor..[[" stroke-width="1" fill="none" />
-
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Current Accel: ]] .. string.format('%.2f G',accel/9.81) .. [[</text>
-                <text x="]].. tostring(.4 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Brake Dist: ]] .. formatNumber(brakeDist,'distance') .. [[</text>
-                
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Max Speed: ]] .. formatNumber(maxSpeed,'speed') .. [[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.0325 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Max Accel: ]] .. string.format('%.2f G',maxSpaceThrust/mass/9.81) ..[[</text>
-                <text x="]].. tostring(.502 * screenWidth) ..[[" y="]].. tostring(.05 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Max Brake: ]] .. string.format('%.2f G',maxBrake/mass/9.81) .. [[</text>
-
-                <text x="]].. tostring(.37 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Mass </text>
-                <text x="]].. tostring(.355 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">]]..formatNumber(mass,'mass')..[[</text>
-
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Gravity </text>
-                <text x="]].. tostring(.612 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">]].. string.format('%.2f G',gravity/9.81) ..[[</text>
-
-                <text x="]].. tostring(.684 * screenWidth) ..[[" y="]].. tostring(.028 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(-10,]].. tostring(.684 * screenWidth) ..",".. tostring(.028 * screenHeight) ..[[)">]].. mode ..[[</text>
-
-            </svg>
-            ]]
-    else
-        sw[#sw+1] = ''
-    end
-    return table.concat(sw,'')
-end
-
-function fuelWidget()
-    curFuel = 0
-    local fuelWarning = false
-    local fuelTankWarning = false
-    for i,v in pairs(spacefueltank) do 
-        curFuel = curFuel + v.getItemsVolume()
-        if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
-    end
-    sFuelPercent = curFuel/maxFuel * 100
-    if sFuelPercent < 20 then fuelWarning = true end
-    curFuelStr = string.format('%.2f%%',sFuelPercent)
-
-    --Center bottom ribbon
-    local fw = {}
-    fw[#fw+1] = string.format([[
-        <svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;">
-            <linearGradient id="sFuel" x1="0%%" y1="0%%" x2="100%%" y2="0%%">
-            <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
-            <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
-            </linearGradient>]],sFuelPercent,sFuelPercent)
-
-    fw[#fw+1] = [[
-        <path d="
-        M ]] .. tostring(.336*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [[ 
-        L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
-        L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
-        L ]] .. tostring(.6635*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [[
-        L ]] .. tostring(.6635*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [[
-        L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [[
-        L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [[
-        L ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [[
-        L ]] .. tostring(.336*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [["
-    stroke="]]..lineColor..[[" stroke-width="2" fill="]]..bgColor..[[" />
-
-    <path d="
-        M ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
-        L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[
-        L ]] .. tostring(.61*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [[
-        L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.0645*screenHeight) .. [[
-        L ]] .. tostring(.39*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [["
-    stroke="]]..lineColor..[[" stroke-width="1" fill="url(#sFuel)" />
-
-    <path d="
-        M ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[ 
-        L ]] .. tostring(.5*screenWidth) .. ' ' .. tostring(.070*screenHeight) .. [["
-    stroke="black" stroke-width="1.5" fill="none" />
-
-    <path d="
-        M ]] .. tostring(.555*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[ 
-        L ]] .. tostring(.555*screenWidth) .. ' ' .. tostring(.070*screenHeight) .. [["
-    stroke="black" stroke-width="1.5" fill="none" />
-
-    <path d="
-        M ]] .. tostring(.445*screenWidth) .. ' ' .. tostring(.055*screenHeight) .. [[ 
-        L ]] .. tostring(.445*screenWidth) .. ' ' .. tostring(.070*screenHeight) .. [["
-    stroke="black" stroke-width="1.5" fill="none" />
-
-    <text x="]].. tostring(.39 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>
-    <!--text x="]].. tostring(.445 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">25%</text>
-    <text x="]].. tostring(.5 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">50%</text>
-    <text x="]].. tostring(.555 * screenWidth) ..[[" y="]].. tostring(.08 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">75%</text-->
-
-
-    ]]
-
-    if fuelTankWarning or fuelWarning or showAlerts then
-        fuelWarningText = 'Fuel level &lt; 20%'
-        if not fuelWarning then fuelWarningText = 'A Fuel tank &lt; 20%%' end
-        warnings['lowFuel'] = 'svgWarning'
-    else
-        warnings['lowFuel'] = nil
-    end
-
-    fw[#fw+1] = '</svg>'
-
-    return table.concat(fw,'')
-end
-
-function apStatusWidget()
-    local bg = bgColor
-    local apStatus = 'inactive'
-    if autopilot then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' end
-    if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' end
-    local apw = {}
-    apw[#apw+1] = [[
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            -- Left Top Side]]
-            apw[#apw+1] = [[<path d="
-        M ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [[ 
-        L ]] .. tostring(.309*screenWidth) .. ' ' .. tostring(.0387*screenHeight) .. [[
-        L ]] .. tostring(.2*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-        L ]] .. tostring(.31*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-        L ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.0185*screenHeight) .. [[
-        L ]] .. tostring(.3365*screenWidth) .. ' ' .. tostring(.028*screenHeight) .. [["
-        stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bg..[[" />
-        
-        <text x="]].. tostring(.25 * screenWidth) ..[[" y="]].. tostring(.012 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold" transform="rotate(10,]].. tostring(.25 * screenWidth) ..",".. tostring(.012 * screenHeight) ..[[)">AutoPilot: ]]..apStatus..[[</text>
-    ]]
-
-    if autopilot_dest and speed > 1000 then
-        local balance = vec3(autopilot_dest - constructPosition):len()/(speed/3.6) --meters/(meter/second) == seconds
-        local seconds = balance % 60
-        balance = balance // 60
-        local minutes = balance % 60
-        balance = balance // 60
-        local hours = balance % 60
-        apw[#apw+1] = [[
-            <text x="]].. tostring(.280 * screenWidth) ..[[" y="]].. tostring(.055 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">ETA: ]]..string.format('%.0f:%.0f.%.0f',hours,minutes,seconds)..[[</text>
-        ]]
-    end
-
-    apw[#apw+1] = [[</svg>]]
-    return table.concat(apw,'')
-end
-
 function positionInfoWidget()
-    local piw = [[
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            -- Far Left Top Side
-            <path d="
-        M ]] .. tostring(.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
-        L ]] .. tostring(.115*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[
-        L ]] .. tostring(.124*screenWidth) .. ' ' .. tostring(.025*screenHeight) .. [[
-        L ]] .. tostring(.25*screenWidth) .. ' ' .. tostring(.035*screenHeight) .. [[
-        L ]] .. tostring(.275*screenWidth) .. ' ' .. tostring(.027*screenHeight) .. [[
-        L ]] .. tostring(.2*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-        L ]] .. tostring(.0*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-        L ]] .. tostring(.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
-        "
-        stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[["/>
-
-        <path d="
-        M ]] .. tostring(1.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
-        L ]] .. tostring(.885*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[
-        L ]] .. tostring(.876*screenWidth) .. ' ' .. tostring(.025*screenHeight) .. [[
-        L ]] .. tostring(.75*screenWidth) .. ' ' .. tostring(.035*screenHeight) .. [[
-        L ]] .. tostring(.725*screenWidth) .. ' ' .. tostring(.027*screenHeight) .. [[
-        L ]] .. tostring(.8*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-        L ]] .. tostring(1.0*screenWidth) .. ' ' .. tostring(.001*screenHeight) .. [[
-        L ]] .. tostring(1.0*screenWidth) .. ' ' .. tostring(.0155*screenHeight) .. [[ 
-        "
-        stroke="]]..lineColor..[[" stroke-width="1" fill="]]..bgColor..[[" />
+    local piw = string.format([[
+            <path class="widget" d="
+                M 0 16.74
+                L 220.8 16.74
+                L 238.08 27
+                L 480 37.8
+                L 528 29.16
+                L 384 1.08
+                L 0 1.08
+                L 0 16.74"
+                stroke="%s" stroke-width="1" fill="%s"/>
+        <path class="widget" d="
+            M 1980 16.74
+            L 1699.2 16.74
+            L 1681.92 27
+            L 1440 37.8
+            L 1392 29.16
+            L 1536 1.08
+            L 1920 1.08
+            L 1920 16.74"
+            stroke="%s" stroke-width="1" fill="%s" />
+        <text class="text" x="1.92" y="14" style="fill: %s" font-size="]].. font_size_ratio ..[[vh">Remote Version: %s</text>
+        <text class="text" x="1728" y="15" style="fill: %s" font-size="]].. font_size_ratio ..[[vh" font-weight="bold">Safe Zone Distance: %s</text>
         
-        <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.01 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".6vw">Remote Version: ]]..hudVersion..[[</text>
-        <text x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Nearest Planet</text>
-        <text x="]].. tostring(.15 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".7vw" >]]..closestPlanetStr..[[</text>
-        
-        <text x="]].. tostring(.82 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size="1.42vh" font-weight="bold">Nearest Pipe</text>
-        <text x="]].. tostring(.78 * screenWidth) ..[[" y="]].. tostring(.022 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".7vw" >]]..closestPipeStr..[[</text>
+        <text class="text" x="240" y="15" style="fill: %s" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Nearest Planet</text>
+        <text class="text" x="288" y="26" style="fill: %s" font-size="]].. font_size_ratio ..[[vh" >%s</text>
 
-        <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.011 * screenHeight) ..[[" style="fill: ]]..fontColor..[[" font-size=".7vw" font-weight="bold">Safe Zone Distance: ]]..SZDStr..[[</text>
-
-        </svg>]]
+        <text class="text" x="1574.4" y="15" style="fill: %s" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Nearest Pipe</text>
+        <text class="text" x="1497.6" y="26" style="fill: %s" font-size="]].. font_size_ratio ..[[vh" >%s</text>
+        ]],
+        lineColor,bgColor,lineColor,bgColor,fontColor,hudVersion,fontColor,SZDStr,fontColor,fontColor,closestPlanetStr,fontColor,fontColor,closestPipeStr
+    )
     return piw
 end
 
-function engineWidget()
-    local ew = [[
-        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.045 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Controlling Engine tags</text>
-            ]]..enabledEngineTagsStr..[[
-        </svg>
-    ]]
-    return ew
-end
-
-function planetARWidget()
-    local arw = {}
-    arw[#arw+1] = planetAR
-
-    if legacyFile then
-        arw[#arw+1] = [[
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
-            </svg>
-            ]]
-    else
-        if string.find(AR_Mode,"FILE") ~= nil then
-            i, j = string.find(AR_Mode,"FILE")
-            fileNumber = tonumber(string.sub(AR_Mode,j+1))
-            --Catch if they reduced the number of custom files
-            if fileNumber > #validWaypointFiles then AR_Mode= "None" end
-            arw[#arw+1] = [[
-                <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                    <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..validWaypointFiles[fileNumber].DisplayName..[[</text>
-                </svg>
-                ]]
-        else
-            arw[#arw+1] = [[
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-                <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.03 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Augmented Reality Mode: ]]..AR_Mode..[[</text>
-            </svg>
-            ]]
-        end
-    end
-    return table.concat(arw,'')
-end
-
 function shipNameWidget()
-    local snw = [[
-        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.13 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Name: ]]..construct.getName()..[[</text>
-            <text x="]].. tostring(.90 * screenWidth) ..[[" y="]].. tostring(.142 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Ship Code: ]]..tostring(construct.getId())..[[</text>
-        </svg>
-    ]]
+    local snw = string.format([[
+            <text class="text" x="1728" y="35" font-size="]].. font_size_ratio+0.42 ..[[vh">Ship Name: %s</text>
+            <text class="text" x="1728" y="50" font-size="]].. font_size_ratio+0.42 ..[[vh">Ship Code: %s</text>
+    ]],cName,cID)
     return snw
 end
 
-function helpWidget()
-    local hw = ''
-    if showHelp then
-        hw = [[
-            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <rect x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.125 * screenHeight) ..[[" rx="15" ry="15" width="60vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.15 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size="1.42vh" font-weight="bold">
-                OPTION KEY BINDINGS</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.17 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+1: Toggle help screen (Alt+Shift+1 toggles minimal Remote HUD view)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.19 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+2: Toggle Augmented reality view mode (NONE, ALL, PLANETS, CUSTOM) HUD Loads custom waypoints for AR from "autoconf/custom/AR_Waypoints.lua"</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.21 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+3: Clear all engine tag filters (i.e. all engines controlled by throttle) (Alt+shift+3 toggles through predefined tags)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.23 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+4: Engage AutoPilot to current AP destination (shown in VR)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.25 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+5: Enable/Disalbe Tracking mode (position tags in lua chat used for trajectory calculation instead of auto-pilot)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.27 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+6: Set AutoPilot destination to the nearest safe zone</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.29 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+7: Toggles radar widget filtering mode (Show all, Show Enemy, Show Identified, Show Friendly) (Alt+Shift+7 toggles radar widget sorting between distance and construct size)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.31 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+8: Toggle Shield vent. Start venting if available. Stop venting if currently venting</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.33 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                Alt+9: Toggle between Cruise and Throttle control modes</text>
-            </rect>
-            
-            <rect x="]].. tostring(.125 * screenWidth) ..[[" y="]].. tostring(.365 * screenHeight) ..[[" rx="15" ry="15" width="60vw" height="22vh" style="fill:rgba(50, 50, 50, 0.9);stroke:white;stroke-width:5;opacity:0.9;" />
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.39 * screenHeight) ..[[" style="fill: ]]..'orange'..[[" font-size="1.42vh" font-weight="bold">
-                Lua Commands</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.41 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                disable &lt;tag&gt;: Disables control of engines tagged with the <tag> parameter</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.43 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                enable &lt;tag&gt;: Enables control of engines tagged with <tag></text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.45 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                warpFrom &lt;start position&gt; &lt;destination position&gt;: Calculates best warp bath from the <start position> (positions are in ::pos{} format)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.47 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                warp &lt;destination position&gt;: Calculates best warp path from current postion to destination (position is in ::pos{} format)</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.49 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                addWaypoint &lt;waypoint1&gt; &lt;Name&gt;: Adds temporary AR points when enabled. Requires a position tag. Optionally, you can also optionally add a custom name as well</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.51 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                delWaypoint &lt;name&gt;: Removes the specified temporary AR point</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.53 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                addShips db: Adds all ships currently on radar to the friendly construct list</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.55 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                code &lt;transponder code&gt;: Adds the transponder tag to the transponder. "delcode &lt;code&gt;" removes the tag</text>
-            <text x="]].. tostring(.13 * screenWidth) ..[[" y="]].. tostring(.57 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">
-                &lt;Primary Target ID&gt;: Filters radar widget to only show the construct with the specified ID</text>
-            </rect>
-
-            </svg>
-        ]]
-    else
-        hw = ''
-    end
-
-    return hw
-end
-
-function travelIndicatorWidget()
-    local p = constructPosition + 2/.000005 * vec3(construct.getWorldOrientationForward())
-    local pInfo = library.getPointOnScreen({p['x'],p['y'],p['z']})
-
-    local tiw = {}
-    tiw[#tiw+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
-    if pInfo[3] ~= 0 then
-        if pInfo[1] < .01 then pInfo[1] = .01 end
-        if pInfo[2] < .01 then pInfo[2] = .01 end
-        local fill = AR_Fill
+function arInfo(p,color,size,fill)
+    local aInfo = library.getPointOnScreen({p['x'],p['y'],p['z']})
+    if aInfo[3] ~= 0 then
+        if aInfo[1] < .01 then aInfo[1] = .01 end
+        if aInfo[2] < .01 then aInfo[2] = .01 end
         local translate = '(0,0)'
-        local depth = '8'           
-        if pInfo[1] < 1 and pInfo[2] < 1 then
-            translate = string.format('(%.2f,%.2f)',screenWidth*pInfo[1],screenHeight*pInfo[2])
-        elseif pInfo[1] > 1 and pInfo[1] < AR_Range and pInfo[2] < 1 then
-            translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight*pInfo[2])
-        elseif pInfo[2] > 1 and pInfo[2] < AR_Range and pInfo[1] < 1 then
-            translate = string.format('(%.2f,%.2f)',screenWidth*pInfo[1],screenHeight)
+        if aInfo[1] < 1 and aInfo[2] < 1 then
+            translate = string.format('(%.2f,%.2f)',screenWidth*aInfo[1],screenHeight*aInfo[2])
+        elseif aInfo[1] > 1 and aInfo[1] < 3 and aInfo[2] < 1 then
+            translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight*aInfo[2])
+        elseif aInfo[2] > 1 and aInfo[2] < 3 and aInfo[1] < 1 then
+            translate = string.format('(%.2f,%.2f)',screenWidth*aInfo[1],screenHeight)
         else
             translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
         end
-        tiw[#tiw+1] = [[<g transform="translate]]..translate..[[">
-                <circle cx="0" cy="0" r="]].. Direction_Indicator_Size ..[[px" style="fill:lightgrey;stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
-                <line x1="]].. Direction_Indicator_Size*1.5 ..[[" y1="0" x2="]].. -Direction_Indicator_Size*1.5 ..[[" y2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
-                <line y1="]].. Direction_Indicator_Size*1.5 ..[[" x1="0" y2="]].. -Direction_Indicator_Size*1.5 ..[[" x2="0" style="stroke:]]..Direction_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
-                </g>]]
+        return string.format([[<g transform="translate%s">
+                <circle cx="0" cy="0" r="%spx" style="fill:%s;stroke:%s;stroke-width:1.5;opacity:0.5;" />
+                <line x1="%s" y1="%s" x2="-%s" y2="-%s" style="stroke:%s;stroke-width:.75;opacity:0.85;" />
+                <line x1="-%s" y1="%s" x2="%s" y2="-%s" style="stroke:%s;stroke-width:.75;opacity:0.85;" />
+                </g>]],translate,size,fill,color,size*1.4,size*1.4,size*1.4,size*1.4,color,size*1.4,size*1.4,size*1.4,size*1.4,color)
+    else
+        return ''
     end
+end
+
+function travelIndicatorWidget()
+    local tiw = {}
+    tiw[#tiw+1] = arInfo(constructPosition + 1.5/.000005 * constructForward,'rgba(200, 225, 235, 1)',5,'lightgrey')
+    if offset_points then
+        tiw[#tiw+1] = arInfo(constructPosition + 1.5/.000005 * constructRight,'rgba(200, 225, 235, 1)',5,'aqua')
+        tiw[#tiw+1] = arInfo(constructPosition + -1.5/.000005 * constructRight,'rgba(200, 225, 235, 1)',5,'aqua')
+        tiw[#tiw+1] = arInfo(constructPosition + -1.5/.000005 * constructForward,'rgba(200, 225, 235, 1)',5,'red')
+        tiw[#tiw+1] = arInfo(constructPosition + -1/.000005 * (constructForward+constructRight),'rgba(200, 225, 235, 1)',5,'yellow')
+        tiw[#tiw+1] = arInfo(constructPosition + -1/.000005 * (constructForward-constructRight),'rgba(200, 225, 235, 1)',5,'yellow')
+        tiw[#tiw+1] = arInfo(constructPosition + 1/.000005 * (constructForward+constructRight),'rgba(200, 225, 235, 1)',5,'green')
+        tiw[#tiw+1] = arInfo(constructPosition + 1/.000005 * (constructForward-constructRight),'rgba(200, 225, 235, 1)',5,'green')
+    end
+    
     if speed > 20 then
-        local a = constructPosition + 2/.000005 * vec3(construct.getWorldVelocity())
-        local aInfo = library.getPointOnScreen({a['x'],a['y'],a['z']})
-        if aInfo[3] ~= 0 then
-            if aInfo[1] < .01 then aInfo[1] = .01 end
-            if aInfo[2] < .01 then aInfo[2] = .01 end
-            local fill = AR_Fill
-            local translate = '(0,0)'
-            local depth = '8'           
-            if aInfo[1] < 1 and aInfo[2] < 1 then
-                translate = string.format('(%.2f,%.2f)',screenWidth*aInfo[1],screenHeight*aInfo[2])
-            elseif aInfo[1] > 1 and aInfo[1] < AR_Range and aInfo[2] < 1 then
-                translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight*aInfo[2])
-            elseif aInfo[2] > 1 and aInfo[2] < AR_Range and aInfo[1] < 1 then
-                translate = string.format('(%.2f,%.2f)',screenWidth*aInfo[1],screenHeight)
-            else
-                translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
-            end
-            tiw[#tiw+1] = [[<g transform="translate]]..translate..[[">
-                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
-                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
-                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:]]..Prograde_Indicator_Color..[[;stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
-                    </g>]]
-        end
-        local r = constructPosition - 2/.000005 * vec3(construct.getWorldVelocity())
-        local aInfo = library.getPointOnScreen({r['x'],r['y'],r['z']})
-        if aInfo[3] ~= 0 then
-            if aInfo[1] < .01 then aInfo[1] = .01 end
-            if aInfo[2] < .01 then aInfo[2] = .01 end
-            local fill = AR_Fill
-            local translate = '(0,0)'
-            local depth = '8'           
-            if aInfo[1] < 1 and aInfo[2] < 1 then
-                translate = string.format('(%.2f,%.2f)',screenWidth*aInfo[1],screenHeight*aInfo[2])
-            elseif aInfo[1] > 1 and aInfo[1] < AR_Range and aInfo[2] < 1 then
-                translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight*aInfo[2])
-            elseif aInfo[2] > 1 and aInfo[2] < AR_Range and aInfo[1] < 1 then
-                translate = string.format('(%.2f,%.2f)',screenWidth*aInfo[1],screenHeight)
-            else
-                translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
-            end
-            tiw[#tiw+1] = [[<g transform="translate]]..translate..[[">
-                    <circle cx="0" cy="0" r="]].. Prograde_Indicator_Size ..[[px" style="fill:none;stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width)..[[;opacity:]].. 0.5 ..[[;" />
-                    <line x1="]].. Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. -Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
-                    <line x1="]].. -Prograde_Indicator_Size*1.4 ..[[" y1="]].. Prograde_Indicator_Size*1.4 ..[[" x2="]].. Prograde_Indicator_Size*1.4 ..[[" y2="]].. -Prograde_Indicator_Size*1.4 ..[[" style="stroke:rgb(255, 60, 60);stroke-width:]]..tostring(Indicator_Width/5)..[[;opacity:]].. 0.85 ..[[;" />
-                    </g>]]
-        end
+        tiw[#tiw+1] = arInfo(constructPosition + 2/.000005 * constructVelocity,'rgb(60, 255, 60)',7.5,'none')
+        tiw[#tiw+1] = arInfo(constructPosition - 2/.000005 * constructVelocity,'rgb(255, 60, 60)',7.5,'none')
     end
-    tiw[#tiw+1] = '</svg>'
     return table.concat(tiw,'')
 end
 
 function warningsWidget()
-    local ww = {}
-    ww[#ww+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
-    if caerusOption then
-        ww[#ww+1] = '<svg width="100%" height="100%" style="position: absolute;left:20%;top:59%;font-family: Calibri;">'
-    end
     local warningText = {}
     warningText['lowFuel'] = fuelWarningText
     warningText['brakes'] = 'Brakes Locked'
@@ -656,449 +542,133 @@ function warningsWidget()
     warningColor['lowFuel'] = 'red'
     warningColor['cored'] = 'orange'
     warningColor['friendly'] = 'green'
-    warningColor['venting'] = shieldHPColor
+    warningColor['venting'] = 'rgb(25, 247, 255)'
 
-    if math.floor(system.getArkTime()*5) % 2 == 0 then
+    if math.floor(arkTime*5) % 2 == 0 then
         warningColor['brakes'] = 'orange'
     else
         warningColor['brakes'] = 'yellow'
     end
 
+    local ww = {}
+    ww[#ww+1] = ''
     local count = 0
     for k,v in pairs(warnings) do
         if v ~= nil then
-            ww[#ww+1] = [[
-                <svg width="]].. tostring(.03 * screenWidth) ..[[" height="]].. tostring(.03 * screenHeight) ..[[" x="]].. tostring(.24 * screenWidth) ..[[" y="]].. tostring(.20 * screenHeight + .032 * screenHeight * count) ..[[" style="fill: ]]..warningColor[k]..[[;">
-                    ]]..warningSymbols[v]..[[
+            ww[#ww+1] = string.format([[
+                <svg class="widget" width="57.6" height="32.4" x="460.8" y="%s" style="fill: %s;" viewBox="0 0 1920 1080">
+                    %s
                 </svg>
-                <text x="]].. tostring(.267 * screenWidth) ..[[" y="]].. tostring(.22 * screenHeight + .032 * screenHeight * count) .. [[" style="fill: ]]..warningColor[k]..[[;" font-size="1.7vh" font-weight="bold">]]..warningText[k]..[[</text>
-                ]]
+                <text x="512.64" y="%s" style="fill: %s;" font-size="]].. font_size_ratio+0.7 ..[[vh" font-weight="bold">%s</text>
+                ]],tostring(.20 * screenHeight + .032 * screenHeight * count),warningColor[k],warningSymbols[v],tostring(.22 * screenHeight + .032 * screenHeight * count),warningColor[k],warningText[k])
             count = count + 1
         end
     end
-    ww[#ww+1] = '</svg>'
     return table.concat(ww,'')
 end
 
 function hpWidget()
-    local hw = {}
-    hw[#hw+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
-    --Shield/CCS Widget
-    shieldPercent = 0
-    if shield_1 then
-        shieldPercent = shield_1.getShieldHitpoints()/shield_1.getMaxShieldHitpoints()*100
-    end
-    CCSPercent = 0
-    if core then
-        if core.getMaxCoreStress() then
-            CCSPercent = 100*(core.getMaxCoreStress()-core.getCoreStress())/core.getMaxCoreStress()
-        end
-    end
-    if CCSPercent < 25 and CCSPercent > 5 and db_1 then
-        db_1.clearValue('homeBaseLocation')
-        if transponder_1 then transponder_1.setTags({}) end
-    elseif CCSPercent == 0 and shieldPercent < 5 then
-        db_1.clearValue('homeBaseLocation')
-        if transponder_1 then transponder_1.setTags({}) end
-    end
-    if (shield_1 and shieldPercent < 15) or showAlerts then
-        hw[#hw+1] = string.format([[
-        <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: red;">
-            ]]..warningSymbols['svgCritical']..[[
-        </svg>
-        <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.64 * screenHeight) ..[[" style="fill: red" font-size="3.42vh" font-weight="bold">SHIELD CRITICAL</text>
-        ]])
-    elseif (shield_1 and shieldPercent < 30) or showAlerts then
-        hw[#hw+1] = string.format([[
-        <svg width="]].. tostring(.06 * screenWidth) ..[[" height="]].. tostring(.06 * screenHeight) ..[[" x="]].. tostring(.40 * screenWidth) ..[[" y="]].. tostring(.60 * screenHeight) ..[[" style="fill: orange;">
-            ]]..warningSymbols['svgWarning']..[[
-        </svg>
-        <text x="]].. tostring(.45 * screenWidth) ..[[" y="]].. tostring(.64 * screenHeight) ..[[" style="fill: orange" font-size="3.42vh" font-weight="bold">SHIELD LOW</text>
-        ]])
-    end
-    hw[#hw+1] = '</svg>'
-    hw[#hw+1] = [[
-        <svg style="position: absolute; top: ]]..hpWidgetY..[[vh; left: ]]..hpWidgetX..[[vw;" viewBox="0 0 355 97" width="]]..tostring(hpWidgetScale)..[[vw">
-            <polyline style="fill-opacity: 0; stroke-linejoin: round; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" points="2 78.902 250 78.902 276 50" bx:origin="0.564202 0.377551"/>
-            <polyline style="stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" points="225 85.853 253.049 85.853 271 67.902" bx:origin="-1.23913 -1.086291"/>
-            <rect x="26.397" y="158.28" width="59" height="9" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000076, 0, 1, -24.396999, -79.380203)" bx:origin="2.813559 -3.390291"/>
-            <rect x="4.921" y="123.131" width="11" height="7" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000076, 0, 1, -2.921, -35.229931)" bx:origin="15.090909 -5.644607"/>
-            <rect x="4.921" y="123.111" width="11" height="6.999" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000106, 0, 1, 13.079, -35.20953)" bx:origin="13.636364 -5.645962"/>
-            <rect x="4.921" y="123.111" width="11" height="6.999" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000106, 0, 1, 29.078999, -35.20953)" bx:origin="12.181818 -5.645719"/>
-            <rect x="4.921" y="123.111" width="11" height="6.999" style="stroke-linecap: round; stroke-linejoin: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[; fill: none;" transform="matrix(1, 0.000106, 0, 1, 45.078999, -35.20953)" bx:origin="10.727273 -5.645477"/>
-            ]]
-    local placement = 0
-    for i = 4, CCSPercent, 4 do 
-        hw[#hw+1] = [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..ccsHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="56" x2="]]..tostring(5+placement)..[["   y2="72" bx:origin="0 0.096154"/>]]  placement = placement + 10
-    end
-            
-    hw[#hw+1] = [[
-            <line style="stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="5" y1="25.706" x2="5" y2="39.508" bx:origin="0 1.607143"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="14.859" y1="31.621" x2="14.859" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="24.718" y1="31.684" x2="24.718" y2="39.571" bx:origin="0 2.0545"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="34.576" y1="31.684" x2="34.576" y2="39.571" bx:origin="0 2.0545"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="44.435" y1="31.621" x2="44.435" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="54.294" y1="31.621" x2="54.294" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="64.153" y1="31.621" x2="64.153" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="74.012" y1="31.621" x2="74.012" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="83.871" y1="31.621" x2="83.871" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="93.729" y1="31.621" x2="93.729" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="103.588" y1="31.684" x2="103.588" y2="39.571" bx:origin="0 2.0545"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="113.447" y1="31.684" x2="113.447" y2="39.571" bx:origin="0 2.0545"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="123.306" y1="31.621" x2="123.306" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="133.165" y1="31.621" x2="133.165" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="143.023" y1="31.621" x2="143.023" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="152.882" y1="31.621" x2="152.882" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="162.741" y1="31.621" x2="162.741" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="172.6" y1="31.621" x2="172.6" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="182.459" y1="31.684" x2="182.459" y2="39.571" bx:origin="0 2.0545"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="192.318" y1="31.684" x2="192.318" y2="39.571" bx:origin="0 2.0545"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="202.176" y1="31.621" x2="202.176" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="212.035" y1="31.621" x2="212.035" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="221.894" y1="31.621" x2="221.894" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="231.753" y1="31.621" x2="231.753" y2="39.508" bx:origin="0 2.0625"/>
-            <line style="paint-order: fill; stroke-miterlimit: 1; stroke-linecap: round; fill: none; stroke: ]]..neutralLineColor..[[;" x1="245" y1="25.706" x2="245" y2="39.508" bx:origin="0 1.535714"/>
-            <text style="fill: ]]..shieldHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="15" y="28.824" bx:origin="-2.698544 2.296589">Shield:</text>
-            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 6.70451px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, -12.273296, 5.679566)" x="16" y="89.114" bx:origin="3.495402 -4.692753">Incoming Damage</text>
-            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 73.924286, 48.558426)" x="16" y="89.114" dx="-83.506" dy="-39.079" bx:origin="35.484825 -7.519482">A</text>
-            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 98.152718, 71.789642)" x="16" y="89.114" dx="-91.857" dy="-65.038" bx:origin="38.374239 -7.519481">E</text>
-            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 106.659058, 48.558426)" x="16" y="89.114" dx="-83.506" dy="-39.079" bx:origin="33.936403 -7.519482">T</text>
-            <text style="fill: rgb(255, 240, 25); font-family: Arial; font-size: 5.58709px; line-height: 8.93935px; stroke-width: 0.25px; white-space: pre;" transform="matrix(1.017081, 0, 0, 0.89492, 121.659058, 48.558426)" x="16" y="89.114" dx="-83.506" dy="-39.079" bx:origin="27.291514 -7.519482">K</text>
-            <text style="fill: ]]..shieldHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="53.45" y="28.824" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',shieldPercent)..[[%</text>
-            <text style="fill: ]]..ccsHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="153" y="28.824" bx:origin="-2.698544 2.296589">CCS:</text>
-            <text style="fill: ]]..ccsHPColor..[[; font-family: Arial; font-size: 11.8px; white-space: pre;" x="182.576" y="28.824" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',CCSPercent)..[[%</text>
-            
-            ]]
-            if shield_1 then
-                local ventCD = shield_1.getVentingCooldown()
-                if ventCD > 0 then
-                    hw[#hw+1] = [[
-                        <text style="fill: ]]..warning_outline_color..[[; font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="66" y="91.01" bx:origin="-2.698544 2.296589">Vent Cooldown: </text>
-                        <text style="fill: ]]..warning_outline_color..[[; font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="151" y="91.01" bx:origin="-2.698544 2.296589">]]..string.format('%.2f',ventCD)..[[s</text>
-                    ]]
-                end
-            end
-    local placement = 0
-    for i = 4, shieldPercent, 4 do 
-        hw[#hw+1] = [[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: ]]..shieldHPColor..[[; fill: none;" x1="]]..tostring(5+placement)..[["   y1="42" x2="]]..tostring(5+placement)..[["   y2="55" bx:origin="0 0.096154"/>]]  placement = placement + 10
-    end
+    local hw = string.format([[
 
-    hw[#hw+1] = '</svg>'
+            %s
+        <svg x="633.6" y="950.4" viewBox="0 0 1920 1080">
+            <polyline class="widget" style="fill-opacity: 0; stroke-linejoin: round; stroke-linecap: round; stroke-width: 2px; stroke: lightgrey; fill: none;" points="2 78.902 250 78.902 276 50" bx:origin="0.564202 0.377551"/>
+            <polyline class="widget" style="stroke-width: 2px; stroke: lightgrey; fill: none;" points="225 85.853 253.049 85.853 271 67.902" bx:origin="-1.23913 -1.086291"/>
+            %s
+            <text style="fill: rgb(25, 247, 255); font-size: 11.8px; white-space: pre;" x="15" y="28.824" bx:origin="-2.698544 2.296589">Shield:</text>
+            <text style="fill: rgb(25, 247, 255); font-size: 11.8px; white-space: pre;" x="53.45" y="28.824" bx:origin="-2.698544 2.296589">%.2f%%</text>
+            <text style="fill: rgb(60, 255, 60); font-size: 11.8px; white-space: pre;" x="153" y="28.824" bx:origin="-2.698544 2.296589">CCS:</text>
+            <text style="fill: rgb(60, 255, 60); font-size: 11.8px; white-space: pre;" x="182.576" y="28.824" bx:origin="-2.698544 2.296589">%.2f%%</text>
+            %s
+            %s
+        </svg>]],
+            shieldWarningHTML,ccsHTML,shieldPercent,CCSPercent,ventHTML,shieldHTML
+        )
 
-    return table.concat(hw,'')
-end
-
-function resistWidget()
-    local stress = shield_1.getStressRatioRaw()
-    local amS = stress[1]
-    local emS = stress[2]
-    local knS = stress[3]
-    local thS = stress[4]
-
-    local srp = shield_1.getResistancesPool()
-    local csr = shield_1.getResistances()
-    local amR = csr[1]/srp
-    local emR = csr[2]/srp
-    local knR = csr[3]/srp
-    local thR = csr[4]/srp
-
-    local resistTimer = shield_1.getResistancesCooldown()
-    local resistTimerPer = 1 - resistTimer/shield_1.getResistancesMaxCooldown()
-    local resistTimerColor = shieldHPColor
-    if resistTimer > 0 then resistTimerColor = warning_outline_color end 
-
-    if not shield_1.isVenting() then
-        warnings['venting'] = nil
-    else 
-        warnings['venting'] = 'svgCritical'
-    end
-
-    local rw = [[
-        <svg style="position: absolute; top: ]]..resistWidgetY..[[vh; left: ]]..resistWidgetX..[[vw;" viewBox="0 0 143 127" width="]]..resistWidgetScale..[[vw">
-            <defs>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-am">
-                    <stop offset="]]..tostring(amS*100)..[[%" style="stop-color: ]]..antiMatterColor..[[; stop-opacity: 1"/>
-                    <stop offset="]]..tostring(amS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-th">
-                    <stop offset="]]..tostring(thS*100)..[[%" style="stop-color: ]]..thermicColor..[[; stop-opacity: 1"/>
-                    <stop offset="]]..tostring(thS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-em">
-                    <stop offset="]]..tostring(emS*100)..[[%" style="stop-color: ]]..electroMagneticColor..[[; stop-opacity: 1"/>
-                    <stop offset="]]..tostring(emS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="stress-kn">
-                    <stop offset="]]..tostring(knS*100)..[[%" style="stop-color: ]]..kineticColor..[[; stop-opacity: 1"/>
-                    <stop offset="]]..tostring(knS*100)..[[%" style="stop-color: ]]..neutralLineColor..[[; stop-opacity:.5"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-am">
-                    <stop offset="]]..tostring(amR*100)..[[%" style="stop-color: ]]..antiMatterColor..[["/>
-                    <stop offset="]]..tostring(amR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-em">
-                    <stop offset="]]..tostring(emR*100)..[[%" style="stop-color: ]]..electroMagneticColor..[["/>
-                    <stop offset="]]..tostring(emR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-th">
-                    <stop offset="]]..tostring(thR*100)..[[%" style="stop-color: ]]..thermicColor..[["/>
-                    <stop offset="]]..tostring(thR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
-                </linearGradient>
-                <linearGradient x1="100%" y1="0%" x2="0%" y2="100%" id="resist-kn">
-                    <stop offset="]]..tostring(knR*100)..[[%" style="stop-color: ]]..kineticColor..[[;"/>
-                    <stop offset="]]..tostring(knR*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
-                </linearGradient>
-                <linearGradient x1="0%" y1="50%" x2="100%" y2="50%" id="resist-timer-horizontal" gradientUnits="userSpaceOnUse">
-                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
-                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..warning_outline_color..[[;"/>  
-                </linearGradient>
-                <linearGradient x1="50%" y1="0%" x2="50%" y2="80%" id="resist-timer-vertical" gradientUnits="userSpaceOnUse">
-                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..neutralLineColor..[[;"/>
-                    <stop offset="]]..tostring(resistTimerPer*100)..[[%" style="stop-color: ]]..warning_outline_color..[[;"/>  
-                </linearGradient>
-            </defs>
-            <ellipse style="fill: none; stroke: ]]..neutralLineColor..[[;" cx="73" cy="61" rx="8" ry="8"/>
-            <ellipse style="fill: ]]..neutralLineColor..[[; stroke: ]]..neutralLineColor..[[;" cx="73" cy="61" rx="2" ry="2"/>
-            <polyline style="fill: none; stroke-linejoin: bevel; stroke-linecap: round; stroke: ]]..neutralLineColor..[[;" points="53 30 35 61 53 93"/>
-            <polyline style="fill: none; stroke-linejoin: bevel; stroke-linecap: round; stroke: ]]..neutralLineColor..[[;" points="92 30 110 61 92 93"/>
-            <polyline style="fill: none; stroke-linecap: round; stroke-linejoin: bevel; stroke: ]]..neutralLineColor..[[;" points="90 35 105 61 90 89"/>
-            <polyline style="fill: none; stroke-linecap: round; stroke-linejoin: bevel; stroke: ]]..neutralLineColor..[[;" points="55 35 40 61 55 89"/>
-            <line style="fill: none; stroke-width: 0.5px; stroke: url(#resist-timer-horizontal);" x1="17" y1="61" x2="128" y2="61"/>
-            <line style="fill: none; stroke-width: 0.5px; stroke: url(#resist-timer-vertical);" x1="72.888" y1="-9.275" x2="72.888" y2="101.725" transform="matrix(1, 0, 0, 1, 0.112056, 14.27536)"/>
-            <text style="fill: ]]..antiMatterColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="55.182" y="51.282">AM</text>
-            <text style="fill: ]]..electroMagneticColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="78" y="51.282">EM</text>
-            <text style="fill: ]]..thermicColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="78" y="77.282">TH</text>
-            <text style="fill: ]]..kineticColor..[[; font-size: 8px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="55" y="77.282">KN</text>
-            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-am);" d="M 15 59 C 45.52 58.894 71.021 34.344 71 3" transform="matrix(-1, 0, 0, -1, 86.000015, 62)"/>
-            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-th);" d="M 75 119 C 105.52 118.894 131.021 94.344 131 63"/>
-            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-em);" d="M 75 59 C 105.52 58.894 131.021 34.344 131 3" transform="matrix(0, -1, 1, 0, 72.000008, 134.000008)"/>
-            <path style="fill: none; stroke-width: 3px; stroke-linecap: round; stroke: url(#stress-kn);" d="M 15 119 C 45.52 118.894 71.021 94.344 71 63" transform="matrix(0, 1, -1, 0, 134.000008, 47.999992)"/>
-            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-am); stroke-width: 5px;" d="M 25 56 C 48.435 55.92 68.016 37.068 68 13" transform="matrix(-1, 0, 0, -1, 93.000015, 69)"/>
-            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-em); stroke-width: 5px;" d="M 78 56 C 101.435 55.919 121.016 37.068 121 13" transform="matrix(0, -1, 1, 0, 65.000004, 134.000004)"/>
-            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-th); stroke-width: 5px;" d="M 78 109 C 101.435 108.919 121.016 90.068 121 66"/>
-            <path style="fill: none; stroke-linecap: round; stroke: url(#resist-kn); stroke-width: 5px;" d="M 24 109 C 47.435 108.919 67.016 90.068 67 66" transform="matrix(0, 1, -1, 0, 133.000008, 41.999992)"/>
-            </svg>
-    ]]
-    return rw
+    return hw
 end
 
 function dpsWidget()
-    local dw = {}
-
-    local x,y,s
-    y = 28.25
-    x = 1.75
-    s = 11.25
-    local ts = system.getArkTime()
-    if dpsTracker[string.format('%.0f',ts/10)] == nil then
-        dpsTracker[string.format('%.0f',(ts-10)/10)] = nil
-        dpsTracker[string.format('%.0f',ts/10)] = 0
-        table.insert(dpsChart,1,0)
-    end
-    if #dpsChart > 24 then
-        table.remove(dpsChart,#dpsChart)
-    end
-    local cDPS = (dpsChart[1]+dpsChart[2])/20000
-    dw[#dw+1] = [[
-        <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 -10 286 240" width="]]..s..[[vw">
-            <rect x="6%" y="6%" width="87%" height="90%" rx="1%" ry="1%" fill="rgba(0,0,0,0)" />
-            <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
-            <polygon style="stroke-linejoin: round; fill: rgba(0,0,0,0); stroke: ]]..neutralLineColor..[[;" points="18 17 12 22 12 62 15 66 15 125 18 127"/>
-            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="127" x2="266" y2="127"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">DPS Chart</text>
-            <text style="fill: rgba(175, 75, 75, 0.90); font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="175" y="35">]].. string.format('%.2f',cDPS) ..[[k</text>
-            ]]
-        
+    local cDPS = 0
+    local dmgTime = tonumber(string.format('%.0f',arkTime))
     for k,v in pairs(dpsChart) do
-        dw[#dw+1] = [[<circle cx="]].. tostring(23 + k*10) ..[[" cy="]].. tostring(123 - 2*v/10000) ..[[" r="2.25px" style="fill:rgba(175, 75, 75, 0.90);rgba(175, 75, 75, 0.90);stroke-width:0;opacity:0.75;" />]]
-    end
-
-    dw[#dw+1] = [[
-        </svg>
-    ]]
-    return table.concat(dw,'')
-end
-
-function transponderWidget()
-    local tw = {}
-    if transponder_1 ~= nil then
-        local transponderColor = warning_outline_color
-        local transponderStatus = 'offline'
-        if transponder_1.isActive() then transponderColor = shieldHPColor transponderStatus = 'Active' end
-        local tags = transponder_1.getTags()
-
-        local x,y,s
-        if minimalWidgets then
-            y = transponderWidgetYmin
-            x = transponderWidgetXmin
-            s = transponderWidgetScalemin
+        if k < dmgTime - dmgAvgDuration then
+            dpsChart[k] = nil
         else
-            y = transponderWidgetY
-            x = transponderWidgetX
-            s = transponderWidgetScale
+            cDPS = cDPS + dpsChart[k]
         end
-
-        tw[#tw+1] = [[
-            <svg style="position: absolute; top: ]]..y..[[vh; left: ]]..x..[[vw;" viewBox="0 0 286 ]]..tostring(101+#tags*24)..[[" width="]]..s..[[vw">
-                <rect x="6%" y="12%" width="87%" height="79%" rx="1%" ry="1%" fill="rgba(100,100,100,.9)" />
-                <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
-                <polygon style="stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 ]]..tostring(81+#tags*24)..[[ 18 ]]..tostring(83+#tags*24)..[["/>
-                <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">Transponder Status:</text>
-                <text style="fill: ]]..transponderColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="190" y="35">]]..transponderStatus..[[</text>
-            ]]
-
-
-        for i,tag in pairs(tags) do
-            local code = 'redacted'
-            if codeCount > 0 then code = tag end
-            tw[#tw+1] = [[<line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="]]..tostring(54+(i-1)*27)..[[" x2="22" y2="]]..tostring(80.7+(i-1)*27)..[["/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="27" y="]]..tostring(73+(i-1)*27)..[[">]]..code..[[</text>]]
-        end
-        tw[#tw+1] = '</svg>'
     end
+    cDPS = cDPS/dmgAvgDuration
 
-    return table.concat(tw,'')
-end
-
-function minimalShipInfo()
-    local msi = {}
-
-    local bg = bgColor
-    local apStatus = 'inactive'
-    if auto_follow then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'following' end
-    if autopilot then bg = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' end
-    if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' end
-
-    local eta = ''
-    if autopilot_dest and speed > 1000 then
-        local balance = vec3(autopilot_dest - constructPosition):len()/(speed/3.6) --meters/(meter/second) == seconds
-        local seconds = balance % 60 if seconds < 10 then seconds = string.format('0%.0f',seconds) else seconds = string.format('%.0f',seconds) end
-        balance = balance // 60
-        local minutes = balance % 60 if minutes < 10 then minutes = string.format('0%.0f',minutes) else minutes = string.format('%.0f',minutes) end
-        balance = balance // 60
-        local hours = balance % 60
-        eta = string.format(' (ETA %.0f:%s.%s)',hours,minutes,seconds)
-    end
-
-    msi[#msi+1] = [[
-        <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">
-            <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring(.015 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.42vh" font-weight="bold">Auto Pilot Mode: ]]..apStatus..eta..[[</text>]]
-    if caerusOption then
-        msi[#msi+1] = [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.92 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">Speed: ]] .. formatNumber(speed,'speed') .. [[</text>]]
-        msi[#msi+1] = [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.935 * screenHeight) ..[[" style="fill: rgb(73, 251, 53);" font-size="1.42vh" font-weight="bold">SZ Dist: ]]..SZDStr..[[</text></text>]]
-    end
-    msi[#msi+1] = [[</svg>
-    ]]
-
-    msi[#msi+1] = [[
-        <svg style="position: absolute; top: ]]..shipInfoWidgetY..[[vh; left: ]]..shipInfoWidgetX..[[vw;" viewBox="0 0 286 260" width="]]..shipInfoWidgetScale..[[vw">
-            <polygon style="stroke-width: 2px; stroke-linejoin: round; fill: ]]..bgColor..[[; stroke: ]]..lineColor..[[;" points="22 15 266 15 266 32 252 46 22 46"/>
-            <polygon style="stroke-linejoin: round; fill: ]]..bg..[[; stroke: ]]..lineColor..[[;" points="18 17 12 22 12 62 15 66 15 258 18 260"/>
-            <text style="fill: ]]..fontColor..[[; font-size: 17px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="37" y="35">]]..string.format('%s (%s)',construct.getName(),pilotName)..[[</text>
-        ]]
-        msi[#msi+1] = [[
-            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="54" x2="22" y2="77"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="40" y="73">Top Speed:</text>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 18px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="73" font-family: "monospace";>]]..formatNumber(maxSpeed,'speed')..[[</text>
-
-            <line style="fill: none; stroke-linecap: round; stroke-width: 2px; stroke: ]]..neutralLineColor..[[;" x1="22" y1="81" x2="22" y2="104"/>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 20px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="40" y="100">Brake Dist:</text>
-            <text style="fill: ]]..neutralFontColor..[[; font-size: 18px; paint-order: fill; stroke-width: 0.5px; white-space: pre;" x="137" y="100" font-family: "monospace";>]]..formatNumber(brakeDist,'distance')..[[</text>
-
-        ]]
-
-        msi[#msi+1] = '</svg>'
-
-    curFuel = 0
-    local fuelWarning = false
-    local fuelTankWarning = false
-    for i,v in pairs(spacefueltank) do 
-        curFuel = curFuel + v.getItemsVolume()
-        if v.getItemsVolume()/v.getMaxVolume() < .2 then fuelTankWarning = true end
-    end
-    sFuelPercent = curFuel/maxFuel * 100
-    if sFuelPercent < 20 then fuelWarning = true end
-    curFuelStr = string.format('%.2f%%',sFuelPercent)
-
-    msi[#msi+1] = string.format([[
-        <svg width="100%%" height="100%%" style="position: absolute;left:0%%;top:0%%;font-family: Calibri;">
-            <linearGradient id="sFuel-vertical" x1="0%%" y1="100%%" x2="0%%" y2="0%%">
-            <stop offset="%.1f%%" style="stop-color:rgba(99, 250, 79, 0.95);stop-opacity:.95" />
-            <stop offset="%.1f%%" style="stop-color:rgba(255, 10, 10, 0.5);stop-opacity:.5" />
-            </linearGradient>]],sFuelPercent,sFuelPercent)
-
-
-    if Nav.axisCommandManager:getMasterMode() == controlMasterModeId.travel then mode = 'Throttle ' .. tostring(Nav.axisCommandManager:getThrottleCommand(0) * 100) .. '%' modeBG = fuelTextColor
-    else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
-    end
-    msi[#msi+1] = [[
-                <path d="
-                    M ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
-                    L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.185*screenHeight) .. [[
-                    L ]] .. tostring(.848*screenWidth) .. ' ' .. tostring(.185*screenHeight) .. [[
-                    L ]] .. tostring(.848*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [[
-                    L ]] .. tostring(.843*screenWidth) .. ' ' .. tostring(.052*screenHeight) .. [["
-                    stroke="]]..lineColor..[[" stroke-width="1" fill="url(#sFuel-vertical)" />
-                <text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.198 * screenHeight) ..[[" style="fill: ]]..fuelTextColor..[[" font-size="1.32vh" font-weight="bold">Fuel: ]] .. curFuelStr .. [[</text>]]
-    if caerusOption then
-        msi[#msi+1] = [[<text x="]].. tostring(.547 * screenWidth) ..[[" y="]].. tostring(.90 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
-    else
-        msi[#msi+1] = [[<text x="]].. tostring(.80 * screenWidth) ..[[" y="]].. tostring(.2115 * screenHeight) ..[[" style="fill: ]]..modeBG..[[" font-size="1.32vh" font-weight="bold">]] .. mode .. [[</text>]]
-    end    
-    msi[#msi+1] = [[</svg>
-        ]]
-
-    if fuelTankWarning or fuelWarning or showAlerts then
-        fuelWarningText = 'Fuel level &lt; 20%'
-        if not fuelWarning then fuelWarningText = 'A Fuel tank &lt; 20%%' end
-        warnings['lowFuel'] = 'svgWarning'
-    else
-        warnings['lowFuel'] = nil
-    end
-
-    msi[#msi+1] = '</svg>'
-
-    return table.concat(msi,'')
+    local dw = string.format([[
+                <text x="1.92" y="99" style="fill: red;" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Damage: %.1fk</text>
+                <text x="1.92" y="120" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">AM: %.0f%% | %.0f%%</text>
+                <text x="2.08" y="135" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">EM: %.0f%% | %.0f%%</text>
+                <text x="2.32" y="150" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">KN: %.0f%% | %.0f%%</text>
+                <text x="2.48" y="165" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">TH: %.0f%% | %.0f%%</text>
+                <text x="2.48" y="180" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Resist cooldown: %.0f seconds</text>
+    ]],cDPS/1000,100*amR,100*amS,100*emR,100*emS,100*knR,100*knS,100*thR,100*thS,shield_resist_cd)
+    return dw
 end
 
 function generateScreen()
-    if db_1 and db_1.hasKey('minimalWidgets') then
-        minimalWidgets = db_1.getIntValue('minimalWidgets') == 1
-    end 
+    local i = 0
     local htmlTable = {}
-    htmlTable[#htmlTable+1] = [[ <html>
+    htmlTable[i+1] = [[ <html>
         <style>
-            svg { filter: drop-shadow(0px 0px 1px rgba(255,255,255,.5));}
+            body {
+                font-family: 'Roboto', sans-serif;
+                color: #e6e6e6;
+                margin: 0;
+                overflow: hidden;
+            }
+            svg {
+                filter: drop-shadow(0px 0px 5px rgba(0, 255, 255, 0.5));
+            }
+            .widget {
+                stroke-width: 2;
+            }
+            .text {
+                fill: #e6e6e6;
+            }
         </style>
-            <body style="font-family: Calibri;">
-     ]]
-     htmlTable[#htmlTable+1] = brakeWidget()
+            <body>
+            <svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;" viewBox="0 0 1920 1080">]]
+    i = i + 1
+    htmlTable[i+1] = brakeWidget()
+    i = i + 1
+    
     if showScreen then 
-        if minimalWidgets then
-            htmlTable[#htmlTable+1] = minimalShipInfo()
-        else
-            htmlTable[#htmlTable+1] = flightWidget()
-            htmlTable[#htmlTable+1] = fuelWidget()
-            htmlTable[#htmlTable+1] = apStatusWidget()
-            htmlTable[#htmlTable+1] = positionInfoWidget()
-            htmlTable[#htmlTable+1] = shipNameWidget()
+        if showHelp then
+            htmlTable[i+1] = systemCheckHTML
+            i = i + 1
         end
-        if transponder_1 then htmlTable[#htmlTable+1] = transponderWidget() end
-        htmlTable[#htmlTable+1] = hpWidget()
-        if shield_1 then htmlTable[#htmlTable+1] = resistWidget() end
-        htmlTable[#htmlTable+1] = engineWidget()
-        if useLogo then
-            htmlTable[#htmlTable+1] = [[<svg viewBox="0 0 500 500" width="5vw" height="5vh" style="position: absolute; top: 7vh; left: 0vw;">]] .. logoSVG .. [[
-                </svg>]]
+        htmlTable[i+1] = profile(flightWidget,'flightWidget')
+        i = i + 1
+        htmlTable[i+1] = fuelHTML
+        i = i + 1
+        htmlTable[i+1] = profile(apStatusWidget,'apStatusWidget')
+        i = i + 1
+        htmlTable[i+1] = profile(positionInfoWidget,'positionInfoWidget')
+        i = i + 1
+        htmlTable[i+1] = shipNameHTML
+        i = i + 1
+        if shield_1 then 
+            htmlTable[i+1] = profile(hpWidget,'hpWidget')
+            i = i + 1
         end
-        htmlTable[#htmlTable+1] = dpsWidget()
+        htmlTable[i+1] = dpsHTML
+        i = i + 1
     end
-    htmlTable[#htmlTable+1] = planetARWidget()
-    htmlTable[#htmlTable+1] = helpWidget()
-    htmlTable[#htmlTable+1] = travelIndicatorWidget()
-    htmlTable[#htmlTable+1] = warningsWidget()
+    
+    htmlTable[i+1] = profile(ARWidget,'ARWidget')
+    i = i + 1
+    htmlTable[i+1] = profile(travelIndicatorWidget,'travelIndicatorWidget')
+    i = i + 1
+    htmlTable[i+1] = profile(warningsWidget,'warningsWidget')
+    i = i + 1
 
-    htmlTable[#htmlTable+1] = [[ </body> </html> ]]
+    htmlTable[i+1] = [[ </svg></body> </html> ]]
     system.setScreen(table.concat(htmlTable, ''))
 end
 
@@ -1106,139 +676,222 @@ function globalDB(action)
     if db_1 ~= nil then
         if action == 'get' then
             if db_1.hasKey('generateAutoCode') then generateAutoCode = db_1.getIntValue('generateAutoCode') == 1 end
-            if db_1.hasKey('asteroidPipes') then asteroidPipes = db_1.getIntValue('asteroidPipes') == 1 end
             if db_1.hasKey('toggleBrakes') then toggleBrakes = db_1.getIntValue('toggleBrakes') == 1 end
-            if db_1.hasKey('caerusOption') then caerusOption = db_1.getIntValue('caerusOption') == 1 end
             if db_1.hasKey('validatePilot') then validatePilot = db_1.getIntValue('validatePilot') == 1 end
-            if db_1.hasKey('showRemotePanel') then showRemotePanel = db_1.getIntValue('showRemotePanel') == 1 end
-            if db_1.hasKey('showDockingPanel') then showDockingPanel = db_1.getIntValue('showDockingPanel') == 1 end
-            if db_1.hasKey('showFuelPanel') then showFuelPanel = db_1.getIntValue('showFuelPanel') == 1 end
-            if db_1.hasKey('showHelper') then showHelper = db_1.getIntValue('showHelper') == 1 end
-            if db_1.hasKey('defaultHoverHeight') then defaultHoverHeight = db_1.getIntValue('defaultHoverHeight') end
-            if db_1.hasKey('topHUDLineColorSZ') then topHUDLineColorSZ = db_1.getStringValue('topHUDLineColorSZ') end
-            if db_1.hasKey('topHUDFillColorSZ') then topHUDFillColorSZ = db_1.getStringValue('topHUDFillColorSZ') end
-            if db_1.hasKey('textColorSZ') then textColorSZ = db_1.getStringValue('textColorSZ') end
-            if db_1.hasKey('topHUDLineColorPVP') then topHUDLineColorPVP = db_1.getStringValue('topHUDLineColorPVP') end
-            if db_1.hasKey('topHUDFillColorPVP') then topHUDFillColorPVP = db_1.getStringValue('topHUDFillColorPVP') end
-            if db_1.hasKey('textColorPVP') then textColorPVP = db_1.getStringValue('textColorPVP') end
-            if db_1.hasKey('fuelTextColor') then fuelTextColor = db_1.getStringValue('fuelTextColor') end
-            if db_1.hasKey('Direction_Indicator_Size') then Direction_Indicator_Size = db_1.getFloatValue('Direction_Indicator_Size') end
-            if db_1.hasKey('Direction_Indicator_Color') then Direction_Indicator_Color = db_1.getStringValue('Direction_Indicator_Color') end
-            if db_1.hasKey('Prograde_Indicator_Size') then Prograde_Indicator_Size = db_1.getFloatValue('Prograde_Indicator_Size') end
-            if db_1.hasKey('Prograde_Indicator_Color') then Prograde_Indicator_Color = db_1.getStringValue('Prograde_Indicator_Color') end
             if db_1.hasKey('AP_Brake_Buffer') then AP_Brake_Buffer = db_1.getFloatValue('AP_Brake_Buffer') end
             if db_1.hasKey('AP_Max_Rotation_Factor') then AP_Max_Rotation_Factor = db_1.getFloatValue('AP_Max_Rotation_Factor') end
             if db_1.hasKey('AR_Mode') then AR_Mode = db_1.getStringValue('AR_Mode') end
-            if db_1.hasKey('AR_Range') then AR_Range = db_1.getFloatValue('AR_Range') end
-            if db_1.hasKey('AR_Size')then AR_Size = db_1.getFloatValue('AR_Size') end
-            if db_1.hasKey('AR_Fill') then AR_Fill = db_1.getStringValue('AR_Fill') end
-            if db_1.hasKey('AR_Outline') then AR_Outline = db_1.getStringValue('AR_Outline') end
-            if db_1.hasKey('AR_Opacity') then AR_Opacity = db_1.getStringValue('AR_Opacity') end
             if db_1.hasKey('AR_Exclude_Moons') then AR_Exclude_Moons = db_1.getIntValue('AR_Exclude_Moons') == 1 end
-            if db_1.hasKey('EngineTagColor') then EngineTagColor = db_1.getStringValue('EngineTagColor') end
-            if db_1.hasKey('Indicator_Width') then Indicator_Width = db_1.getFloatValue('Indicator_Width') end
-            if db_1.hasKey('warning_size') then warning_size = db_1.getFloatValue('warning_size') end
-            if db_1.hasKey('warning_outline_color') then warning_outline_color = db_1.getStringValue('warning_outline_color') end
-            if db_1.hasKey('warning_fill_color') then warning_fill_color = db_1.getStringValue('warning_fill_color') end
-            if db_1.hasKey('useLogo') then useLogo = db_1.getIntValue('useLogo') == 1 end
-            if db_1.hasKey('logoSVG') then logoSVG = db_1.getStringValue('logoSVG') end
-            if db_1.hasKey('minimalWidgets') then minimalWidgets = db_1.getIntValue('minimalWidgets') == 1 end
             if db_1.hasKey('homeBaseLocation') then homeBaseLocation = db_1.getStringValue('homeBaseLocation') end
             if db_1.hasKey('homeBaseDistance') then homeBaseDistance = db_1.getIntValue('homeBaseDistance') end
-
             if db_1.hasKey('autoVent') then autoVent = db_1.getIntValue('autoVent') == 1 end
-
-            if db_1.hasKey('hpWidgetX') then hpWidgetX = db_1.getFloatValue('hpWidgetX') end
-            if db_1.hasKey('hpWidgetY') then hpWidgetY = db_1.getFloatValue('hpWidgetY') end
-            if db_1.hasKey('hpWidgetScale') then hpWidgetScale = db_1.getFloatValue('hpWidgetScale') end
-            if db_1.hasKey('shieldHPColor') then shieldHPColor = db_1.getStringValue('shieldHPColor') end
-            if db_1.hasKey('ccsHPColor') then ccsHPColor = db_1.getStringValue('ccsHPColor') end
-
             if db_1.hasKey('shieldProfile') then shieldProfile = db_1.getStringValue('shieldProfile') end
-            if db_1.hasKey('resistWidgetX') then resistWidgetX = db_1.getFloatValue('resistWidgetX') end
-            if db_1.hasKey('resistWidgetY') then resistWidgetY = db_1.getFloatValue('resistWidgetY') end
-            if db_1.hasKey('resistWidgetScale') then resistWidgetScale = db_1.getFloatValue('resistWidgetScale') end
-            if db_1.hasKey('antiMatterColor') then antiMatterColor = db_1.getStringValue('antiMatterColor') end
-            if db_1.hasKey('electroMagneticColor') then electroMagneticColor = db_1.getStringValue('electroMagneticColor') end
-            if db_1.hasKey('kineticColor') then kineticColor = db_1.getStringValue('kineticColor') end
-            if db_1.hasKey('thermicColor') then thermicColor = db_1.getStringValue('thermicColor') end
-
-            if db_1.hasKey('transponderWidgetX') then transponderWidgetX = db_1.getFloatValue('transponderWidgetX') end
-            if db_1.hasKey('transponderWidgetY') then transponderWidgetY = db_1.getFloatValue('transponderWidgetY') end
-            if db_1.hasKey('transponderWidgetScale') then transponderWidgetScale = db_1.getFloatValue('transponderWidgetScale') end
-            if db_1.hasKey('transponderWidgetXmin') then transponderWidgetXmin = db_1.getFloatValue('transponderWidgetXmin') end
-            if db_1.hasKey('transponderWidgetYmin') then transponderWidgetYmin = db_1.getFloatValue('transponderWidgetYmin') end
-            if db_1.hasKey('transponderWidgetScalemin') then transponderWidgetScalemin = db_1.getFloatValue('transponderWidgetScalemin') end
-
-            if db_1.hasKey('screenRefreshRate') then screenRefreshRate = db_1.getFloatValue('screenRefreshRate') end
+            if db_1.hasKey('dampenerTorqueReduction') then dampenerTorqueReduction = db_1.getFloatValue('dampenerTorqueReduction') end
+            if db_1.hasKey('offset_points') then offset_points = db_1.getIntValue('offset_points') == 1 end
+            if db_1.hasKey('dmgAvgDuration') then dmgAvgDuration = db_1.getIntValue('dmgAvgDuration') end
+            if db_1.hasKey('font_size_ratio') then font_size_ratio = db_1.getFloatValue('font_size_ratio') end
+            if db_1.hasKey('atmoManualLimit') then atmoManualLimit = db_1.getFloatValue('atmoManualLimit') end
 
         elseif action == 'save' then
             if generateAutoCode then db_1.setIntValue('generateAutoCode',1) else db_1.setIntValue('generateAutoCode',0) end
-            if asteroidPipes then db_1.setIntValue('asteroidPipes',1) else db_1.setIntValue('asteroidPipes',0) end
-            if toggleBrakes then db_1.setIntValue('toggleBrakes',1) else db_1.setIntValue('toggleBrakes',0) end
-            if caerusOption then db_1.setIntValue('caerusOption',1) else db_1.setIntValue('caerusOption',0) end
-            if showRemotePanel then db_1.setIntValue('showRemotePanel',1) else db_1.setIntValue('showRemotePanel',0) end
-            if showDockingPanel then db_1.setIntValue('showDockingPanel',1) elsedb_1.setIntValue('showDockingPanel',0) end
-            if showFuelPanel then db_1.setIntValue('showFuelPanel',1) else db_1.setIntValue('showFuelPanel',0) end
-            if showHelper then db_1.setIntValue('showHelper',1) else db_1.setIntValue('showHelper',0) end
             if validatePilot then db_1.setIntValue('validatePilot',1) else db_1.setIntValue('validatePilot',0) end
-            db_1.setIntValue('defaultHoverHeight',defaultHoverHeight)
-            db_1.setStringValue('topHUDLineColorSZ',topHUDLineColorSZ)
-            db_1.setStringValue('topHUDFillColorSZ',topHUDFillColorSZ)
-            db_1.setStringValue('textColorSZ',textColorSZ)
-            db_1.setStringValue('topHUDLineColorPVP',topHUDLineColorPVP)
-            db_1.setStringValue('topHUDFillColorPVP',topHUDFillColorPVP)
-            db_1.setStringValue('textColorPVP',textColorPVP)
-            db_1.setStringValue('fuelTextColor',fuelTextColor)
-            db_1.setFloatValue('Direction_Indicator_Size',Direction_Indicator_Size)
-            db_1.setStringValue('Direction_Indicator_Color',Direction_Indicator_Color)
-            db_1.setFloatValue('Prograde_Indicator_Size',Prograde_Indicator_Size) 
-            db_1.setStringValue('Prograde_Indicator_Color',Prograde_Indicator_Color) 
             db_1.setFloatValue('AP_Brake_Buffer',AP_Brake_Buffer)
             db_1.setFloatValue('AP_Max_Rotation_Factor',AP_Max_Rotation_Factor)
             db_1.setStringValue('AR_Mode',AR_Mode)
-            db_1.setFloatValue('AR_Range',AR_Range)
-            db_1.setFloatValue('AR_Size',AR_Size)
-            db_1.setStringValue('AR_Fill',AR_Fill)
-            db_1.setStringValue('AR_Outline',AR_Outline)
-            db_1.setStringValue('AR_Opacity',AR_Opacity)
-            db_1.setStringValue('EngineTagColor',EngineTagColor)
-            db_1.setFloatValue('Indicator_Width',Indicator_Width)
-            db_1.setFloatValue('warning_size',warning_size)
             if AR_Exclude_Moons then db_1.setIntValue('AR_Exclude_Moons',1) else db_1.setIntValue('AR_Exclude_Moons',0) end
-            db_1.setStringValue('warning_outline_color',warning_outline_color)
-            db_1.setStringValue('warning_fill_color',warning_fill_color)
-            if useLogo then db_1.setIntValue('useLogo',1) else db_1.setIntValue('useLogo',0) end
-            db_1.setStringValue('logoSVG',logoSVG)
-            if minimalWidgets then db_1.setIntValue('minimalWidgets',1) else db_1.setIntValue('minimalWidgets',0) end
             if homeBaseLocation then db_1.setStringValue('homeBaseLocation',homeBaseLocation) end
             db_1.setIntValue('homeBaseDistance',homeBaseDistance)
             if autoVent then db_1.setIntValue('autoVent',1) else db_1.setIntValue('autoVent',0) end
-
-            db_1.setFloatValue('hpWidgetX',hpWidgetX)
-            db_1.setFloatValue('hpWidgetY',hpWidgetY)
-            db_1.setFloatValue('hpWidgetScale',hpWidgetScale)
-            db_1.setStringValue('shieldHPColor',shieldHPColor)
-            db_1.setStringValue('ccsHPColor',ccsHPColor)
-
             db_1.setStringValue('shieldProfile',shieldProfile)
-            db_1.setFloatValue('resistWidgetX',resistWidgetX)
-            db_1.setFloatValue('resistWidgetY',resistWidgetY)
-            db_1.setFloatValue('resistWidgetScale',resistWidgetScale)
-            db_1.setStringValue('antiMatterColor',antiMatterColor)
-            db_1.setStringValue('electroMagneticColor',electroMagneticColor)
-            db_1.setStringValue('kineticColor',kineticColor)
-            db_1.setStringValue('thermicColor',thermicColor)
-
-            db_1.setFloatValue('transponderWidgetX',transponderWidgetX)
-            db_1.setFloatValue('transponderWidgetY',transponderWidgetY)
-            db_1.setFloatValue('transponderWidgetScale',transponderWidgetScale)
-            db_1.setFloatValue('transponderWidgetXmin',transponderWidgetXmin)
-            db_1.setFloatValue('transponderWidgetYmin',transponderWidgetYmin)
-            db_1.setFloatValue('transponderWidgetScalemin',transponderWidgetScalemin)
-            db_1.setFloatValue('screenRefreshRate',screenRefreshRate)
+            db_1.setFloatValue('dampenerTorqueReduction',dampenerTorqueReduction)
+            if offset_points then db_1.setIntValue('offset_points',1) else db_1.setIntValue('offset_points',0) end
+            db_1.setIntValue('dmgAvgDuration',dmgAvgDuration)
+            db_1.setFloatValue('font_size_ratio',font_size_ratio)
+            db_1.setFloatValue('atmoManualLimit',atmoManualLimit)
         end
     end
+end
+
+function ARWidget()
+    -- Generate on screen planets for Augmented Reality view --
+    AR_Generate = {}
+    if autopilot_dest_pos ~= nil then AR_Generate['AutoPilot'] = convertWaypoint(autopilot_dest_pos) end
+    if route and routes[route][route_pos] == autopilot_dest_pos then
+        for k,v in pairs(routes[route]) do
+            AR_Generate[string.format('RP_%s',k)] = convertWaypoint(routes[route][k])
+        end
+    end
+
+    --Correcting cases where the user was using the legacy FROM_FILE mode
+    if AR_Mode == 'FROM_FILE' and not legacyFile then AR_Mode = "ALL" end
+
+    if AR_Mode == 'ALL' then
+        for k,v in pairs(AR_Custom_Points) do 
+            AR_Generate[k] = convertWaypoint(v)
+        end
+        for k,v in pairs(planets) do
+            AR_Generate[k] = v
+        end
+        for k,v in pairs(AR_Temp_Points) do 
+            AR_Generate[k] = convertWaypoint(v)
+        end
+    elseif string.find(AR_Mode,"FILE") ~= nil and not legacyFile then
+        i, j = string.find(AR_Mode,"FILE")
+        fileNumber = tonumber(string.sub(AR_Mode,j+1))
+        if fileNumber > #validWaypointFiles then 
+            AR_Mode = "NONE"
+        elseif not legacyFile then
+            for k,v in pairs(AR_Array[fileNumber]) do 
+                AR_Generate[k] = convertWaypoint(v)
+            end
+        end
+    elseif AR_Mode == 'FROM_FILE' then
+        for k,v in pairs(AR_Custom_Points) do 
+            AR_Generate[k] = convertWaypoint(v)
+        end
+    elseif AR_Mode == 'TEMPORARY' then
+        for k,v in pairs(AR_Temp_Points) do 
+            AR_Generate[k] = convertWaypoint(v)
+        end
+    elseif AR_Mode == 'PLANETS' then
+        for k,v in pairs(planets) do
+            AR_Generate[k] = v
+        end
+    end
+    local planetARTable = {}
+    planetARTable[#planetARTable+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
+    for name,pos in pairs(AR_Generate) do
+        if not (name:find('Moon') or name:find('Haven') or name:find('Sanctuary') or name:find('Asteroid')) or vec3(pos - constructPosition):len()*0.000005 < 20 or not AR_Exclude_Moons then
+            local pDist = vec3(pos - constructPosition):len()
+            if pDist*0.000005 < 500  or planets[name] == nil then 
+                local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
+                if pInfo[3] ~= 0 then
+                    if pInfo[1] < .01 then pInfo[1] = .01 end
+                    if pInfo[2] < .01 then pInfo[2] = .01 end
+                    local fill = 'rgb(29, 63, 255)'
+                    if planets[name] == nil  and name ~= 'AutoPilot' and not string.starts(name,'RP_') then fill = 'rgb(49, 182, 60)'
+                    elseif name == 'AutoPilot' then fill = 'red'
+                    elseif string.starts(name,'RP_') then fill = 'rgb(138, 43, 226)'
+                    end
+                    local translate = '(0,0)'
+                    local depth = 15 * 1/( 0.02*pDist*0.000005)
+                    local pDistStr = ''
+                    if pDist < 1000 then pDistStr = string.format('%.2fm',pDist)
+                    elseif pDist < 100000 then pDistStr = string.format('%.2fkm',pDist/1000)
+                    else pDistStr = string.format('%.2fsu',pDist*0.000005)
+                    end
+                    if depth > 15 then depth = tostring(15) elseif depth < 1 then depth = '1' else depth = tostring(depth) end
+                    if pInfo[1] < 1 and pInfo[2] < 1 then
+                        translate = string.format('(%.2f,%.2f)',screenWidth*pInfo[1],screenHeight*pInfo[2])
+                    elseif pInfo[1] > 1 and pInfo[1] < 3 and pInfo[2] < 1 then
+                        translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight*pInfo[2])
+                    elseif pInfo[2] > 1 and pInfo[2] < 3 and pInfo[1] < 1 then
+                        translate = string.format('(%.2f,%.2f)',screenWidth*pInfo[1],screenHeight)
+                    else
+                        translate = string.format('(%.2f,%.2f)',screenWidth,screenHeight)
+                    end
+                    if name == 'AutoPilot' then
+                        planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">
+                                <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <line x1="0" y1="0" x2="]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <line x1="]].. depth*1.2 ..[[" y1="]].. depth*1.2 ..[[" x2="]]..tostring(depth*1.2 + 30)..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <text x="]]..tostring(depth*1.2)..[[" y="]].. depth*1.2+screenHeight*0.008 ..[[" style="fill: rgba(125, 150, 160, 1)" font-size="]]..tostring(.04*15)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                                </g>]]
+                    elseif string.starts(name,'RP_') then
+                        local tDepth = depth*.5
+                        planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">
+                                <circle cx="0" cy="0" r="]].. tDepth ..[[px" style="fill:]]..fill..[[;stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.75;" />
+                                <line x1="0" y1="0" x2="-]].. tDepth*1.2 ..[[" y2="-]].. tDepth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <line x1="-]].. tDepth*1.2 ..[[" y1="-]].. tDepth*1.2 ..[[" x2="-]]..tostring(tDepth*1.2 + 30)..[[" y2="-]].. tDepth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <text x="-]]..tostring(6*#name+tDepth*1.2)..[[" y="-]].. tDepth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(125, 150, 160, 1)" font-size="]]..tostring(.04*15)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                                </g>]]
+                    else
+                        planetARTable[#planetARTable+1] = [[<g transform="translate]]..translate..[[">
+                                <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill:]]..fill..[[;stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:rgba(125, 150, 160, 1);stroke-width:1;opacity:0.5;" />
+                                <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(125, 150, 160, 1)" font-size="]]..tostring(.04*15)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
+                                </g>]]
+                    end
+                end
+            end
+        end
+    end
+    planetARTable[#planetARTable+1] = '</svg>'
+    planetAR = table.concat(planetARTable, '')
+    -- End planet updates --
+
+    local arw = {}
+    arw[#arw+1] = planetAR
+    
+    if legacyFile then
+        arw[#arw+1] = string.format([[
+                <text x="1.92" y="32.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Augmented Reality Mode: %s</text>
+                <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">FPS: %s</text>
+            ]],AR_Mode,FPS)
+    else
+        if string.find(AR_Mode,"FILE") ~= nil then
+            i, j = string.find(AR_Mode,"FILE")
+            fileNumber = tonumber(string.sub(AR_Mode,j+1))
+            --Catch if they reduced the number of custom files
+            if fileNumber > #validWaypointFiles then AR_Mode = "NONE" end
+            arw[#arw+1] = string.format([[
+                    <text x="1.92" y="32.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Augmented Reality Mode: %s</text>
+                    <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">FPS: %s</text>
+                ]],validWaypointFiles[fileNumber].DisplayName,FPS)
+        else
+            arw[#arw+1] = string.format([[
+                <text x="1.92" y="32.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">Augmented Reality Mode: %s</text>
+                <text x="1.92" y="68" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">FPS: %s</text>
+            ]],AR_Mode,FPS)
+        end
+    end
+    return table.concat(arw,'')
+end
+
+function systemCheckWidget()
+    local dw = {}
+    local y_offset = 175
+    local x_offset = 50
+    local r_width = 300
+    if brokenDisplay['Weapons'] ~= "" or brokenDisplay['Engine'] ~= "" or brokenDisplay['Control'] ~= "" then
+        r_width = 800
+    end
+
+    dw[#dw+1] = string.format([[
+        <rect width="%s" height="100" x="%s" y="%s" rx="5" ry="5" style="fill: rgba(25,25,25,0.65); stroke-width: 1.5; stroke: rgba(175,25,25,0.80);" />
+    ]],r_width,x_offset-20,y_offset+175)
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">Engines:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,197+y_offset,x_offset+120,197+y_offset,100*DamageGroupMap['Engine']['Current']/DamageGroupMap['Engine']['Total'],.000001*DamageGroupMap['Engine']['Current'])
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(250, 150, 150, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" >%s</text>
+    ]],x_offset+240,197+y_offset,string.sub(brokenDisplay['Engine'],1,-2))
+
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">System Controls:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,217+y_offset,x_offset+120,217+y_offset,100*DamageGroupMap['Control']['Current']/DamageGroupMap['Control']['Total'],.000001*DamageGroupMap['Control']['Current'])
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(250, 150, 150, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" >%s</text>
+    ]],x_offset+240,217+y_offset,string.sub(brokenDisplay['Control'],1,-2))
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">Weapons:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,237+y_offset,x_offset+120,237+y_offset,100*DamageGroupMap['Weapons']['Current']/DamageGroupMap['Weapons']['Total'],.000001*DamageGroupMap['Weapons']['Current'])
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(250, 150, 150, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" >%s</text>
+    ]],x_offset+240,237+y_offset,string.sub(brokenDisplay['Weapons'],1,-2))
+
+    dw[#dw+1] = string.format([[
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">Other:</text>
+        <text x="%s" y="%s" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.5 ..[[vh" font-weight="bold">%.1f%% (%.1fM)</text>
+    ]],x_offset,257+y_offset,x_offset+120,257+y_offset,100*DamageGroupMap['Misc']['Current']/DamageGroupMap['Misc']['Total'],.000001*DamageGroupMap['Misc']['Current'])
+    return table.concat(dw,'')
 end
 
 Kinematic = {} -- just a namespace
@@ -1309,15 +962,6 @@ function Kinematic.computeDistanceAndTime(initial,final,mass,thrust,t50,brakeThr
     return distanceToMax+d, timeToMax+t
 end
 
-function Kinematic.computeTravelTime(initial, acceleration, distance)
-    if distance == 0 then return 0 end
-    if acceleration ~= 0 then
-        return (math.sqrt(2*acceleration*distance+initial^2) - initial)/
-                    acceleration
-    end
-    assert(initial > 0, 'Acceleration and initial speed are both zero.')
-    return distance/initial
-end
 
 function isNumber(n)  return type(n)           == 'number' end
 function isSNumber(n) return type(tonumber(n)) == 'number' end
@@ -1325,43 +969,808 @@ function isTable(t)   return type(t)           == 'table'  end
 function isString(s)  return type(s)           == 'string' end
 function isVector(v)  return isTable(v) and isNumber(v.x and v.y and v.z) end
 
-clamp = utils.clamp
-
-Transform = {}
-
-function Transform.computeHeading(planetCenter, position, direction)
-    planetCenter   = vec3(planetCenter)
-    position       = vec3(position)
-    direction      = vec3(direction)
-    local radius   = position - planetCenter
-    if radius.x == 0 and radius.y == 0 then -- at north or south pole
-        return radius.z >=0 and math.pi or 0
+function runFlush()
+    ---------- Global Values ----------
+    local clamp  = utils.clamp
+    local function signedRotationAngle(normal, vecA, vecB)
+        vecA = vecA:project_on_plane(normal)
+        vecB = vecB:project_on_plane(normal)
+        return math.atan(vecA:cross(vecB):dot(normal), vecA:dot(vecB))
     end
-    local chord    = planetCenter + vec3(0,0,radius:len()) - position
-    local north    = chord:project_on_plane(radius):normalize_inplace()
-    -- facing north, east is to the right
-    local east     = north:cross(radius):normalize_inplace()
-    local dir_prj  = direction:project_on_plane(radius):normalize_inplace()
-    local adjacent = north:dot(dir_prj)
-    local opposite = east:dot(dir_prj)
-    local heading  = math.atan(opposite, adjacent) -- North==0
 
-    if heading < 0 then heading = heading + 2*math.pi end
-    if math.abs(heading - 2*math.pi) < .001 then heading = 0 end
-    return heading
+    if (pitchPID == nil) then
+        pitchPID = pid.new(0.1, 0, 11)
+        rollPID = pid.new(0.1, 0, 11)
+        yawPID = pid.new(0.1, 0, 11)
+    end
+    ------------------------------------
+
+    apBrakeDist,brakeTime = Kinematic.computeDistanceAndTime(speedVec:len(),0,mass + dockedMass,0,0,maxBrake)
+
+    local pitchSpeedFactor = 0.8 --export: This factor will increase/decrease the player input along the pitch axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+    local yawSpeedFactor =  1 --export: This factor will increase/decrease the player input along the yaw axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+    local rollSpeedFactor = 1.5 --export: This factor will increase/decrease the player input along the roll axis<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+
+    local brakeSpeedFactor = 3 --export: When braking, this factor will increase the brake force by brakeSpeedFactor * velocity<br>Valid values: Superior or equal to 0.01
+    local brakeFlatFactor = 1 --export: When braking, this factor will increase the brake force by a flat brakeFlatFactor * velocity direction><br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+
+    local autoRoll = false --export: [Only in atmosphere]<br>When the pilot stops rolling,  flight model will try to get back to horizontal (no roll)
+    local autoRollFactor = 2 --export: [Only in atmosphere]<br>When autoRoll is engaged, this factor will increase to strength of the roll back to 0<br>Valid values: Superior or equal to 0.01
+
+    local turnAssist = true --export: [Only in atmosphere]<br>When the pilot is rolling, the flight model will try to add yaw and pitch to make the construct turn better<br>The flight model will start by adding more yaw the more horizontal the construct is and more pitch the more vertical it is
+    local turnAssistFactor = 2 --export: [Only in atmosphere]<br>This factor will increase/decrease the turnAssist effect<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+
+    local torqueFactor = 2 -- Force factor applied to reach rotationSpeed<br>(higher value may be unstable)<br>Valid values: Superior or equal to 0.01
+
+    -- validate params
+    pitchSpeedFactor = math.max(pitchSpeedFactor, 0.01)
+    yawSpeedFactor = math.max(yawSpeedFactor, 0.01)
+    rollSpeedFactor = math.max(rollSpeedFactor, 0.01)
+    torqueFactor = math.max(torqueFactor, 0.01)
+    brakeSpeedFactor = math.max(brakeSpeedFactor, 0.01)
+    brakeFlatFactor = math.max(brakeFlatFactor, 0.01)
+    autoRollFactor = math.max(autoRollFactor, 0.01)
+    turnAssistFactor = math.max(turnAssistFactor, 0.01)
+
+    -- final inputs
+    local finalPitchInput = pitchInput + system.getControlDeviceForwardInput()
+    local finalRollInput = rollInput + system.getControlDeviceYawInput()
+    local finalYawInput = yawInput - system.getControlDeviceLeftRightInput()
+    local finalBrakeInput = brakeInput
+
+    -- Axis
+    local worldVertical = vec3(core.getWorldVertical()) -- along gravity
+    local constructUp = vec3(construct.getWorldOrientationUp())
+    constructForward = vec3(construct.getWorldOrientationForward())
+    constructRight = vec3(construct.getWorldOrientationRight())
+    constructVelocity = vec3(construct.getWorldVelocity())
+    local constructVelocityDir = vec3(constructVelocity):normalize()
+    local currentRollDeg = getRoll(worldVertical, constructForward, constructRight)
+    local currentRollDegAbs = math.abs(currentRollDeg)
+    local currentRollDegSign = utils.sign(currentRollDeg)
+
+    -- Rotation
+    local constructAngularVelocity = vec3(construct.getWorldAngularVelocity())
+    -- SETUP AUTOPILOT ROTATIONS --
+    local targetAngularVelocity = vec3()
+
+    local destVec = vec3()
+    local currentYaw = 0
+    local currentPitch = getPitch(worldVertical, constructForward, constructRight)
+    local currentRoll = getRoll(worldVertical, constructForward, constructRight)
+    local targetYaw = 0
+    local targetPitch = 0
+    local yawChange = 0
+    local pitchChange = 0
+    local total_align = 0
+    --local totalAngularChange = nil
+    if autopilot_dest then
+        destVec = vec3(autopilot_dest - constructPosition):normalize()
+        local dirYaw = -math.deg(signedRotationAngle(constructUp:normalize(), destVec:normalize(), constructForward:normalize()))
+        local dirPitch = math.deg(signedRotationAngle(constructRight:normalize(), destVec:normalize(), constructForward:normalize()))
+
+        local speedYaw = -math.deg(signedRotationAngle(constructUp:normalize(), destVec:normalize(), constructVelocity))
+        local speedPitch = math.deg(signedRotationAngle(constructRight:normalize(), destVec:normalize(), constructVelocity))
+
+        local yawDiff = -math.deg(signedRotationAngle(constructUp:normalize(), constructVelocity:normalize(), constructForward:normalize()))
+        local pitchDiff = math.deg(signedRotationAngle(constructRight:normalize(), constructVelocity:normalize(), constructForward:normalize()))
+
+        if speed < 40 then
+            yawChange = dirYaw
+            pitchChange = dirPitch
+        else
+            yawChange = speedYaw
+            pitchChange = speedPitch
+
+            if math.abs(yawDiff) > 30 then yawChange = dirYaw end
+            if math.abs(pitchDiff) > 30 then pitchChange = dirPitch end
+        end
+        total_align = math.abs(yawChange) + math.abs(pitchChange)
+    end
+
+    local apRollInput = 0
+    if orbit_active then
+        if speed > 50 or true then
+            -- Orbit mode: Tangential steering with radius, altitude, and roll corrections
+            local to_center = orbit_center - constructPosition
+            local radial = to_center:normalize()
+            local dist = to_center:len()
+            local up = worldVertical:normalize()
+            local tangential = radial:cross(up):normalize()
+            local proj1 = constructVelocityDir:dot(tangential)
+            local proj2 = constructVelocityDir:dot(-tangential)
+            if proj2 > proj1 then tangential = -tangential end  -- Match current velocity direction
+
+            -- Radius correction
+            local radius_error = (dist - orbit_radius)/orbit_radius  -- Positive if too far
+            local radial_correction = -radial * radius_error
+
+            -- Target direction for steering
+            local target_dir = (tangential):normalize()
+
+            -- Rotation injections (yaw)
+            dirYaw = -math.deg(signedRotationAngle(constructUp:normalize(), target_dir, constructVelocity))/360
+            yawChange = clamp(radius_error * 20 + dirYaw * 10 , -1, 1)
+            if math.abs(yawChange) < 0.2 then
+                yawChange = clamp(radius_error * 10 + dirYaw * 20 , -1, 1)
+            end
+
+            -- Roll correction to level with planet
+            rollPID:inject(-currentRoll)
+            apRollInput = rollPID:get()
+            if apRollInput > AP_Max_Rotation_Factor then apRollInput = AP_Max_Rotation_Factor
+            elseif apRollInput < -AP_Max_Rotation_Factor then apRollInput = -AP_Max_Rotation_Factor
+            end
+
+            -- Altitude hold with PID using pitch
+            local speedPitch = math.deg(signedRotationAngle(constructRight:normalize(), constructVelocity:normalize(), constructForward:normalize())) --USE THIS TO Ensure we don't over pitch maybe
+
+            local current_agl = core.getAltitude()
+            local height_error = orbit_agl - current_agl  -- Positive if too low
+            pitchChange = clamp(height_error-currentPitch, -100, 100) * 0.75
+            if pitchChange > 1 then pitchChange = 1
+            elseif pitchChange < -1 then pitchChange = -1
+            end
+
+            system.print(string.format("AP Yaw: %.2f, Pitch: %.2f, Roll: %.2f, speedPitch: %.2f", yawChange, pitchChange, apRollInput, speedPitch ))
+        end
+    end
+
+    if autopilot and (autopilot_dest ~= nil or orbit_active) and Nav.axisCommandManager:getThrottleCommand(0) ~= 0 then
+        yawPID:inject(yawChange)
+        local apYawInput = yawPID:get()
+        if apYawInput > AP_Max_Rotation_Factor then apYawInput = AP_Max_Rotation_Factor
+        elseif apYawInput < -AP_Max_Rotation_Factor then apYawInput = -AP_Max_Rotation_Factor
+        end
+
+        pitchPID:inject(pitchChange)
+        local apPitchInput = -pitchPID:get()
+        if orbit_active then
+            apPitchInput = pitchPID:get()
+        end
+        if apPitchInput > AP_Max_Rotation_Factor then apPitchInput = AP_Max_Rotation_Factor
+        elseif apPitchInput < -AP_Max_Rotation_Factor then apPitchInput = -AP_Max_Rotation_Factor
+        end
+        targetAngularVelocity = apYawInput * 2 * constructUp
+                                + apPitchInput * 2 * constructRight
+                                + finalPitchInput * pitchSpeedFactor * constructRight
+                                + finalRollInput * rollSpeedFactor * constructForward
+                                + finalYawInput * yawSpeedFactor * constructUp
+        if orbit_active then
+            targetAngularVelocity = targetAngularVelocity + apRollInput * constructForward
+        end
+    else
+        targetAngularVelocity = finalPitchInput * pitchSpeedFactor * constructRight
+            + finalRollInput * rollSpeedFactor * constructForward
+            + finalYawInput * yawSpeedFactor * constructUp
+    end
+
+    ---------------------------------
+
+    -- In atmosphere?
+    if worldVertical:len() > 0.01 and unit.getAtmosphereDensity() > 0.0 and false then
+        local autoRollRollThreshold = 1.0
+        -- autoRoll on AND currentRollDeg is big enough AND player is not rolling
+        if autoRoll == true and currentRollDegAbs > autoRollRollThreshold and finalRollInput == 0 then
+            local targetRollDeg = utils.clamp(0,currentRollDegAbs-30, currentRollDegAbs+30);  -- we go back to 0 within a certain limit
+            if (rollPID == nil) then
+                rollPID = pid.new(autoRollFactor * 0.01, 0, autoRollFactor * 0.1) -- magic number tweaked to have a default factor in the 1-10 range
+            end
+            rollPID:inject(targetRollDeg - currentRollDeg)
+            local autoRollInput = rollPID:get()
+
+            targetAngularVelocity = targetAngularVelocity + autoRollInput * constructForward
+        end
+        local turnAssistRollThreshold = 20.0
+        -- turnAssist AND currentRollDeg is big enough AND player is not pitching or yawing
+        if turnAssist == true and currentRollDegAbs > turnAssistRollThreshold and finalPitchInput == 0 and finalYawInput == 0 then
+            local rollToPitchFactor = turnAssistFactor * 0.1 -- magic number tweaked to have a default factor in the 1-10 range
+            local rollToYawFactor = turnAssistFactor * 0.025 -- magic number tweaked to have a default factor in the 1-10 range
+
+            -- rescale (turnAssistRollThreshold -> 180) to (0 -> 180)
+            local rescaleRollDegAbs = ((currentRollDegAbs - turnAssistRollThreshold) / (180 - turnAssistRollThreshold)) * 180
+            local rollVerticalRatio = 0
+            if rescaleRollDegAbs < 90 then
+                rollVerticalRatio = rescaleRollDegAbs / 90
+            elseif rescaleRollDegAbs < 180 then
+                rollVerticalRatio = (180 - rescaleRollDegAbs) / 90
+            end
+
+            rollVerticalRatio = rollVerticalRatio * rollVerticalRatio
+
+            local turnAssistYawInput = - currentRollDegSign * rollToYawFactor * (1.0 - rollVerticalRatio)
+            local turnAssistPitchInput = rollToPitchFactor * rollVerticalRatio
+
+            targetAngularVelocity = targetAngularVelocity
+                                + turnAssistPitchInput * constructRight
+                                + turnAssistYawInput * constructUp
+        end
+    end
+
+    -- Engine commands
+    local keepCollinearity = 1 -- for easier reading
+    local dontKeepCollinearity = 0 -- for easier reading
+    local tolerancePercentToSkipOtherPriorities = 1 -- if we are within this tolerance (in%), we do not go to the next priorities
+
+    -- Rotation
+    if not dampening and not autopilot then
+        constructAngularVelocity = vec3(construct.getWorldAngularVelocity())*.1
+    end
+
+    local angularAcceleration = torqueFactor * (targetAngularVelocity - constructAngularVelocity)
+    if not dampening then
+        angularAcceleration = angularAcceleration*dampenerTorqueReduction
+    end
+
+    local airAcceleration = vec3(construct.getWorldAirFrictionAngularAcceleration())
+    angularAcceleration = angularAcceleration - airAcceleration -- Try to compensate air friction
+    Nav:setEngineTorqueCommand('torque', angularAcceleration, keepCollinearity, 'airfoil', '', '', tolerancePercentToSkipOtherPriorities)
+
+    -- Brakes
+    local brakeAcceleration = vec3()
+    if autopilot then
+        if autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer or brakesOn or (total_align > 5 and speed < 40) then
+            brakeAcceleration = -maxBrake * constructVelocityDir
+            brakeInput = 1
+        elseif autopilot_dest ~= nil and not brakesOn then
+            brakeAcceleration = vec3()
+            brakeInput = 0
+        end
+    else
+        brakeAcceleration = -finalBrakeInput * (brakeSpeedFactor * constructVelocity + brakeFlatFactor * constructVelocityDir)
+    end
+    if atmoSpeedLimit and inAtmo and speed >= .98*maxAtmoSpeed then
+        brakeAcceleration = -maxBrake * constructVelocityDir
+        brakeInput = 1
+    elseif atmoSpeedLimit and inAtmo and not brakesOn and not autopilot then
+        brakeAcceleration = vec3()
+        brakeInput = 0
+    end
+    Nav:setEngineForceCommand('brake', brakeAcceleration)
+
+    -- AutoNavigation regroups all the axis command by 'TargetSpeed'
+    local autoNavigationEngineTags = ''
+    local autoNavigationAcceleration = vec3()
+    local autoNavigationUseBrake = false
+
+    -- Longitudinal Translation
+    local longitudinalEngineTags = 'thrust analog longitudinal'
+    if #enabledEngineTags > 0 then
+        longitudinalEngineTags = longitudinalEngineTags .. ' disengaged'
+        for i,tag in pairs(enabledEngineTags) do
+            longitudinalEngineTags = longitudinalEngineTags .. ',thrust analog longitudinal '.. tag
+        end
+    end
+    local longitudinalCommandType = Nav.axisCommandManager:getAxisCommandType(axisCommandId.longitudinal)
+    local longitudinalAcceleration = vec3()
+
+    if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + AP_Brake_Buffer + speed then
+        Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
+        longitudinalAcceleration = vec3()
+        Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
+    elseif autopilot and autopilot_dest ~= nil and speed < maxSpeed and enginesOn then
+        Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,1)
+        longitudinalAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromThrottle(longitudinalEngineTags,axisCommandId.longitudinal)
+        Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
+    elseif autopilot and autopilot_dest ~= nil and speed >= maxSpeed - 10 then
+        Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
+        longitudinalAcceleration = vec3()
+        Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
+        enginesOn = false
+    else
+        if (longitudinalCommandType == axisCommandType.byThrottle) then
+            longitudinalAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromThrottle(longitudinalEngineTags,axisCommandId.longitudinal)
+            Nav:setEngineForceCommand(longitudinalEngineTags, longitudinalAcceleration, keepCollinearity)
+        elseif  (longitudinalCommandType == axisCommandType.byTargetSpeed) then
+            local longitudinalAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromTargetSpeed(axisCommandId.longitudinal)
+            autoNavigationEngineTags = autoNavigationEngineTags .. ' , ' .. longitudinalEngineTags
+            autoNavigationAcceleration = autoNavigationAcceleration + longitudinalAcceleration
+            if (Nav.axisCommandManager:getTargetSpeed(axisCommandId.longitudinal) == 0 or -- we want to stop
+                Nav.axisCommandManager:getCurrentToTargetDeltaSpeed(axisCommandId.longitudinal) < - Nav.axisCommandManager:getTargetSpeedCurrentStep(axisCommandId.longitudinal) * 0.5) -- if the longitudinal velocity would need some braking
+            then
+                autoNavigationUseBrake = true
+            end
+
+        end
+    end
+
+    -- Lateral Translation
+    local lateralStrafeEngineTags = 'thrust analog lateral'
+    local lateralCommandType = Nav.axisCommandManager:getAxisCommandType(axisCommandId.lateral)
+    if (lateralCommandType == axisCommandType.byThrottle) then
+        local lateralStrafeAcceleration =  Nav.axisCommandManager:composeAxisAccelerationFromThrottle(lateralStrafeEngineTags,axisCommandId.lateral)
+        Nav:setEngineForceCommand(lateralStrafeEngineTags, lateralStrafeAcceleration, keepCollinearity)
+    elseif  (lateralCommandType == axisCommandType.byTargetSpeed) then
+        local lateralAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromTargetSpeed(axisCommandId.lateral)
+        autoNavigationEngineTags = autoNavigationEngineTags .. ' , ' .. lateralStrafeEngineTags
+        autoNavigationAcceleration = autoNavigationAcceleration + lateralAcceleration
+    end
+
+    -- Vertical Translation
+    local verticalStrafeEngineTags = 'thrust analog vertical'
+    local verticalCommandType = Nav.axisCommandManager:getAxisCommandType(axisCommandId.vertical)
+    if (verticalCommandType == axisCommandType.byThrottle) then
+        local verticalStrafeAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromThrottle(verticalStrafeEngineTags,axisCommandId.vertical)
+        Nav:setEngineForceCommand(verticalStrafeEngineTags, verticalStrafeAcceleration, keepCollinearity, 'airfoil', 'ground', '', tolerancePercentToSkipOtherPriorities)
+    elseif  (verticalCommandType == axisCommandType.byTargetSpeed) then
+        local verticalAcceleration = Nav.axisCommandManager:composeAxisAccelerationFromTargetSpeed(axisCommandId.vertical)
+        autoNavigationEngineTags = autoNavigationEngineTags .. ' , ' .. verticalStrafeEngineTags
+        autoNavigationAcceleration = autoNavigationAcceleration + verticalAcceleration
+    end
+
+    -- Auto Navigation (Cruise Control)
+    if (autoNavigationAcceleration:len() > constants.epsilon) then
+        if (brakeInput ~= 0 or autoNavigationUseBrake or math.abs(constructVelocityDir:dot(constructForward)) < 0.95)  -- if the velocity is not properly aligned with the forward
+        then
+            autoNavigationEngineTags = autoNavigationEngineTags .. ', brake'
+        end
+        Nav:setEngineForceCommand(autoNavigationEngineTags, autoNavigationAcceleration, dontKeepCollinearity, '', '', '', tolerancePercentToSkipOtherPriorities)
+    end
+
+    -- Rockets
+    Nav:setBoosterCommand('rocket_engine')
+
+    -- Disable Auto-Pilot when destination is reached --
+    if autopilot and autopilot_dest ~= nil and vec3(constructPosition - autopilot_dest):len() <= apBrakeDist + 1200 + AP_Brake_Buffer and speed < 1000 then
+        brakeInput = brakeInput + 1
+        Nav.axisCommandManager:setThrottleCommand(axisCommandId.longitudinal,0)
+        Nav:setEngineForceCommand(longitudinalEngineTags, vec3(), keepCollinearity)
+        if not route then
+            system.print('-- Autopilot complete --')
+            autopilot_dest_pos = nil
+            autopilot = false
+        elseif route and speed < 40 and routes[route][route_pos+1] ~= nil and vec3(constructPosition - autopilot_dest):len() <= 1200+AP_Brake_Buffer then
+            system.print('-- Route pilot point complete --')
+            system.print('-- Starting next point --')
+            route_pos = route_pos+1
+            autopilot_dest = vec3(convertWaypoint(routes[route][route_pos]))
+            autopilot_dest_pos = routes[route][route_pos]
+            system.print('-- Route pilot destination set --')
+            brakesOn = false
+            enginesOn = true
+            system.print(routes[route][route_pos])
+        elseif route and route_pos == #routes[route] then
+            system.print('-- Route pilot complete --')
+            autopilot_dest_pos = nil
+            autopilot = false
+            route = nil
+            route_pos = nil
+            db_1.clearValue('route')
+            db_1.clearValue('route_pos')
+            db_1.setIntValue('record',0)
+        end
+    end
+    ---------------------------------------------------
 end
 
-function Transform.computePRYangles(yaxis, zaxis, faxis, uaxis)
-    yaxis = yaxis.x and yaxis or vec3(yaxis)
-    zaxis = zaxis.x and zaxis or vec3(zaxis)
-    faxis = faxis.x and faxis or vec3(faxis)
-    uaxis = uaxis.x and uaxis or vec3(uaxis)
-    local zproject = zaxis:project_on_plane(faxis):normalize_inplace()
-    local adjacent = uaxis:dot(zproject)
-    local opposite = faxis:cross(zproject):dot(uaxis)
-    local roll     = math.atan(opposite, adjacent) -- rotate 'up' around 'fwd'
-    local pitch    = math.asin(clamp(faxis:dot(zaxis), -1, 1))
-    local fproject = faxis:project_on_plane(zaxis):normalize_inplace()
-    local yaw      = math.asin(clamp(yaxis:cross(fproject):dot(zaxis), -1, 1))
-    return pitch, roll, yaw
+function runTimerScreen()
+    arkTime = system.getArkTime()
+    local dataUpdate = false
+    if dataUpdateCounter % dataUpdateRatio == 0 then
+        dataUpdateCounter = 0
+        dataUpdate = true
+    else
+        dataUpdateCounter = dataUpdateCounter + 1
+    end
+
+    local cFPS = FPS_COUNTER/(arkTime - FPS_INTERVAL)
+    if fps_data['avg'] == nil then fps_data['avg'] = cFPS end
+    FPS = string.format('%.1f | %.1f',cFPS,fps_data['avg'])
+    FPS_COUNTER = 0
+    FPS_INTERVAL = arkTime
+    
+    if debug then
+        fps_data['count'] = fps_data['count'] + 1
+        fps_data['sum'] = fps_data['sum'] + cFPS
+        if cFPS > fps_data['max'] then fps_data['max'] = cFPS end
+        if cFPS < fps_data['min'] and cFPS > 5 then fps_data['min'] = cFPS end
+        if fps_data['avg'] ~= cFPS then
+            fps_data['avg'] = (fps_data['sum'])/fps_data['count']
+        end
+    end
+    bgColor = ''
+    lineColor = ''
+    fontColor = ''
+    if inSZ then 
+        bgColor='rgba(25, 25, 50, 0.35)'
+        lineColor='rgba(150, 175, 185, .75)'
+        fontColor='rgba(225, 250, 265, 1)' 
+    else 
+        bgColor='rgba(175, 75, 75, 0.30)'
+        lineColor='rgba(220, 50, 50, .75)'
+        fontColor='rgba(225, 250, 265, 1)'
+    end
+    
+    -- Check player seated status --
+    seated = player.isSeated()
+    if seated and not player.isFrozen() then
+        player.freeze(1)
+    elseif not seated and player.isFrozen() then
+        player.freeze(0)
+    end
+    ----------------------------------
+    if dataUpdate then
+        cName = construct.getName()
+    end
+    if transponder_1 then tags = transponder_1.getTags() end
+    
+    ----------------------------------
+    
+    
+    -- Shield Updates --
+    if shield_1 then
+        srp = shield_1.getResistancesPool()
+        csr = shield_1.getResistances()
+        rcd = shield_1.getResistancesCooldown()
+        rem = shield_1.getResistancesRemaining()
+        srr = shield_1.getStressRatioRaw()
+        ventCD = shield_1.getVentingCooldown()
+    
+        if shieldProfile == 'auto' then
+            if srr[1] == 0 and srr[2] == 0 and srr[3] == 0 and srr[4] == 0 then -- No stress
+                dmgTick = nil
+                if (csr[1] == srp/4 and csr[2] == srp/4 and csr[3] == srp/4 and csr[4] == srp/4) or rcd ~= 0 then
+                    --No change
+                else
+                    shield_1.setResistances(srp/4,srp/4,srp/4,srp/4)
+                end
+            elseif dmgTick then
+                if math.abs(arkTime - dmgTick) >= initialResistWait then
+                    if not ((csr[1] == (srp*srr[1]) and csr[2] == (srp*srr[2]) and csr[3] == (srp*srr[3]) and csr[4] == (srp*srr[4])) or rcd ~= 0) then -- If ratio hasn't change, or timer is not up, don't waste the resistance change timer.
+                        shield_1.setResistances(srp*srr[1],srp*srr[2],srp*srr[3],srp*srr[4])
+                    end
+                end
+            end
+        elseif not resistProfiles[shieldProfile] then
+            system.print('-- Detected invalid shield profile --')
+            shieldProfile = 'auto'
+        else
+            if not (csr[1] == srp*resistProfiles[shieldProfile]['am']
+                and csr[2] == srp*resistProfiles[shieldProfile]['em']
+                and csr[3] == srp*resistProfiles[shieldProfile]['kn']
+                and csr[4] == srp*resistProfiles[shieldProfile]['th']) then
+                if not rcd ~= 0 then
+                    shield_1.setResistances(
+                        srp*resistProfiles[shieldProfile]['am'],
+                        srp*resistProfiles[shieldProfile]['em'],
+                        srp*resistProfiles[shieldProfile]['kn'],
+                        srp*resistProfiles[shieldProfile]['th']
+                    )
+                end
+            end
+        end
+    
+        shp = shield_1.getShieldHitpoints()
+        venting = shield_1.isVenting()
+        if not venting and shp == 0 and autoVent then
+            shield_1.startVenting()
+        elseif not shield_1.isActive() and not venting or vec3(homeBaseVec - constructPosition):len() < homeBaseDistance*1000 then
+            if homeBaseVec then
+                if vec3(homeBaseVec - constructPosition):len() >= homeBaseDistance*1000 then
+                    shield_1.activate()
+                else
+                    shield_1.deactivate()
+                end
+            else
+                shield_1.activate()
+            end
+        end
+    
+        if core then coreHP = (core.getMaxCoreStress()-core.getCoreStress())/core.getMaxCoreStress() end
+    end
+    -- End Shield Updates --
+    
+    
+    -- Engine Tag Filtering --
+    if dataUpdate then
+        local engTable = {}
+        local tempTag = nil
+        local offset = 0
+        for i,tag in pairs(enabledEngineTags) do
+            if i % 2 == 0 then 
+                engTable[#engTable+1] = [[
+                    <text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (i-2)*.008) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tag.. ',' ..tempTag..[[</text>    
+                ]]
+                tempTag = nil
+                offset = offset + 1
+            else
+                tempTag = tag
+            end
+        end
+        if tempTag ~= nil then 
+            engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.016) * screenHeight) ..[[" style="fill: rgb(60, 255, 60);" font-weight="bold" font-size="]].. font_size_ratio ..[[vh">]]..tempTag..[[</text>]]
+        end
+        if #engTable == 0 then
+            engTable[#engTable+1] = [[<text x="]].. tostring(.001 * screenWidth) ..[[" y="]].. tostring((.060 + (offset)*.008) * screenHeight) ..[[" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio ..[[vh">ALL</text>]]
+        end
+        enabledEngineTagsStr = table.concat(engTable,'')
+    end
+    ----------------------------
+    
+    -- Safe Zone Distance --
+    if dataUpdate then
+        inSZ = not construct.isInPvPZone()
+        SZD = math.abs(construct.getDistanceToSafeZone())
+        
+        SZDStr = ''
+        if SZD < 1000 then SZDStr = string.format('%.2f m',SZD)
+        elseif SZD < 100000 then SZDStr = string.format('%.2f km',SZD/1000)
+        else SZDStr = string.format('%.2f su',SZD*.000005)
+        end
+    end
+    ---------------------------
+    
+    -- Planet Location Updates --
+    if dataUpdate then
+        closestPlanetName,closestPlanetDist = closestPlanet()
+        if cr == nil then
+            cr = coroutine.create(closestPipe)
+        elseif cr ~= nil then
+            if coroutine.status(cr) == "suspended" then
+                coroutine.resume(cr)
+            elseif coroutine.status(cr) == "dead" then
+                cr = nil
+            end
+        end
+        closestPipeStr = string.format('%s (%s)',closestPipeName,formatNumber(closestPipeDistance,'distance'))
+        closestPlanetStr = string.format('%s (%s)',closestPlanetName,formatNumber(closestPlanetDist,'distance'))
+    end
+    ---- End Planet Updates ----
+    
+    ------- Warp Drive Brake activation ------
+    if construct.isWarping() then
+        brakeInput = 1
+        brakesOn = true
+    end
+    -----------------------------------------
+    -- Throttle Status --
+    if Nav.axisCommandManager:getMasterMode() == controlMasterModeId.travel then mode = 'Throttle ' .. tostring(Nav.axisCommandManager:getThrottleCommand(0) * 100) .. '%' modeBG = bgColor
+    else mode = 'Cruise '  .. string.format('%.2f',Nav.axisCommandManager:getTargetSpeed(0)) .. ' km/h' modeBG = 'rgba(99, 250, 79, 0.5)'
+    end
+    ---------------------
+    
+    CCSPercent = 0
+    if coreHP ~= 0 then
+        CCSPercent = 100*coreHP
+    end
+    
+    if CCSPercent < 25 and CCSPercent > 1 then
+        if db_1 then db_1.clearValue('homeBaseLocation') end
+        if transponder_1 then transponder_1.setTags({}) end
+    elseif CCSPercent == 0 and shieldPercent < 5 then
+        if db_1 then db_1.clearValue('homeBaseLocation') end
+        if transponder_1 then transponder_1.setTags({}) end
+    end
+    
+    shieldPercent = 0
+    shieldPercent = shp/maxSHP*100
+    
+    if shieldPercent < 15 then
+        shieldWarningHTML = string.format([[
+            <svg width="115.2" height="64.8" x="792" y="648" style="fill: red;">
+                %s
+            </svg>
+            <text x="894" y="691.2" style="fill: red" font-size="]].. font_size_ratio+2.42 ..[[vh" font-weight="bold">SHIELD CRITICAL</text>
+        ]],warningSymbols['svgCritical'])
+    elseif shieldPercent < 30 then
+        shieldWarningHTML = string.format([[
+            <svg width="115.2" height="64.8" x="792" y="648" style="fill: orange;">
+                %s
+            </svg>
+            <text x="894" y="691.2" style="fill: orange" font-size="]].. font_size_ratio+2.42 ..[[vh" font-weight="bold">SHIELD LOW</text>
+        ]],warningSymbols['svgWarning'])
+    else
+        shieldWarningHTML = ''
+    end
+    
+    local placement = 0
+    local temp = {}
+    for i = 4, CCSPercent, 4 do 
+        temp[#temp+1] = string.format([[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: rgb(60, 255, 60); fill: none;" x1="%s" y1="56" x2="%s" y2="72" bx:origin="0 0.096154"/>]],
+        5+placement,5+placement)
+        placement = placement + 10
+    end
+    ccsHTML = table.concat(temp,'')
+    
+    ventHTML = ''
+    if shield_1 then
+        if ventCD > 0 then
+            ventHTML = string.format([[
+                <text style="fill: rgb(255, 60, 60); font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="66" y="91.01" bx:origin="-2.698544 2.296589">Vent Cooldown: </text>
+                <text style="fill: rgb(255, 60, 60); font-family: Arial; font-size: 11.8px; paint-order: fill; white-space: pre;" x="151" y="91.01" bx:origin="-2.698544 2.296589">%.2fs</text>
+            ]],ventCD)
+        end
+    end
+    
+    local placement = 0
+    temp = {}
+    for i = 4, shieldPercent, 4 do 
+        temp[#temp+1] = string.format([[<line style="stroke-width: 5px; stroke-miterlimit: 1; stroke: rgb(25, 247, 255); fill: none;" x1="%s"   y1="42" x2="%s"   y2="55" bx:origin="0 0.096154"/>]],
+        5+placement,5+placement)
+        placement = placement + 10
+    end
+    shieldHTML = table.concat(temp,'')
+    
+    if not venting or not shield_1 then
+        warnings['venting'] = nil
+    else 
+        warnings['venting'] = 'svgCritical'
+    end
+    
+    if shield_1 then
+        amS = srr[1]
+        emS = srr[2]
+        knS = srr[3]
+        thS = srr[4]
+        amR = csr[1]/srp
+        emR = csr[2]/srp
+        knR = csr[3]/srp
+        thR = csr[4]/srp
+        shield_resist_cd = shield_1.getResistancesCooldown()
+    end
+    
+    if showHelp then
+        if dataUpdate then
+            DamageGroupMap = {}
+            DamageGroupMap['Engine'] = {}
+            DamageGroupMap['Engine']['Total'] = 0
+            DamageGroupMap['Engine']['Current'] = 0
+        
+            DamageGroupMap['Control'] = {}
+            DamageGroupMap['Control']['Total'] = 0
+            DamageGroupMap['Control']['Current'] = 0
+        
+            DamageGroupMap['Weapons'] = {}
+            DamageGroupMap['Weapons']['Total'] = 0
+            DamageGroupMap['Weapons']['Current'] = 0
+        
+            DamageGroupMap['Misc'] = {}
+            DamageGroupMap['Misc']['Total'] = 0
+            DamageGroupMap['Misc']['Current'] = 0
+        
+            brokenElements = {}
+            brokenElements['Engine'] = {}
+            brokenElements['Control'] = {}
+            brokenElements['Weapons'] = {}
+        
+            brokenDisplay = {}
+            brokenDisplay['Engine'] = ''
+            brokenDisplay['Control'] = ''
+            brokenDisplay['Weapons'] = ''
+        
+            local itemClasses = {}
+            for _,id in pairs(core.getElementIdList()) do
+                local itemClass = core.getElementClassById(id)
+                local itemDisplay = core.getElementDisplayNameById(id)
+                if string.find(string.lower(itemClass),'engine')
+                    or string.find(string.lower(itemClass),'brake') then
+                    DamageGroupMap['Engine']['Total'] = DamageGroupMap['Engine']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Engine']['Current'] = DamageGroupMap['Engine']['Current'] + core.getElementHitPointsById(id)
+                    if not (core.getElementHitPointsById(id) > 0) then
+                        if brokenElements['Engine'][itemDisplay] == nil then
+                            brokenElements['Engine'][itemDisplay] = 1
+                        else
+                            brokenElements['Engine'][itemDisplay] = brokenElements['Engine'][itemDisplay] + 1
+                        end
+                    end
+                elseif string.find(string.lower(itemClass),'control')
+                    or string.find(string.lower(itemClass),'pvpseat')
+                    or string.find(string.lower(itemClass),'fuel') then
+                    DamageGroupMap['Control']['Total'] = DamageGroupMap['Control']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Control']['Current'] = DamageGroupMap['Control']['Current'] + core.getElementHitPointsById(id)
+                    if not (core.getElementHitPointsById(id) > 0) then
+                        if brokenElements['Control'][itemDisplay] == nil then
+                            brokenElements['Control'][itemDisplay] = 1
+                        else
+                            brokenElements['Control'][itemDisplay] = brokenElements['Control'][itemDisplay] + 1
+                        end
+                    end
+                elseif string.find(string.lower(itemClass),'ammocontainer')
+                    or string.find(string.lower(itemClass),'radar')
+                    or string.find(string.lower(itemClass),'weapon') then
+                    DamageGroupMap['Weapons']['Total'] = DamageGroupMap['Weapons']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Weapons']['Current'] = DamageGroupMap['Weapons']['Current'] + core.getElementHitPointsById(id)
+                    if not (core.getElementHitPointsById(id) > 0 ) then
+                        if brokenElements['Weapons'][itemDisplay] == nil then
+                            brokenElements['Weapons'][itemDisplay] = 1
+                        else
+                            brokenElements['Weapons'][itemDisplay] = brokenElements['Weapons'][itemDisplay] + 1
+                        end
+                    end
+                else
+                    DamageGroupMap['Misc']['Total'] = DamageGroupMap['Misc']['Total'] + core.getElementMaxHitPointsById(id)
+                    DamageGroupMap['Misc']['Current'] = DamageGroupMap['Misc']['Current'] + core.getElementHitPointsById(id)
+                end
+            end
+            for k,v in pairs(brokenElements) do
+                for dk,dv in pairs(v) do
+                    if brokenDisplay[k] == nil then
+                        brokenDisplay[k] = 'Broken: '
+                    end
+                    brokenDisplay[k] = brokenDisplay[k] .. string.format(' %sx %s,',dv,dk)
+                end
+            end
+        end
+    end
+    
+    if dataUpdate then
+        fuelHTML = profile(fuelWidget,'fuelWidget')
+        shipNameHTML = profile(shipNameWidget,'shipNameWidget')
+        dpsHTML = profile(dpsWidget,'dpsWidget')
+        systemCheckHTML = profile(systemCheckWidget,'systemCheckWidget')
+    end
+end
+
+function runUpdate()
+    Nav:update()
+    FPS_COUNTER = FPS_COUNTER + 1
+    ticker = ticker + 1
+
+    cAltitude = core.getAltitude()
+    if atmoManualLimit == 0 then
+        maxAtmoSpeed = construct.getFrictionBurnSpeed()*3.6
+    else
+        maxAtmoSpeed = atmoManualLimit
+    end
+    inAtmo = unit.getAtmosphereDensity() > 0
+
+    speedVec = vec3(constructVelocity)
+    speed = speedVec:len() * 3.6
+    if speed < 50 then speedVec = vec3(constructForward) end
+    if route and routes[route][route_pos] == autopilot_dest_pos then
+        maxSpeed = route_speed
+    else
+        maxSpeed = construct.getMaxSpeed() * 3.6
+    end
+    gravity = core.getGravityIntensity()
+    mass = construct.getMass()
+    constructPosition = vec3(construct.getWorldPosition())
+    maxBrake = json.decode(unit.getWidgetData()).maxBrake
+    if maxBrake == nil then maxBrake = 0 end
+    maxThrustTags = 'thrust'
+    if #enabledEngineTags > 0 then
+        maxThrustTags = maxThrustTags .. ' disengaged'
+        for i,tag in pairs(enabledEngineTags) do
+            maxThrustTags = maxThrustTags .. ',thrust '.. tag
+        end
+    end
+    maxThrust = construct.getMaxThrustAlongAxis(maxThrustTags,construct.getOrientationForward())
+    maxSpaceThrust = math.abs(maxThrust[3])
+
+    dockedMass = 0
+    for _,id in pairs(construct.getDockedConstructs()) do 
+        dockedMass = dockedMass + construct.getDockedConstructMass(id)
+    end
+    for _,id in pairs(construct.getPlayersOnBoard()) do 
+        dockedMass = dockedMass + construct.getBoardedPlayerMass(id)
+    end
+    brakeDist,brakeTime = Kinematic.computeDistanceAndTime(speedVec:len(),0,mass + dockedMass,0,0,maxBrake)
+    accel = vec3(construct.getWorldAcceleration()):len()
+
+    -- SCREEN UPDATES --
+    if autopilot_dest and speed > 1000 then
+        local balance = vec3(autopilot_dest - constructPosition):len()/(speed/3.6) --meters/(meter/second) == seconds
+        local seconds = balance % 60
+        balance = balance // 60
+        local minutes = balance % 60
+        balance = balance // 60
+        local hours = balance % 60
+        apHTML = [[
+            <text x="537.6" y="59.4" style="fill: rgba(200, 225, 235, 1)" font-size="]].. font_size_ratio+0.42 ..[[vh" font-weight="bold">ETA: ]]..string.format('%.0f:%.0f.%.0f',hours,minutes,seconds)..[[</text>
+        ]]
+    end
+
+    apBG = bgColor
+    if autopilot then apBG = 'rgba(99, 250, 79, 0.5)' apStatus = 'Engaged' if route and routes[route][route_pos] == autopilot_dest_pos then apStatus = route end end
+    if not autopilot and autopilot_dest ~= nil then apStatus = 'Set' if route and routes[route][route_pos] == autopilot_dest_pos then apStatus = route end end
+
+    if route_pos and route_pos ~= db_1.getIntValue('route_pos',route_pos) then db_1.setIntValue('route_pos',route_pos) end
+    -- END SCREEN UPDATES --
+
+    -- Generate Screen overlay --
+    if speed ~= nil and ticker % 3 == 0 then
+        ticker = 0
+        profile(generateScreen,'generateScreen')
+    end
+    -----------------------------
 end

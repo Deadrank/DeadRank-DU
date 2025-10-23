@@ -1,11 +1,10 @@
-name: DeadRemote v5.0.0
-
+name: DeadRemote v6.0.0
 slots:
     core:
         class: CoreUnit
     db:
         class: DataBank
-        select: all
+        select: manual
     radar:
         class: RadarPVPUnit
         select: manual
@@ -20,6 +19,9 @@ slots:
         select: all
     rocketfueltank:
         class: RocketFuelContainer
+        select: all
+    atmofueltank:
+        class: AtmoFuelContainer
         select: all
     antigrav:
         class: AntiGravityGeneratorUnit
@@ -55,10 +57,6 @@ handlers:
       args: ['screen']
       lua: |
 {{unit.onTimer.screen.lua}}
-    onTimer:
-      args: ['showCode']
-      lua: |
-{{unit.onTimer.showCode.lua}}
   system:
     onStart:
       lua: |
@@ -72,7 +70,6 @@ handlers:
     onInputText(text):
       lua: |
 {{system.onInputText.lua}}
-
     onActionStart:
       args: ['antigravity']
       lua: |
@@ -270,3 +267,7 @@ handlers:
     onAbsorbed(damage,rawDamage):
       lua: |
 {{shield.onAbsorbed.lua}}
+  core:
+    onStressChanged(stress):
+      lua: |
+{{core.onStressChanged.lua}}

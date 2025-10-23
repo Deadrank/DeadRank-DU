@@ -8,9 +8,7 @@ elseif string.find(AT,'thermic') then AT = 'Thermic'
 end
 
 if printCombatLog then 
-    system.print(string.format('Hit %s for %.0f damage',radar_1.getConstructName(targetId),damage))
-    system.print(string.format('%.0f%% resist against %s',(1-damage/baseDamage)*100,AT))
-    system.print()
+    system.print(string.format('Hit %s for %.0f damage (%.0f%% %s)',radar_1.getConstructName(targetId),damage,(1-damage/baseDamage)*100,AT))
 end
 
 if dmgTracker[tostring(targetId)] then 
@@ -19,12 +17,9 @@ else
     dmgTracker[tostring(targetId)] = damage
 end
 
-local ts = system.getArkTime()
-if dpsTracker[string.format('%.0f',ts/10)] then
-    dpsTracker[string.format('%.0f',ts/10)] = dpsTracker[string.format('%.0f',ts/10)] + damage
-    dpsChart[1] = dpsTracker[string.format('%.0f',ts/10)]
+local dmgTime = tonumber(string.format('%.0f',arkTime))
+if not dpsChart[dmgTime] then
+    dpsChart[dmgTime] = damage
 else
-    dpsTracker[string.format('%.0f',(ts-10)/10)] = nil
-    dpsTracker[string.format('%.0f',ts/10)] = damage
-    table.insert(dpsChart,1,damage)
+    dpsChart[dmgTime] = dpsChart[dmgTime] + damage
 end

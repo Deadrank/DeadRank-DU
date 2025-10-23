@@ -62,10 +62,16 @@ if type(tonumber(text)) == 'number' and (#text == 3 or text == '0') then
             system.print('-- Removing primary target filter --')
             primary = nil
             radarFilter = 'All'
+            if not slave and write_db then
+                write_db.clearValue('primaryTarget')
+            end
     else
         system.print(string.format('-- Adding primary target filter [%s] --',text))
         primary = tostring(text)
         radarFilter = 'primary'
+        if not slave and write_db then
+            write_db.setStringValue('primaryTarget',tostring(text))
+        end
     end
 end
 if text:lower() == 'print db' then
@@ -238,6 +244,15 @@ if text:lower() == 'clear tracking' then
     manual_trajectory = {}
     trajectory_calc = {}
 end
+if text:lower() == 'add' then
+    if not contains(primaries,tostring(radarSelected)) and radarSelected ~= '0' then
+        system.print(string.format('-- Adding %s to primary radar--',radarSelected))
+        table.insert(primaries,tostring(radarSelected))
+    end
+    for _,t in pairs(primaries) do
+        system.print(t)
+    end
+end
 if string.starts(text:lower(), 'a') and (#text == 4) and type(tonumber(string.sub(text,2))) then
     if not contains(primaries,string.sub(text,2)) then
         system.print(string.format('-- Adding %s to primary radar--',string.sub(text,2)))
@@ -274,4 +289,41 @@ if text:lower() == 'primary radar on' then
         system.print('-- Enabling primary target radar --')
         primaryRadarID,primaryRadarPanelID = RadarWidgetCreate('PRIMARY TARGETS')
     end
+end
+
+if text:lower() == 'show weapons' then
+    weaponWidgets = true
+    for k,weapon in pairs(weaponData) do
+        if not weapon['widget'] then
+            local _widget = nil
+            _widget = system.createWidget(weaponPanel, weapon['type'])
+            weapon['widget'] = _widget
+            system.addDataToWidget(weapon['Data'],_widget)
+            weapon['shown'] = true
+        end
+    end
+    system.print('-- Showing available weapon widgets --')
+end
+
+if text:lower() == 'hide weapons' then
+    weaponWidgets = false
+    system.print('-- Hiding weapon widgets --')
+    for k,weapon in pairs(weaponData) do
+        system.destroyWidget(weapon['widget'])
+        weapon['widget'] = nil
+        weapon['shown'] = false
+    end
+    WeaponWidgetCreate(false)
+end
+if text:lower() == 'record' then
+    recordAll = not recordAll
+    if recordAll then
+        db_1.setIntValue('record',1)
+    else
+        db_1.setIntValue('record',0)
+    end
+    system.print(string.format('-- Contact recording: %s --',recordAll))
+end
+if text == 'slave' then
+    system.print('-- Slave Radar Primary: '..slaveRadarPrimary)
 end

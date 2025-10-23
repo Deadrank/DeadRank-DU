@@ -10,6 +10,8 @@ showAlerts = false
 
 -- SETTINGS --
 useDB = true --export use connected DB for config options
+dmgAvgDuration = 10 --export Duration to avg incoming damage over
+slave = false --export Show slave radar widget
 szAlerts = false --export
 minimalWidgets = false --export
 hideAbandonedCores = true --export
@@ -19,16 +21,9 @@ validatePilot = false --export
 pilotSeat = false --export
 targetRadar = false --export 2nd Radar widget with primary targets
 weaponWidgets = true --export Show weapon widgets (stasis always shown)
+excludeXS = true --export
 abandonedCoreDist = 10 --export Distance in AR to show abandoned cores in SU
 dangerWarning = 4 --export
-bottomHUDLineColorSZ = 'rgba(150, 175, 185, .75)' --export
-bottomHUDFillColorSZ = 'rgba(25, 25, 50, 0.35)' --export
-textColorSZ = 'rgba(225, 250, 265, 1)' --export
-bottomHUDLineColorPVP = 'rgba(220, 50, 50, .75)' --export
-bottomHUDFillColorPVP = 'rgba(175, 75, 75, 0.30)' --export
-textColorPVP = 'rgba(225, 250, 265, 1)' --export
-neutralLineColor = 'lightgrey' --export
-neutralFontColor = 'white' --export
 L_Shield_HP = 11500000 --export
 M_Shield_HP = 8625000 --export
 S_Shield_HP = 8625000 --export
@@ -36,27 +31,8 @@ XS_Shield_HP = 500000 --export
 max_radar_load = 300 --export
 maxWeaponsPerWidget = 3 --export How many weapons in each default weapon widget
 radarBuffer = 0.00001
-warning_size = 0.75 --export How large the warning indicators should be
-warning_outline_color = 'rgb(255, 60, 60)' --export
-warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
-
-antiMatterColor = 'rgb(56, 255, 56)' --export
-electroMagneticColor = 'rgb(27, 255, 217)' --export
-kineticColor = 'rgb(255, 75, 75)' --export
-thermicColor = 'rgb(255, 234, 41)' --export
-
--- Radar Info Widget --
-friendlyTextColor = 'rgb(60, 255, 60)' --export
-radarInfoWidgetX = 29 --export
-radarInfoWidgetY = 67 --export
-radarInfoWidgetScale = 11.25 --export
-
-radarInfoWidgetXmin = 67.5 --export
-radarInfoWidgetYmin = -0.9 --export
-radarInfoWidgetScalemin = 10 --export
 
 lAlt = false
------------------------------------------
 
 -- Choose DB for seat --
 write_db = nil
@@ -74,6 +50,7 @@ if not found then
             write_db = dbName
             write_db.setStringValue('usedBy',chairID)
             found = true
+            break
         end
     end
 end
@@ -88,22 +65,26 @@ if useDB and write_db ~= nil then
 end
 
 --- Radar Initial Values ---
+recordAll = false
+slaveRadarPrimary = '0'
+radarSelected = '0'
 constructPosition = vec3(construct.getWorldPosition())
 manual_trajectory = {}
 trajectory_calc = {}
 cr = nil
-cr_time = nil
-cr_delta = nil
+cr_time = 0
+cr_delta = 0
 constructListData = {}
 radarWidgetData = nil
+radarTrackingData = {}
 radarFriendlies = {}
 radarDataID = nil
 primaryRadarID = nil
 primaryRadarPanelID = nil
 primaryData = nil
-primaries = {}
 radarStart = false
 filterSize = {}
+table.insert(filterSize,'XL')
 table.insert(filterSize,'L')
 table.insert(filterSize,'M')
 table.insert(filterSize,'S')
@@ -116,6 +97,15 @@ table.insert(validSizes,'L')
 table.insert(validSizes,'M')
 table.insert(validSizes,'S')
 table.insert(validSizes,'XS')
+radarKind = {}
+table.insert(radarKind,'Universe')
+table.insert(radarKind,'Planet')
+table.insert(radarKind,'Asteroid')
+table.insert(radarKind,'Static')
+table.insert(radarKind,'Dynamic')
+table.insert(radarKind,'Space')
+table.insert(radarKind,'Alien')
+table.insert(radarKind,'Beacon')
 radarStats = {
     ['enemy'] = {
         ['L'] = 0,
@@ -139,13 +129,21 @@ speedCompare = 0
 gapCompare = 0
 identifiedBy = 0
 attackedBy = 0
+closestEnemy = {}
 warpScan = {}
 unknownRadar = {}
 radarContactNumber = 0
+primaries = {}
+if pcall(require,'autoconf/custom/hvt') then 
+    primaries = require('autoconf/custom/hvt') 
+end
+scout_info = {}
+if pcall(require,'autoconf/custom/scouting') then 
+    scout_info = require('autoconf/custom/scouting')
+end
 ------------------------------
 
 --- Screen Resolution/keys ---
-screenCount = 1
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 --------------------------
@@ -162,13 +160,12 @@ inSZ = not construct.isInPvPZone()
 SZD = construct.getDistanceToSafeZone()
 
 --- Weapons --
-dpsTracker = {}
 dpsChart = {}
-dpsChart[1] = 0
-dpsChart[2] = 0
-dpsChart[3] = 0
-dpsChart[4] = 0
-weaponDataList = {}
+weaponPanel = nil
+weaponData = {}
+stasisData = {}
+stasis = false
+shown_weapons = {}
 shieldDmgTrack = {
     ['L'] = L_Shield_HP,
     ['M'] = M_Shield_HP,
@@ -192,7 +189,7 @@ if validatePilot then
 end
 
 -- AR Initialization --
-AR_Mode = 'ALL'
+ar_mode = 'ALL'
 AR_Range = 3
 AR_Size = 8
 AR_Fill = 'rgb(29, 63, 255)'
@@ -202,6 +199,17 @@ FC = nil
 fc_pos = nil
 SL = nil
 sl_pos = nil
+
+-- HTML Initialization --
+arHTML = ''
+weaponHTML = ''
+radarHTML = ''
+identHTML = ''
+dpsHTML = ''
+warningsHTML = ''
+screen_update = 0
+arkTime = system.getArkTime()
+
 ----------------------
 
 warnings = {}
@@ -295,14 +303,16 @@ instructionHTML = ''
 
 unit.setTimer('booting',1)
 
-unit.setTimer('screen',screenRefreshRate)
+unit.setTimer('screen',.5)
 system.showScreen(1)
 
 showScreen = true
 lShift = false
 
 radarRange = 0
+radar = nil
 if radar_1 ~= nil then
+    radar = radar_1
     radarRange = radar_1.getIdentifyRanges()
     if #radarRange > 0 then
         radarRange = radarRange[1]

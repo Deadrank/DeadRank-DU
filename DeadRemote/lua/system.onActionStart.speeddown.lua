@@ -5,13 +5,3 @@ if player.isFrozen() or seated then
         Nav.axisCommandManager:updateCommandFromActionStart(axisCommandId.longitudinal, -5.0)
     end
 end
-
-if auto_follow then
-    system.print('Lowering speed: ' .. tostring(followSpeedMod))
-    if lAlt then
-        followSpeedMod = followSpeedMod - 250
-    else
-        followSpeedMod = followSpeedMod - 500
-    end
-    system.print('Lowered speed to: ' .. tostring(followSpeedMod))
-end

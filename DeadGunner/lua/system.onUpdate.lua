@@ -1,5 +1,13 @@
 constructPosition = vec3(construct.getWorldPosition())
+arkTime = system.getArkTime()
+
 -- Radar Updates --
+
+if write_db then
+    --system.print(string.format('%s',write_db.hasKey('record')))
+    if write_db.hasKey('record') and write_db.getIntValue('record') == 1 then recordAll = true else recordAll = false end
+end
+
 if radar_1 and cr == nil then
     cr = coroutine.create(updateRadar)
 elseif cr ~= nil then
@@ -8,12 +16,12 @@ elseif cr ~= nil then
     elseif coroutine.status(cr) == "dead" then
         cr = nil
         system.updateData(radarDataID,radarWidgetData)
-        if targetRadar then system.updateData(primaryRadarID,primaryData) end
+        if targetRadar or slave then system.updateData(primaryRadarID,primaryData) end
         if not cr_time then
-            cr_time = system.getArkTime()
+            cr_time = arkTime
         else
-            cr_delta = system.getArkTime() - cr_time
-            cr_time = system.getArkTime()
+            cr_delta = arkTime - cr_time
+            cr_time = arkTime
             if cr_delta > 1 or showAlerts then
                 warnings['radar_delta'] = 'svgCritical'
             else
@@ -24,31 +32,12 @@ elseif cr ~= nil then
 end
 ---- End Radar Updates ----
 
-if screenCount % 4 == 0 then
-    screenCount = 1
-    arkTime = system.getArkTime()
 
-    -- SZ Boundary --
-    inSZ = not construct.isInPvPZone()
-    SZD = construct.getDistanceToSafeZone()
-    bgColor = bottomHUDFillColorSZ 
-    fontColor = textColorSZ
-    lineColor = bottomHUDLineColorSZ
-    if not inSZ then 
-        lineColor = bottomHUDLineColorPVP
-        bgColor = bottomHUDFillColorPVP
-        fontColor = textColorPVP
-    end
-    ---------------------
-
-    if bootTimer >= 2 then
-        generateHTML()
-    end
-
+if screen_update % 4 == 0 then
     -- Generate on screen combat points for Augmented Reality view --
     AR_Generate = {}
     local tID = radar_1.getTargetId()
-    if AR_Mode == 'ALL' then
+    if ar_mode == 'ALL' then
         if write_db then
             for _,key in pairs(write_db.getKeyList()) do
                 if string.starts(key,'abnd-') and not string.starts(key,'abnd-name-') then
@@ -57,7 +46,11 @@ if screenCount % 4 == 0 then
                     local dist = vec3(abndVec - constructPosition):len()*0.000005
                     if radar_1 and dist < 1.95 then
                         if radar_1.getConstructDistance(string.sub(key,6)) ~= 0 then
-                            table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
+                            if write_db.hasKey(string.gsub(key,'abnd','kill')) then
+                                table.insert(AR_Generate,{[1]='[KILL] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
+                            else
+                                table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = abndVec})
+                            end
                         elseif not inSZ then
                             system.print('-- Removing '.. write_db.getStringValue(string.gsub(key,'-','-name-')) ..' ('.. write_db.getStringValue(key) ..')')
                             write_db.clearValue(string.gsub(key,'-','-name-'))
@@ -111,9 +104,9 @@ if screenCount % 4 == 0 then
         end
         for k,v in pairs(radarFriendlies) do
             local temp_pos = string.format('::pos{0,0,%.2f,%.2f,%.2f}',v[2][1],v[2][2],v[2][3])
-            table.insert(AR_Generate,{[1]='['.. v[1] ..']', [2] = convertWaypoint(temp_pos)})
+            table.insert(AR_Generate,{[1]=v[1], [2] = convertWaypoint(temp_pos)})
         end
-    elseif AR_Mode == 'FLEET' then
+    elseif ar_mode == 'FLEET' then
         if FC then
             if radar_1.hasMatchingTransponder(FC) then
                 local temp = radar_1.getConstructWorldPos(FC)
@@ -132,16 +125,6 @@ if screenCount % 4 == 0 then
                 table.insert(AR_Generate,{[1]='Squad Leader [LAST KNOWN]', [2] = convertWaypoint(sl_pos)})
             end
         end
-    elseif AR_Mode == 'ABANDONDED' then
-        if write_db then
-            for _,key in pairs(write_db.getKeyList()) do
-                if string.starts(key,'abnd-') and not string.starts(key,'abnd-name-') then
-                    abndPos = write_db.getStringValue(key)
-                    table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = convertWaypoint(abndPos)})
-                end
-            end
-        end
-    elseif AR_Mode == 'TRAJECTORY' then
         local rem = {}
         for id,tbl in pairs(manual_trajectory) do
             for i,v in pairs(manual_trajectory[tostring(id)]) do
@@ -162,6 +145,15 @@ if screenCount % 4 == 0 then
             local dist = v['speed']*(arkTime-v['ts'])
             table.insert(AR_Generate,{[1]=string.format('Location [%s]',string.sub(tostring(id),-3)), [2] = v['p1'] + dist*(v['p2']-v['p1'] )/vec3(v['p2']-v['p1'] ):len()})
         end
+    elseif ar_mode == 'ABANDONDED' then
+        if write_db then
+            for _,key in pairs(write_db.getKeyList()) do
+                if string.starts(key,'abnd-') and not string.starts(key,'abnd-name-') then
+                    abndPos = write_db.getStringValue(key)
+                    table.insert(AR_Generate,{[1]='[CORED] '..write_db.getStringValue(string.gsub(key,'-','-name-')), [2] = convertWaypoint(abndPos)})
+                end
+            end
+        end
     end
     ARSVG = {}
     ARSVG[#ARSVG+1] = '<svg width="100%" height="100%" style="position: absolute;left:0%;top:0%;font-family: Calibri;">'
@@ -169,7 +161,7 @@ if screenCount % 4 == 0 then
         local name = v[1]
         local pos = v[2]
         local pDist = vec3(pos - constructPosition):len()
-        if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ) ) or (string.starts(name,'[') and not string.starts(name,'[CORED]')) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
+        if (pDist*0.000005 < abandonedCoreDist and (pDist*0.000005 > 1.95 or inSZ or string.starts(name,'[KILL]')) ) or (string.starts(name,'[') and not string.starts(name,'[CORED]')) or string.starts(name,'Fleet Commander') or string.starts(name,'Squad Leader') or string.starts(name,'T-') or string.starts(name,'Location ') then 
             local pInfo = library.getPointOnScreen({pos['x'],pos['y'],pos['z']})
 
             if pInfo[3] ~= 0 then
@@ -218,12 +210,18 @@ if screenCount % 4 == 0 then
                             <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:]]..AR_Opacity..[[;" />
                             <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: ]]..AR_Outline..[[" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s (%s)',name,pDistStr)..[[</text>
                             </g>]]
-                elseif string.starts(name,'[') and not string.starts(name,'[CORED]') then
+                elseif string.starts(name,'[') and not string.starts(name,'[CORED]') and not string.starts(name,'[KILL]') then
                     ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
                             <circle cx="0" cy="0" r="]].. depth ..[[px" style="fill: rgba(255,150,0,0); stroke:rgba(255, 255, 255, .75);stroke-width:2;" />
                             <line x1="0" y1="0" x2="-]].. depth*1.2 ..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                             <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]]..tostring(depth*1.2 + 30)..[[" y2="-]].. depth*1.2 ..[[" style="stroke:]]..AR_Outline..[[;stroke-width:1;opacity:1;" />
                             <text x="-]]..tostring(6*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(250, 250, 250, .90);" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s',name)..[[</text>
+                            </g>]]
+                elseif string.starts(name,'[KILL]') then
+                    ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
+                            <line x1="-]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 0, 0, 1);stroke-width:3;opacity:1;" />
+                            <line x1="]].. depth*1.2 ..[[" y1="-]].. depth*1.2 ..[[" x2="-]].. depth*1.2 ..[[" y2="]].. depth*1.2 ..[[" style="stroke:rgba(125, 0, 0, 1);stroke-width:3;opacity:1;" />
+                            <text x="-]]..tostring(2*#name+depth*1.2)..[[" y="-]].. depth*1.2+screenHeight*0.0035 ..[[" style="fill: rgba(250, 250, 250, .90);" font-size="]]..tostring(.075*AR_Size)..[[vw">]]..string.format('%s',name)..[[</text>
                             </g>]]
                 else
                     ARSVG[#ARSVG+1] = [[<g transform="translate]]..translate..[[">
@@ -237,7 +235,11 @@ if screenCount % 4 == 0 then
         end
     end
     ARSVG[#ARSVG+1] = '</svg>'
+    arHTML =  table.concat(ARSVG,'')
     -----------------------------------------------------------
-else
-    screenCount = screenCount + 1
+
+    if bootTimer >= 2 then
+        generateHTML()
+    end
 end
+screen_update = screen_update + 1

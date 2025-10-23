@@ -4,71 +4,34 @@ pilotName = system.getPlayerName(masterPlayerID)
 validPilotCode = '123456' --Your player ID
 ----------------------
 
-------- Predifined Engine Tags -------
-predefinedTags = {}
-table.insert(predefinedTags,'military')
-table.insert(predefinedTags,'maneuver')
-table.insert(predefinedTags,'freight')
---------------------------------------
-
-showAlerts = false
-
----------------------------------------
-
-hudVersion = 'v5.0.0'
+hudVersion = 'v5.0.14-min'
 system.print('-- '..hudVersion..' --')
-screenRefreshRate = 0.10 --export
+offset_points = false --export Puts additional position markers around your ship
+dampenerTorqueReduction = .01 --export 0 is no adjustors, 1 is full adjustors
+screenRefreshRate = 0.25 --export
+dataUpdateRatio = 3 --export Rate to update data whole number (shields, fuel, etc)
 useDB = true --export
-caerusOption = false --export
+atmoManualLimit = 0 --export Manually limit speed in atmosphere
 validatePilot = false --export
 toggleBrakes = true --export
 autoVent = true --export Autovent shield at 0 hp
-asteroidPipes = false --export Calculate pipes to "Asteroids.lua" file
+dmgAvgDuration = 10 --export Duration to avg incoming damage over
 trackerMode = false --export Use input position tags as location trackers instead of auto-pilot
 trackerList = {}
 homeBaseLocation = '' --export Location of home base (to turn off shield)
 homeBaseDistance = 5 --export Distance from home base to turn off shield (km)
-defaultHoverHeight = 42 --export
 boosterSpeedThreshold = 55000 --export km/h
-topHUDLineColorSZ = 'rgba(150, 175, 185, .75)' --export
-topHUDFillColorSZ = 'rgba(25, 25, 50, 0.35)' --export
-textColorSZ = 'rgba(225, 250, 265, 1)' --export
-topHUDLineColorPVP = 'rgba(220, 50, 50, .75)' --export
-topHUDFillColorPVP = 'rgba(175, 75, 75, 0.30)' --export
-textColorPVP = 'rgba(225, 250, 265, 1)' --export
-fuelTextColor = 'rgba(200, 225, 235, 1)' --export
-neutralFontColor = 'white' --export
-neutralLineColor = 'lightgrey' --export
-Indicator_Width = 1.5
-Direction_Indicator_Size = 5 --export
-Direction_Indicator_Color = 'rgba(200, 225, 235, 1)' --export
-Prograde_Indicator_Size = 7.5 --export
-Prograde_Indicator_Color = 'rgb(60, 255, 60)' --export
 AP_Brake_Buffer = 5000 --export
 AP_Max_Rotation_Factor = 10 --export
 AR_Mode = 'NONE' --export
-AR_Range = 3 --export
-AR_Size = 15 --export
-AR_Fill = 'rgb(29, 63, 255)' --export
-AR_Outline = 'rgba(125, 150, 160, 1)' --export
-AR_Opacity = '0.5' --export
 AR_Exclude_Moons = true --export
-EngineTagColor = 'rgb(60, 255, 60)' --export
 initialResistWait = 15
-autoVent = true
-warning_size = 0.75 --export How large the warning indicators should be.
-warning_outline_color = 'rgb(255, 60, 60)' --export
-warning_fill_color = 'rgba(50, 50, 50, 0.9)' --export
-useLogo = false --export Enable the logo to be shown on the HUD. Must use the logo variable in unit.onStart and logo must be in SVG format.
-logoSVG = '' --export SVG Logo that will be placed in the top left of the HUD (automatically scaled)
-showRemotePanel = false --export
-showDockingPanel = false --export
-showFuelPanel = false --export
-showHelper = false --export
-showShieldWidget = false --export
 dampening = true --inertial dampening
+route_speed = 20000 --export max speed to fly routes
+font_size_ratio = 1.0 --export Font size scaling
+if font_size_ratio == 0 then font_size_ratio = 0.1 end
+debug = false --export collect and print debug data
 
-minimalWidgets = false
 -- HP (Shield/CCS) widget --
 shieldProfile = 'auto'
 resistProfiles = {}
@@ -82,33 +45,35 @@ resistProfiles['em'] = {['am']=0, ['em']=1, ['kn']=0, ['th']=0}
 resistProfiles['kn'] = {['am']=0, ['em']=0, ['kn']=1, ['th']=0}
 resistProfiles['th'] = {['am']=0, ['em']=0, ['kn']=0, ['th']=1}
 
-hpWidgetX = 33 --export
-hpWidgetY = 88 --export
-hpWidgetScale = 17 --export
-shieldHPColor = 'rgb(25, 247, 255)' --export
-ccsHPColor = 'rgb(60, 255, 60)' --export
--- Resist Widget --
-resistWidgetX = 45 --export
-resistWidgetY = 82 --export
-resistWidgetScale = 8.5 --export
-antiMatterColor = 'rgb(56, 255, 56)' --export
-electroMagneticColor = 'rgb(27, 255, 217)' --export
-kineticColor = 'rgb(255, 75, 75)' --export
-thermicColor = 'rgb(255, 234, 41)' --export
+-- Element Damage Groups --
+DamageGroupMap = {}
+DamageGroupMap['Engine'] = {}
+DamageGroupMap['Engine']['Total'] = 0
+DamageGroupMap['Engine']['Current'] = 0
 
--- Transponder Widget --
-transponderWidgetX = 40 --export
-transponderWidgetY = 67 --export
-transponderWidgetScale = 11.25 --export
+DamageGroupMap['Control'] = {}
+DamageGroupMap['Control']['Total'] = 0
+DamageGroupMap['Control']['Current'] = 0
 
-transponderWidgetXmin = 58.5 --export
-transponderWidgetYmin = -0.9 --export
-transponderWidgetScalemin = 10 --export
+DamageGroupMap['Weapons'] = {}
+DamageGroupMap['Weapons']['Total'] = 0
+DamageGroupMap['Weapons']['Current'] = 0
 
--- Ship information Widget --
-shipInfoWidgetX = 76.5
-shipInfoWidgetY = -0.9
-shipInfoWidgetScale = 10
+DamageGroupMap['Misc'] = {}
+DamageGroupMap['Misc']['Total'] = 0
+DamageGroupMap['Misc']['Current'] = 0
+
+brokenElements = {}
+brokenElements['Engine'] = {}
+brokenElements['Control'] = {}
+brokenElements['Weapons'] = {}
+
+brokenDisplay = {}
+brokenDisplay['Engine'] = ''
+brokenDisplay['Control'] = ''
+brokenDisplay['Weapons'] = ''
+
+fontColor = 'Red;'
 
 -- WayPoint File Info
 validWaypointFiles = {}
@@ -116,19 +81,12 @@ validWaypointFiles = {}
 boosterOn = false
 boosterPulseOn = false
 boosterCount = 0
-screenCount = 0
 
 
 userCode = {}
 userCode[validPilotCode] = pilotName
 if db_1 ~= nil and useDB then
     globalDB('get')
-end
-
-if caerusOption then
-    shipInfoWidgetX = 53
-    shipInfoWidgetY = 80
-    shipInfoWidgetScale = 12
 end
 
 if db_1 ~= nil then
@@ -138,6 +96,8 @@ if db_1 ~= nil then
         end
     end
 end
+
+-----------------
 
 -- Transponder --
 showCode = false
@@ -158,25 +118,79 @@ unit.setTimer('code',0.25)
 -----------------
 
 ---- Initialization ---
+ticker = 0
 arkTime = system.getArkTime()
-dpsTracker = {}
 dpsChart = {}
-dpsChart[1] = 0
-dpsChart[2] = 0
-dpsChart[3] = 0
-dpsChart[4] = 0
+CCSPercent = 0
+ccsHTML = ''
+shieldPercent = 0
+shieldHTML = ''
+shieldWarningHTML = ''
+ventHTML = ''
+shield_resist_cd = 0
+amS = 0
+emS = 0
+knS = 0
+thS = 0
+amR = 0
+emR = 0
+knR = 0
+thR = 0
 constructPosition = vec3(construct.getWorldPosition())
+constructForward = vec3(construct.getWorldOrientationForward())
+constructVelocity = vec3(construct.getWorldVelocity())
+speed = 0
+apHTML = ''
+apStatus = 'inactive'
+apBG = ''
+SZDStr = ''
+cName = construct.getName()
+cID = construct.getId()
 cr = nil
 cr_ar = nil
-followID = nil
-followSpeedMod = 0
+hoverLocked = false
+
+-- Orbit globals
+orbit_active = false
+orbit_center = vec3(0,0,0)
+orbit_radius = 0
+orbit_agl = 0    -- meters above ground
+
+-- Optional: Height hold PID (simple P for now; expand if oscillation occurs)
+height_kp = 0.05  -- Proportional: Tune for response (e.g., 0.01-0.1)
+height_ki = 0.01  -- Integral: Tune for steady-state (e.g., 0.005-0.02)
+height_kd = 0.1   -- Derivative: Tune for damping (e.g., 0.05-0.2)
+height_integral = 0
+height_last_error = 0
+height_i_max = 100  -- Anti-windup limit (adjust based on error units in meters)
+radius_kp = 0.5  -- Tune: for radial correction
+roll_kp = 0.1  -- New: For roll correction
+-------
+
+dockedMass = 0
+maxThrustTags = 'thrust'
+FPS = 0
+FPS_COUNTER = 0
+FPS_INTERVAL = arkTime
 
 AR_Custom_Points = {}
 AR_Custom = false
 AR_Temp = false
 AR_Temp_Points = {}
-asteroidPipeList = {}
 AR_Array = {}
+dpsHTML = ''
+fuelHTML = ''
+shipNameHTML = shipNameWidget()
+systemCheckHTML = ''
+
+profiling_data = {}
+fps_data = {}
+fps_data['min'] = 999
+fps_data['max'] = 0
+fps_data['count'] = 0
+fps_data['sum'] = 0
+dataUpdateCounter = 0
+
 
 legacyFile = false
 if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
@@ -186,7 +200,6 @@ if pcall(require,'autoconf/custom/DeadRemote_CustomFileIndex') then
             system.print('Found waypointFileId: '..waypointFileId..' displayName='..waypointFile.DisplayName..' waypointFilePath='..waypointFile.FilePath)
             if pcall(require,waypointFile.FilePath) then
                 waypoints = require(waypointFile.FilePath)
-                if asteroidPipes and waypointFile.DisplayName == 'Asteroids' then asteroidPipeList = waypoints end
                 if type(waypoints) == "table" then
                     table.insert(validWaypointFiles,waypointFile)
                     AR_Array[#validWaypointFiles] = {}
@@ -215,10 +228,30 @@ else
     end
 end
 
+-- Import routes file --
+routes = {}
+route = nil
+route_pos = nil
+if db_1 then
+    db_1.setIntValue('record',0)
+end
+if pcall(require,'autoconf/custom/routes') then
+    routes = require('autoconf/custom/routes')
+end
+
 screenHeight = system.getScreenHeight()
 screenWidth = system.getScreenWidth()
 maxFuel = 0
+maxAtmoFuel = 0
+sFuelPercent = 0
+aFuelPercent = 0
+maxBrake = 0
+maxAtmoSpeed = construct.getFrictionBurnSpeed()*3.6
+inAtmo = unit.getAtmosphereDensity() > 0
+atmoSpeedLimit = true
+cAltitude = core.getAltitude()
 for i,v in pairs(spacefueltank) do maxFuel = maxFuel + v.getMaxVolume() end
+for i,v in pairs(atmofueltank) do maxAtmoFuel = maxAtmoFuel + v.getMaxVolume() end
 currentSystem = Atlas[0]
 planets = {}
 constructPosition = vec3(construct.getWorldPosition())
@@ -237,7 +270,34 @@ pipes = {}
 SZ = vec3(13771471, 7435803, -128971)
 inSZ = true
 enabledEngineTags = {}
+enabledEngineTagsStr = ''
+closestPipeStr = ''
+closestPlanetStr = ''
 milEng = false
+if shield_1 then
+    srp = shield_1.getResistancesPool()
+    csr = shield_1.getResistances()
+    rcd = shield_1.getResistancesCooldown()
+    rem = shield_1.getResistancesRemaining()
+    srr = shield_1.getStressRatioRaw()
+    maxCD = shield_1.getResistancesMaxCooldown()
+    venting = shield_1.isVenting()
+    shp = shield_1.getShieldHitpoints()
+    maxSHP = shield_1.getMaxShieldHitpoints()
+    ventCD = shield_1.getVentingCooldown()
+else
+    srp = {}
+    csr = {}
+    rcd = 0
+    rem = 0
+    srr = {}
+    maxCD = 0
+    venting = 0
+    shp = 0
+    maxSHP = 0
+    ventCD = 0
+end
+coreHP = 0
 ------------------------------------
 
 -- Shield Initialize --
@@ -258,39 +318,12 @@ Nav = Navigator.new(system, core, unit)
 Nav.axisCommandManager:setupCustomTargetSpeedRanges(axisCommandId.longitudinal, {1000, 5000, 10000, 20000, 30000, 40000, 50000})
 Nav.axisCommandManager:setTargetGroundAltitude(0)
 
--- Parenting widget
-if showDockingPanel then
-    parentingPanelId = system.createWidgetPanel("Docking")
-    parentingWidgetId = system.createWidget(parentingPanelId,"parenting")
-    system.addDataToWidget(unit.getDataId(),parentingWidgetId)
-end
-
 
 -- element widgets
--- For now we have to alternate between PVP and non-PVP widgets to have them on the same side.
-if not showRemotePanel then
-    unit.hideWidget()
-    core.hideWidget()
-else
-    unit.showWidget()
-    core.showWidget()
-end
+unit.hideWidget()
+core.hideWidget()
 
 placeRadar = true
-if atmofueltank_size > 0 and showFuelPanel then
-    _autoconf.displayCategoryPanel(atmofueltank, atmofueltank_size, "Atmo Fuel", "fuel_container")
-    if placeRadar then
-        _autoconf.displayCategoryPanel(radar, radar_size, "Radar", "radar")
-        placeRadar = false
-    end
-end
-if spacefueltank_size > 0 and showFuelPanel then
-    _autoconf.displayCategoryPanel(spacefueltank, spacefueltank_size, "Space Fuel", "fuel_container")
-    if placeRadar then
-        _autoconf.displayCategoryPanel(radar, radar_size, "Radar", "radar")
-        placeRadar = false
-    end
-end
 _autoconf.displayCategoryPanel(rocketfueltank, rocketfueltank_size, "Rocket Fuel", "fuel_container")
 if placeRadar then -- We either have only rockets or no fuel tanks at all, uncommon for usual vessels
     _autoconf.displayCategoryPanel(radar, radar_size, "Radar", "radar")
@@ -299,7 +332,6 @@ end
 if antigrav ~= nil then antigrav.showWidget() end
 if warpdrive ~= nil then warpdrive.showWidget() end
 if gyro ~= nil then gyro.showWidget() end
-if shield_1 ~= nil and showShieldWidget then shield_1.showWidget() end
 
 -- freeze the player in he is remote controlling the construct
 seated = player.isSeated()
@@ -307,9 +339,7 @@ if seated then
     player.freeze(1)
 end
 
-if not showHelper then
-    system.showHelper(0)
-end
+system.showHelper(0)
 
 -- landing gear
 -- make sure every gears are synchonized with the first
@@ -331,7 +361,11 @@ lAlt = false
 if validatePilot then
     local validPilot = false
     for k,v in pairs(userCode) do 
-        if k == tostring(player.getId()) then validPilot = true system.print(string.format('-- Welcome %s --',pilotName)) break end
+        if k == tostring(player.getId()) then 
+            validPilot = true 
+            system.print(string.format('-- Welcome %s --',pilotName)) 
+            break
+        end
     end
     if not validPilot then
         system.print(player.getId())
@@ -437,7 +471,5 @@ warningSymbols['svgBrakes'] = [[
                     </g>
                 </svg>
             ]]
-
-
 unit.setTimer('screen',screenRefreshRate)
 system.showScreen(1)

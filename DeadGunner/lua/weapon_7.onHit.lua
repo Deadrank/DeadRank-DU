@@ -1,5 +1,5 @@
-local baseDamage = weapon_1.getBaseDamage()
-local AT = system.getItem(weapon_1.getAmmo())
+local baseDamage = weapon_7.getBaseDamage()
+local AT = system.getItem(weapon_7.getAmmo())
 AT = tostring(AT['name']):lower()
 if string.find(AT,'antimatter') then AT = 'Antimatter'
 elseif string.find(AT,'electromagnetic') then AT = 'ElectroMagnetic'

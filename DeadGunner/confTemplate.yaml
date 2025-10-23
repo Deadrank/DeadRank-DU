@@ -1,4 +1,4 @@
-name: DeadGunner v5.0.0
+name: DeadGunner v6.0.0
 
 pvp: true
 
@@ -25,6 +25,14 @@ handlers:
     onLeave(id):
       lua: |
 {{radar_1.onLeave.lua}}
+  radar_2:
+    onEnter(id):
+      lua: |
+{{radar_2.onEnter.lua}}
+  radar_2:
+    onLeave(id):
+      lua: |
+{{radar_2.onLeave.lua}}
   unit:
     onStart:
       lua: |
@@ -86,6 +94,10 @@ handlers:
     onElementDestroyed(targetId,elementId):
       lua: |
 {{weapon.onElementDestroyed.lua}}
+  weapon_1:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
   weapon_2:
     onHit(targetId,damage):
       lua: |
@@ -98,6 +110,10 @@ handlers:
     onElementDestroyed(targetId,elementId):
       lua: |
 {{weapon.onElementDestroyed.lua}}
+  weapon_2:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
   weapon_3:
     onHit(targetId,damage):
       lua: |
@@ -110,6 +126,10 @@ handlers:
     onElementDestroyed(targetId,elementId):
       lua: |
 {{weapon.onElementDestroyed.lua}}
+  weapon_3:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
   weapon_4:
     onHit(targetId,damage):
       lua: |
@@ -122,6 +142,10 @@ handlers:
     onElementDestroyed(targetId,elementId):
       lua: |
 {{weapon.onElementDestroyed.lua}}
+  weapon_4:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
   weapon_5:
     onHit(targetId,damage):
       lua: |
@@ -134,6 +158,10 @@ handlers:
     onElementDestroyed(targetId,elementId):
       lua: |
 {{weapon.onElementDestroyed.lua}}
+  weapon_5:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
   weapon_6:
     onHit(targetId,damage):
       lua: |
@@ -146,3 +174,39 @@ handlers:
     onElementDestroyed(targetId,elementId):
       lua: |
 {{weapon.onElementDestroyed.lua}}
+  weapon_6:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
+  weapon_7:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_7.onHit.lua}}
+  weapon_7:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_7:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_7:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}
+  weapon_8:
+    onHit(targetId,damage):
+      lua: |
+{{weapon_8.onHit.lua}}
+  weapon_8:
+    onMissed(targetId):
+      lua: |
+{{weapon.onMissed.lua}}
+  weapon_8:
+    onElementDestroyed(targetId,elementId):
+      lua: |
+{{weapon.onElementDestroyed.lua}}
+  weapon_8:
+    onDestroyed(targetId):
+      lua: |
+{{weapon.onDestroyed.lua}}

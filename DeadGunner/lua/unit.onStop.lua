@@ -1,1 +1,4 @@
-if write_db ~= nil then write_db.clearValue('targetSpeed') write_db.clearValue('targetFollowDist') write_db.clearValue('targetID') globalDB('save') end
+if write_db ~= nil then
+    write_db.clearValue('primaryTarget')
+    globalDB('save')
+end

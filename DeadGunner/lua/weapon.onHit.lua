@@ -8,12 +8,9 @@ else
     dmgTracker[tostring(targetId)] = damage
 end
 
-local ts = system.getArkTime()
-if dpsTracker[string.format('%.0f',ts/10)] then
-    dpsTracker[string.format('%.0f',ts/10)] = dpsTracker[string.format('%.0f',ts/10)] + damage
-    dpsChart[1] = dpsTracker[string.format('%.0f',ts/10)]
+local dmgTime = tonumber(string.format('%.0f',arkTime))
+if not dpsChart[dmgTime] then
+    dpsChart[dmgTime] = damage
 else
-    dpsTracker[string.format('%.0f',(ts-10)/10)] = nil
-    dpsTracker[string.format('%.0f',ts/10)] = damage
-    table.insert(dpsChart,1,damage)
+    dpsChart[dmgTime] = dpsChart[dmgTime] + damage
 end
